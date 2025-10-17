@@ -16,7 +16,6 @@ app = FastAPI()
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# Allow React frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],

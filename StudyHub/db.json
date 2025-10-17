@@ -4,6 +4,16 @@
             "name": "khulood",
             "email": "khulood.g@gmail.com",
             "password": "12345"
+        },
+        {
+            "name": "khulood",
+            "email": "khulood2@gmail.com",
+            "password": "1234"
+        },
+        {
+            "name": "Nujood AlOtaibi",
+            "email": "N@gmail.com",
+            "password": "12345"
         }
     ]
 }

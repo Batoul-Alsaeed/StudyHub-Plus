@@ -36,7 +36,7 @@ function Register() {
         setName('');
         setEmail('');
         setPassword('');
-        navigate('/'); // redirect to login
+        navigate('/dashboard'); // redirect to dashboard
       } else {
         setError(data.detail || data.message || 'Registration failed.');
       }
