@@ -80,3 +80,54 @@ def login(data: dict, db: Session = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
     return {"message": "Login successful", "user": user.name}
+
+
+
+# Create a new Challenge (POST)
+@app.post("/api/challenges", response_model=schemas.ChallengeResponse)
+def create_challenge(challenge: schemas.ChallengeCreate, db: Session = Depends(get_db)):
+    new_challenge = models.Challenge(
+        title=challenge.title,
+        description=challenge.description,
+        level=challenge.level,
+        creator_name=challenge.creator_name,
+        start_date=challenge.start_date,
+        end_date=challenge.end_date
+    )
+    db.add(new_challenge)
+    db.commit()
+    db.refresh(new_challenge)
+
+    return new_challenge
+
+# Get All Challenges (GET)
+@app.get("/api/challenges", response_model=list[schemas.ChallengeResponse])
+def get_challenges(db: Session = Depends(get_db)):
+    challenges = db.query(models.Challenge).all()
+    return challenges
+
+
+# Join Challenge (POST)
+@app.post("/api/challenges/{challenge_id}/join")
+def join_challenge(challenge_id: int, db: Session = Depends(get_db)):
+    challenge = db.query(models.Challenge).filter(models.Challenge.id == challenge_id).first()
+
+    if not challenge:
+        raise HTTPException(status_code=404, detail="Challenge not found")
+
+    challenge.participants += 1
+    db.commit()
+    db.refresh(challenge)
+
+    return {"message": "Joined challenge successfully", "participants": challenge.participants}
+
+# Get Single Challenge by ID (GET)
+@app.get("/api/challenges/{challenge_id}", response_model=schemas.ChallengeResponse)
+def get_challenge(challenge_id: int, db: Session = Depends(get_db)):
+    challenge = db.query(models.Challenge).filter(models.Challenge.id == challenge_id).first()
+
+    if not challenge:
+        raise HTTPException(status_code=404, detail="Challenge not found")
+
+    return challenge
+

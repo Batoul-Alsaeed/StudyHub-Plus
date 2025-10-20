@@ -1,0 +1,36 @@
+.challenges-page {
+  padding: 30px;
+  background-color: #f5f2ec;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+}
+
+.ch-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+
+.challenge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.challenge-card {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.view-btn {
+  margin-top: 10px;
+  background-color: #8b7cd3;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
