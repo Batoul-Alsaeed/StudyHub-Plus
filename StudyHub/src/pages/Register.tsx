@@ -2,6 +2,8 @@ import { useState } from 'react';
 import '../css/Login.css';
 import illustration from '../assets/images/Register Image.png';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from "../contexts/AuthContext";
+
 
 function Register() {
   const [name, setName] = useState<string>('');
@@ -10,6 +12,8 @@ function Register() {
   const [error, setError] = useState<string>('');
   const navigate = useNavigate();
   const [success, setSuccess] = useState<string>('');
+  const { setUser } = useAuth();
+
 
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -32,10 +36,11 @@ function Register() {
       const data = await response.json();
 
       if (response.ok) {
-        setSuccess(`Welcome, ${data.name}! Registration successful.`);
+        alert(`Welcome, ${data.name}! Registration successful.`);
         setName('');
         setEmail('');
         setPassword('');
+        setUser({ name: data.name, email: data.email });
         navigate('/dashboard'); // redirect to dashboard
       } else {
         setError(data.detail || data.message || 'Registration failed.');

@@ -68,14 +68,29 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     # Save to db.json
     save_to_json({"name": user.name, "email": user.email, "password": user.password})
 
-    return {"message": "User registered successfully", "name": user.name}
+    return {"message": "User registered successfully", "name": user.name, "email": user.email}
 
 
 # Login endpoint
 @app.post("/api/login")
-def login(data: dict, db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.email == data.get("email")).first()
-    if not user or not pwd_context.verify(data.get("password"), user.password):
+def login(user: dict, db: Session = Depends(get_db)):
+    email = user.get("email")
+    password = user.get("password")
+
+        # Read from db.json
+    if not DB_FILE.exists():
+        raise HTTPException(status_code=404, detail="Database not found")
+
+    with open(DB_FILE, "r") as f:
+        data = json.load(f)
+
+    found_user = next((u for u in data["users"] if u["email"] == email and u["password"] == password), None)
+
+    if not found_user:
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
-    return {"message": "Login successful", "user": user.name}
+    return {
+        "message": "Login successful",
+        "name": found_user["name"],
+        "email": found_user["email"]
+    }

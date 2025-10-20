@@ -6,7 +6,7 @@
   justify-content: space-between;
   width: 260px;
   height: 100vh;
-  background-color: #faf8f6;
+  background-color: white;
   border-radius: 15px;
   padding: 20px;
 }
@@ -16,16 +16,10 @@
 }
 
 .logo-img {
-  width: 100px;
+  width: 200px;
   margin-bottom: 10px;
 }
 
-.logo h2 {
-  font-size: 14px;
-  color: #001b44;
-  font-weight: 600;
-  letter-spacing: 1px;
-}
 
 .nav-links {
   display: flex;
@@ -52,13 +46,33 @@
 }
 
 .nav-item.active {
-  color: #f4b400;
+  color: #FFC727;
   font-weight: 600;
 }
 
 .material-icons {
-  font-size: 22px;
+  font-size: 24px;
 }
+
+.divider-logout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 100px; 
+  margin-bottom: 10px;
+}
+
+.line-logout {
+  flex: 1;
+  height: 1px;
+  background-color: #bfbfbf8e;
+  max-width: 1000px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 15px;
+}
+
 
 .logout {
   display: flex;
@@ -70,6 +84,8 @@
   padding: 10px;
   border-radius: 10px;
   transition: 0.3s;
+  margin-bottom: 40px;
+  margin-top: 20px;
 }
 
 .logout:hover {

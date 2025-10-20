@@ -35,7 +35,7 @@ function Login() {
         alert('Welcome Back!');
         setUser({ name: data.user || data.name || "User", email });
         setError('');
-        navigate('/dashboard');
+        navigate('/dashboard'); // redirect to dashboard
       } else {
         setError(data.detail || data.message || 'Invalid email or password.');
       }

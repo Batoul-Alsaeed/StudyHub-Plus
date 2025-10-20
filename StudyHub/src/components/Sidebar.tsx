@@ -25,7 +25,7 @@ export default function Sidebar() {
       <nav className="nav-links">
         <Link
           to="/dashboard"
-          className={`nav-item ${activePath === "/" ? "active" : ""}`}
+          className={`nav-item ${activePath === "/dashboard" ? "active" : ""}`}
         >
           <span className="material-icons">grid_view</span>
           <p>Dashboard</p>
@@ -47,6 +47,10 @@ export default function Sidebar() {
           <p>Group Challenge</p>
         </Link>
       </nav>
+
+      <div className="divider-logout">
+            <span className="line-logout"></span>
+      </div>
 
       <div className="logout" onClick={handleLogout}>
         <span className="material-icons">logout</span>

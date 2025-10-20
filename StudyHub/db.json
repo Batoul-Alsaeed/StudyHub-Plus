@@ -14,6 +14,31 @@
             "name": "Nujood AlOtaibi",
             "email": "N@gmail.com",
             "password": "12345"
+        },
+        {
+            "name": "tst",
+            "email": "tst@gmail.com",
+            "password": "1234"
+        },
+        {
+            "name": "t1",
+            "email": "t1@gmail.com",
+            "password": "1234"
+        },
+        {
+            "name": "k",
+            "email": "k@gmail.com",
+            "password": "1234"
+        },
+        {
+            "name": "12",
+            "email": "12@gmail.com",
+            "password": "123"
+        },
+        {
+            "name": "Khulood AlOtaibi",
+            "email": "1@gmail.com",
+            "password": "1234"
         }
     ]
 }

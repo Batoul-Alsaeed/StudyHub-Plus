@@ -8,58 +8,100 @@
 .top-section {
   display: flex;
   gap: 20px;
+  align-items: flex-start;
 }
 
 .welcome-card {
-  flex: 2;
+  flex: none;
+  width: 60%;
+  min-width: 600px;
+  max-width: 900px;
   background-color: #f8cfc6;
   border-radius: 15px;
   padding: 30px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  border: 1.5px solid #e1a79c;
+  height: auto;
+  min-height: 280px;
+}
+.welcome-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;;
+  align-items: flex-start; 
+  gap: 6px; 
+  margin-top: -25px;
+  margin-left: 10px;
 }
 
-.welcome-card h2 {
+.welcome-text h2 {
   color: #001b44;
-  font-size: 28px;
-  font-weight: 500;
+  font-size: 60px;
+  font-weight: lighter;
+  margin-bottom: 5px;
+  margin: 0;
+  line-height: 2;
 }
 
-.welcome-card h2 span {
+.welcome-text h3 {
+  color: #001b44;
+  font-size: 40px;
   font-weight: 700;
+  margin-top: 10px;
+  line-height: 1.1;
 }
 
 .welcome-img {
-  width: 220px;
+  width: 300px;
   height: auto;
+  max-width: 100%;
+  flex-shrink: 0;
 }
 
 .streak-card {
-  flex: 1;
+  flex: none;
+  width: 27%;
   background-color: #fdf2e9;
   border-radius: 15px;
-  padding: 25px;
-  text-align: center;
+  padding: 30px 25px 35px;
+  text-align: left;
   position: relative;
+  border: 1.5px solid #f0c6a5; 
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  height: auto;
+  min-height: 310px;
 }
 
 .streak-card h3 {
   color: #001b44;
-  font-weight: 500;
+  font-weight:lighter;
+  font-size: 28px;
+  margin-bottom: 5px;
+  margin-top: 0;
+  line-height: 1.1;
 }
 
 .streak-card span {
-  font-size: 28px;
+  font-size: 50px;
   color: #001b44;
   font-weight: 700;
+  margin-top: 0;
+  line-height: 1;
 }
 
 .streak-img {
-  width: 120px;
+  width: 250px;
+  height: auto;
   position: absolute;
-  bottom: 15px;
-  right: 20px;
+  bottom: 5px;
+  margin-bottom: 0.2px;
+  right: 15px;
+  opacity: 0.95;
 }
 
 .progress-section {
@@ -79,6 +121,8 @@
   font-size: 18px;
   color: #001b44;
   margin-bottom: 15px;
+  text-align: center;
+
 }
 
 .chart-img {
@@ -102,6 +146,7 @@
 .text {
   color: #333;
   margin-top: -5px;
+  text-align: center;
 }
 
 .focus-progress {
@@ -118,4 +163,20 @@
 .plant-img {
   width: 100px;
   margin: auto;
+}
+
+@media (max-width: 900px) {
+  .top-section {
+    flex-direction: column;
+  }
+
+  .welcome-card,
+  .streak-card {
+    width: 100%;
+  }
+
+  .welcome-img,
+  .streak-img {
+    width: 200px;
+  }
 }
