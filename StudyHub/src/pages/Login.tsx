@@ -2,13 +2,16 @@ import { useState } from 'react';
 import '../css/Login.css';
 import illustration from '../assets/images/Login Image.png';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from "../contexts/AuthContext";
+
 
 function Login() {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
   const navigate = useNavigate();
-  const [userName, setUserName] = useState<string>('');
+  const { setUser } = useAuth();
+
 
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -29,8 +32,8 @@ function Login() {
       const data = await response.json();
 
       if (response.ok) {
-        alert('Welcome Back, ${data.user}!');
-        setUserName(data.user);
+        alert('Welcome Back!');
+        setUser({ name: data.user || data.name || "User", email });
         setError('');
         navigate('/dashboard');
       } else {
