@@ -1,58 +1,89 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "react-modal";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import "../css/Challenges.css";
 
 Modal.setAppElement("#root");
 
-interface ChallengeModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: (challenge: any) => void;
-}
-
-const ChallengeModal: React.FC<ChallengeModalProps> = ({
+export default function ChallengeModal({
   isOpen,
   onClose,
   onSave,
-}) => {
+  initialData,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (data: any) => void;
+  initialData?: any;
+}) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [difficulty, setDifficulty] = useState("Easy");
+  const [requirements, setRequirements] = useState<string[]>([]);
+  const [newRequirement, setNewRequirement] = useState("");
+  const [level, setLevel] = useState("Easy");
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [endDate, setEndDate] = useState<Date | null>(null);
-  const [success, setSuccess] = useState(false);
+  const [maxParticipants, setMaxParticipants] = useState<number>(1);
+  const [errors, setErrors] = useState<string | null>(null);
 
-  const handleSave = () => {
-    if (!title || !description || !startDate || !endDate) {
-      alert("Please fill in all fields.");
-      return;
+  useEffect(() => {
+    if (initialData) {
+      setTitle(initialData.title || "");
+      setDescription(initialData.description || "");
+      setRequirements(initialData.requirements || []);
+      setLevel(initialData.level || "Easy");
+      setStartDate(
+        initialData.start_date ? new Date(initialData.start_date) : new Date()
+      );
+      setEndDate(initialData.end_date ? new Date(initialData.end_date) : null);
+      setMaxParticipants(initialData.max_participants ?? 1);
+    } else {
+      setTitle("");
+      setDescription("");
+      setRequirements([]);
+      setLevel("Easy");
+      setStartDate(new Date());
+      setEndDate(null);
+      setMaxParticipants(1);
     }
+  }, [initialData, isOpen]);
 
-    const newChallenge = {
-      title,
-      description,
-      difficulty,
-      start_date: startDate,
-      end_date: endDate,
-    };
-
-    onSave(newChallenge);
-    setSuccess(true);
-    setTimeout(() => {
-      setSuccess(false);
-      onClose();
-      resetForm();
-    }, 2000);
+  const validate = () => {
+    if (!title.trim()) return "Title is required";
+    if (!description.trim()) return "Description is required";
+    if (!maxParticipants || maxParticipants < 1)
+      return "Max participants must be ≥ 1";
+    if (startDate && endDate && endDate < startDate)
+      return "End date must be after start date";
+    return null;
   };
 
-  const resetForm = () => {
-    setTitle("");
-    setDescription("");
-    setDifficulty("Easy");
-    setStartDate(new Date());
-    setEndDate(null);
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    const err = validate();
+    if (err) return setErrors(err);
+
+    const data = {
+      title,
+      description,
+      requirements,
+      level,
+      start_date: startDate ? startDate.toISOString().split("T")[0] : null,
+      end_date: endDate ? endDate.toISOString().split("T")[0] : null,
+      max_participants: maxParticipants,
+      creator_name: localStorage.getItem("username") || "Guest",
+    };
+    onSave(data);
+  };
+
+  const addRequirement = () => {
+    if (!newRequirement.trim()) return;
+    setRequirements([...requirements, newRequirement.trim()]);
+    setNewRequirement("");
+  };
+
+  const removeRequirement = (index: number) => {
+    setRequirements(requirements.filter((_, i) => i !== index));
   };
 
   return (
@@ -62,74 +93,117 @@ const ChallengeModal: React.FC<ChallengeModalProps> = ({
       className="challenge-modal"
       overlayClassName="challenge-overlay"
     >
-      <h2 style={{ textAlign: "center", color: "#001b44", marginBottom: "15px" }}>
-        Create New Challenge
+      <h2 style={{ textAlign: "center", color: "#001b44", marginBottom: 10 }}>
+        {initialData ? "Edit Challenge" : "Create New Challenge"}
       </h2>
+      {errors && <p style={{ color: "#e74c3c", marginBottom: 10 }}>{errors}</p>}
 
-      <div className="form-group">
-        <label>Title</label>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Enter challenge title"
-        />
-      </div>
+      <form onSubmit={handleSave}>
+        <div className="form-group">
+          <label>Title</label>
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Challenge title"
+          />
+        </div>
 
-      <div className="form-group">
-        <label>Description / Requirements</label>
-        <textarea
-          rows={3}
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Describe the challenge requirements"
-        />
-      </div>
+        <div className="form-group">
+          <label>Description</label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Describe the challenge"
+          />
+        </div>
 
-      <div className="form-group">
-        <label>Difficulty Level</label>
-        <select
-          value={difficulty}
-          onChange={(e) => setDifficulty(e.target.value)}
-        >
-          <option value="Easy">🟢 Easy</option>
-          <option value="Medium">🟡 Medium</option>
-          <option value="Hard">🔴 Hard</option>
-        </select>
-      </div>
+        {/* ✅ Requirements section */}
+        <div className="form-group">
+          <label>Requirements / Tasks</label>
+          <div className="requirements-input">
+            <input
+              value={newRequirement}
+              onChange={(e) => setNewRequirement(e.target.value)}
+              placeholder="Add a task..."
+            />
+            <button type="button" onClick={addRequirement}>
+              + Add
+            </button>
+          </div>
+          <ul className="requirements-list">
+            {requirements.map((req, i) => (
+              <li key={i}>
+                {req}
+                <button
+                  type="button"
+                  onClick={() => removeRequirement(i)}
+                  className="remove-btn"
+                >
+                  ✕
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
 
-      <div className="form-group">
-        <label>Start Date</label>
-        <DatePicker
-          selected={startDate}
-          onChange={(date) => setStartDate(date)}
-          className="date-input"
-          dateFormat="yyyy-MM-dd"
-        />
-      </div>
+        {/* ✅ Difficulty buttons */}
+        <div className="form-group">
+          <label>Difficulty Level</label>
+          <div className="difficulty-options">
+            {["Easy", "Medium", "Hard"].map((option) => (
+              <button
+                key={option}
+                type="button"
+                className={`difficulty-btn ${option.toLowerCase()} ${
+                  level === option ? "active" : ""
+                }`}
+                onClick={() => setLevel(option)}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        </div>
 
-      <div className="form-group">
-        <label>End Date</label>
-        <DatePicker
-          selected={endDate}
-          onChange={(date) => setEndDate(date)}
-          className="date-input"
-          dateFormat="yyyy-MM-dd"
-        />
-      </div>
+        <div className="form-group">
+          <label>Max Participants</label>
+          <input
+            type="number"
+            min={1}
+            value={maxParticipants}
+            onChange={(e) => setMaxParticipants(Number(e.target.value))}
+          />
+        </div>
 
-      <div className="modal-actions">
-        <button className="cancel-btn" onClick={onClose}>
-          Cancel
-        </button>
-        <button className="save-btn" onClick={handleSave}>
-          Save
-        </button>
-      </div>
+        <div className="form-group">
+          <label>Start Date</label>
+          <DatePicker
+            selected={startDate}
+            onChange={(d) => setStartDate(d)}
+            className="date-input"
+            dateFormat="yyyy-MM-dd"
+          />
+        </div>
 
-      {success && <p className="success">✅ Challenge Created Successfully!</p>}
+        <div className="form-group">
+          <label>End Date</label>
+          <DatePicker
+            selected={endDate}
+            onChange={(d) => setEndDate(d)}
+            className="date-input"
+            dateFormat="yyyy-MM-dd"
+          />
+        </div>
+
+        <div className="modal-actions">
+          <button type="button" className="cancel-btn" onClick={onClose}>
+            Cancel
+          </button>
+          <button type="submit" className={`save-btn ${level.toLowerCase()}`}>
+            {initialData ? "Save" : "Create"}
+          </button>
+        </div>
+      </form>
     </Modal>
   );
-};
-
-export default ChallengeModal;
+}

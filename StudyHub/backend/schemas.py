@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List, Dict
 
 class UserCreate(BaseModel):
     name: str
@@ -22,6 +22,11 @@ class ChallengeCreate(BaseModel):
     creator_name: str
     start_date: Optional[str] = None
     end_date: Optional[str] = None
+    max_participants: int = 1
+    tasks: Optional[List[str]] = []
+    participants: Optional[List[int]] = []
+    progress: Optional[Dict[str, float]] = {}
+    group_progress: Optional[float] = 0.0
 
 # (Response Body)
 class ChallengeResponse(BaseModel):
@@ -33,6 +38,11 @@ class ChallengeResponse(BaseModel):
     start_date: Optional[str]
     end_date: Optional[str]
     participants: int
+    max_participants: int
+    tasks: Optional[List[str]]
+    participants: Optional[List[int]]
+    progress: Optional[Dict[str, float]]
+    group_progress: Optional[float]
 
     class Config:
         orm_mode = True
