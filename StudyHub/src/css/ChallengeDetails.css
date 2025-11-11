@@ -1,0 +1,155 @@
+.challenge-details-page {
+  background-color: #fff;
+  border-radius: 20px;
+  padding: 40px 50px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.05);
+  font-family: "DM Sans", sans-serif;
+  color: #001b44;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.back-btn {
+  background-color: #8a80c9;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-bottom: 20px;
+}
+.back-btn:hover {
+  background-color: #7b6bd9;
+}
+
+/* العنوان في المنتصف */
+.challenge-title {
+  text-align: center;
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 25px;
+}
+
+/* صفّ المعلومات */
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.creator {
+  color: #b0b0b0;
+  font-weight: 500;
+}
+
+.level {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: #001b44;
+}
+
+.level .material-icons {
+  font-size: 18px;
+}
+
+.dates {
+  color: #444;
+  font-size: 14px;
+}
+
+/* الوصف */
+.challenge-description {
+  margin-bottom: 25px;
+  color: #222;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* شريط التقدّم */
+.progress-section {
+  margin-bottom: 30px;
+}
+
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 10px;
+  background: #e0e0e0;
+  border-radius: 50px;
+  margin-bottom: 15px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 50px;
+  transition: width 0.4s ease;
+}
+
+/* ألوان الصعوبة */
+.easy .progress-fill {
+  background-color: #3140c4;
+}
+.medium .progress-fill {
+  background-color: #f6a623;
+}
+.hard .progress-fill {
+  background-color: #e74c3c;
+}
+
+/* النسبة بنفس لون المستوى */
+.easy .progress-percent {
+  color: #3140c4;
+}
+.medium .progress-percent {
+  color: #f6a623;
+}
+.hard .progress-percent {
+  color: #e74c3c;
+}
+
+/* المتطلبات */
+.requirements h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.requirements ul {
+  list-style: none;
+  padding: 0;
+}
+
+.requirements li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  color: #000;
+  margin-bottom: 10px;
+}
+
+.requirements li .material-icons {
+  font-size: 20px;
+}
+
+/* تحسين التفاعل */
+.challenge-details-page:hover {
+  transform: translateY(-1px);
+  transition: transform 0.2s ease;
+}
