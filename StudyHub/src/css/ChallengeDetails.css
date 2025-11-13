@@ -1,155 +1,395 @@
-.challenge-details-page {
-  background-color: #fff;
-  border-radius: 20px;
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
+
+/* =====================================================
+   ROOT CONTAINER (Same as Card Look)
+===================================================== */
+.challenge-container {
+  max-width: 980px;
+  margin: 40px auto;
   padding: 40px 50px;
-  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.05);
-  font-family: "DM Sans", sans-serif;
-  color: #001b44;
-  max-width: 900px;
-  margin: 0 auto;
+  border-radius: 18px;
+  font-family: "Inter", sans-serif;
+  transition: all 0.3s ease;
 }
 
-.back-btn {
-  background-color: #8a80c9;
+
+
+/* =====================================================
+   BACK BUTTON
+===================================================== */
+.challenge-back-btn {
+  background: #8b7cd3;
   color: white;
   border: none;
   padding: 10px 20px;
-  border-radius: 8px;
-  font-weight: 600;
+  border-radius: 10px;
   cursor: pointer;
-  transition: 0.3s;
-  margin-bottom: 20px;
+  font-weight: 600;
+  transition: background 0.3s ease;
 }
-.back-btn:hover {
-  background-color: #7b6bd9;
+.challenge-back-btn:hover {
+  background: #7263b9;
 }
 
-/* العنوان في المنتصف */
+/* =====================================================
+   TITLE
+===================================================== */
 .challenge-title {
   text-align: center;
-  font-size: 26px;
-  font-weight: 700;
-  margin-bottom: 25px;
+  font-size: 28px;
+  font-weight: 800;
+  color: #001b44;
+  margin-top: 16px;
+  margin-bottom: 18px;
 }
 
-/* صفّ المعلومات */
-.details-header {
+/* =====================================================
+   TABS (Details / Leaderboard / Comments)
+===================================================== */
+.challenge-tabs {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: center;
+  gap: 14px;
   margin-bottom: 25px;
-  flex-wrap: wrap;
-  gap: 12px;
+}
+.challenge-tab-btn {
+  background-color: #e8e6ea;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 25px;
+  font-weight: 600;
+  color: #001b44;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.challenge-tab-btn.active {
+  background-color: #8c7ae6;
+  color: #fff;
+}
+.challenge-tab-btn:hover {
+  background-color: #d8d5dd;
 }
 
-.creator {
-  color: #b0b0b0;
-  font-weight: 500;
+/* =====================================================
+   INFO SECTION (Creator, Level, Dates)
+===================================================== */
+.challenge-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 20px;
 }
-
-.level {
+.challenge-creator {
+  color: #777;
+  font-size: 15px;
+  font-weight: 600;
+}
+.challenge-level {
   display: flex;
   align-items: center;
   gap: 6px;
+  font-weight: 700;
+  color: #000;
+}
+.challenge-dates {
   font-weight: 600;
-  color: #001b44;
+  color: #555;
 }
-
-.level .material-icons {
-  font-size: 18px;
-}
-
-.dates {
-  color: #444;
-  font-size: 14px;
-}
-
-/* الوصف */
 .challenge-description {
-  margin-bottom: 25px;
+  text-align: center;
   color: #222;
   font-size: 15px;
   line-height: 1.6;
+  margin-bottom: 24px;
 }
 
-/* شريط التقدّم */
-.progress-section {
-  margin-bottom: 30px;
+/* =====================================================
+   PROGRESS SECTION
+===================================================== */
+.challenge-progress-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 28px;
 }
-
-.progress-labels {
+.challenge-progress-label {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  font-weight: 700;
   font-size: 14px;
-  margin-bottom: 5px;
+  font-weight: 700;
+  color: #000;
 }
-
-.progress-bar {
+.challenge-progress-bar {
   width: 100%;
   height: 10px;
   background: #e0e0e0;
   border-radius: 50px;
-  margin-bottom: 15px;
   overflow: hidden;
 }
-
-.progress-fill {
+.challenge-progress-fill {
   height: 100%;
   border-radius: 50px;
-  transition: width 0.4s ease;
+  transition: width 0.4s ease-in-out;
 }
 
-/* ألوان الصعوبة */
-.easy .progress-fill {
+/* Difficulty colors for progress */
+.challenge-container.easy .challenge-progress-fill.user {
   background-color: #3140c4;
 }
-.medium .progress-fill {
-  background-color: #f6a623;
+.challenge-container.easy .challenge-progress-fill.group {
+  background-color: #7b89f3;
 }
-.hard .progress-fill {
-  background-color: #e74c3c;
+.challenge-container.medium .challenge-progress-fill.user {
+  background-color: #f9cf62;
 }
-
-/* النسبة بنفس لون المستوى */
-.easy .progress-percent {
-  color: #3140c4;
+.challenge-container.medium .challenge-progress-fill.group {
+  background-color: #f6dd92;
 }
-.medium .progress-percent {
-  color: #f6a623;
+.challenge-container.hard .challenge-progress-fill.user {
+  background-color: #f36b80;
 }
-.hard .progress-percent {
-  color: #e74c3c;
+.challenge-container.hard .challenge-progress-fill.group {
+  background-color: #f8a0ae;
 }
 
-/* المتطلبات */
-.requirements h3 {
-  font-size: 18px;
+/* =====================================================
+   REQUIREMENTS
+===================================================== */
+.challenge-requirements {
+  margin-top: 20px;
+}
+.challenge-requirements h3 {
+  font-size: 15px;
   font-weight: 700;
-  margin-bottom: 15px;
-}
-
-.requirements ul {
-  list-style: none;
-  padding: 0;
-}
-
-.requirements li {
+  margin-bottom: 10px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 15px;
+  gap: 6px;
+}
+.challenge-requirements ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.challenge-task-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  margin-bottom: 4px;
   color: #000;
-  margin-bottom: 10px;
+  cursor: pointer;
+}
+.challenge-task-item.done {
+  opacity: 0.7;
+  text-decoration: line-through;
+}
+.challenge-task-item .material-icons {
+  font-size: 18px;
 }
 
-.requirements li .material-icons {
-  font-size: 20px;
+/* =====================================================
+   JOIN / LEAVE BUTTONS (Match Challenge Color)
+===================================================== */
+.challenge-save-btn,
+.challenge-cancel-btn {
+  width: 100%;
+  margin-top: 10px;
+  font-size: 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  padding: 12px 0;
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  letter-spacing: 0.2px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
-/* تحسين التفاعل */
-.challenge-details-page:hover {
+/* Easy */
+.challenge-container.easy .challenge-save-btn,
+.challenge-container.easy .challenge-cancel-btn {
+  background-color: #3140c4;
+}
+.challenge-container.easy .challenge-save-btn:hover,
+.challenge-container.easy .challenge-cancel-btn:hover {
+  background-color: #2633a5;
+}
+
+/* Medium */
+.challenge-container.medium .challenge-save-btn,
+.challenge-container.medium .challenge-cancel-btn {
+  background-color: #ffc727;
+}
+.challenge-container.medium .challenge-save-btn:hover,
+.challenge-container.medium .challenge-cancel-btn:hover {
+  background-color: #e6b941;
+}
+
+/* Hard */
+.challenge-container.hard .challenge-save-btn,
+.challenge-container.hard .challenge-cancel-btn {
+  background-color: #f36b80;
+}
+.challenge-container.hard .challenge-save-btn:hover,
+.challenge-container.hard .challenge-cancel-btn:hover {
+  background-color: #e34a65;
+}
+
+/* Disabled / Ended state */
+.challenge-save-btn:disabled,
+.challenge-cancel-btn:disabled {
+  background-color: #ccc;
+  color: #555;
+  cursor: not-allowed;
+}
+
+/* =====================================================
+   COMMENTS + LEADERBOARD
+===================================================== */
+.challenge-leaderboard,
+.challenge-comments {
+  margin-top: 20px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.challenge-leaderboard h3,
+.challenge-comments h3 {
+  text-align: center;
+  margin-bottom: 16px;
+}
+.challenge-comments-list,
+.challenge-leaderboard-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+.challenge-comment-item,
+.challenge-leaderboard-item {
+  background: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+}
+
+/* =====================================================
+   COMMENTS SECTION (Unified Design)
+===================================================== */
+.challenge-comment-item .comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.challenge-comment-item .comment-header strong {
+  color: #001b44;
+}
+
+.challenge-comment-item .timestamp {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-size: 13px;
+  color: #555;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.challenge-comment-item .timestamp-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-direction: row-reverse;
+}
+
+.challenge-comment-item .date-icon,
+.challenge-comment-item .time-icon {
+  font-size: 14px;
+  color: #8a80c9;
+  vertical-align: middle;
+}
+
+/* =====================================================
+   COMMENT FORM
+===================================================== */
+.challenge-comment-form {
+  margin-top: 16px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.challenge-comment-form textarea {
+  flex: 1;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 8px;
+  resize: none;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  background: #fff;
+  transition: border 0.2s ease;
+}
+
+.challenge-comment-form textarea:focus {
+  border-color: #8a80c9;
+  box-shadow: 0 0 0 2px rgba(138, 128, 201, 0.15);
+  outline: none;
+}
+
+.challenge-comment-form button {
+  background: #8a80c9;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.25s ease, transform 0.2s ease;
+}
+
+.challenge-comment-form button:hover {
+  background: #7b6bd9;
   transform: translateY(-1px);
-  transition: transform 0.2s ease;
+}
+
+/* =====================================================
+   COMMENT EDIT FORM
+===================================================== */
+.challenge-edit-comment-form textarea {
+  width: 100%;
+  height: 60px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 8px;
+  font-size: 14px;
+  resize: none;
+}
+
+.challenge-edit-comment-form textarea:focus {
+  border-color: #8a80c9;
+  box-shadow: 0 0 0 2px rgba(138, 128, 201, 0.15);
+  outline: none;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+@media (max-width: 640px) {
+  .challenge-container {
+    padding: 20px;
+  }
+  .challenge-title {
+    font-size: 24px;
+  }
 }

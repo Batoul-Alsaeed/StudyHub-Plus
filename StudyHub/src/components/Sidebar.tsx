@@ -19,7 +19,9 @@ export default function Sidebar() {
   return (
     <div className="sidebar">
       <div className="logo">
+        <Link to="/landing">
         <img src={logo} alt="StudyHub+" className="logo-img" />
+        </Link>
       </div>
 
       <nav className="nav-links">
@@ -32,30 +34,30 @@ export default function Sidebar() {
         </Link>
 
         <Link
-          to="/focus"
-          className={`nav-item ${activePath === "/focus" ? "active" : ""}`}
+          to="/focuestime"
+          className={`nav-item ${activePath === "/focuestime" ? "active" : ""}`}
         >
           <span className="material-icons">timer</span>
           <p>Focus Timer</p>
         </Link>
 
         <Link
-          to="/group"
-          className={`nav-item ${activePath === "/group" ? "active" : ""}`}
+          to="/challenges"
+          className={`nav-item ${activePath === "/challenges" ? "active" : ""}`}
         >
           <span className="material-icons">groups</span>
           <p>Group Challenge</p>
         </Link>
+        
+        <div className="divider-logout">
+          <span className="line-logout"></span>
+        </div>
+        
+        <div className="logout" onClick={handleLogout}>
+          <span className="material-icons">logout</span>
+          <p>Logout</p>
+        </div>
       </nav>
-
-      <div className="divider-logout">
-            <span className="line-logout"></span>
-      </div>
-
-      <div className="logout" onClick={handleLogout}>
-        <span className="material-icons">logout</span>
-        <p>Logout</p>
-      </div>
     </div>
   );
 }

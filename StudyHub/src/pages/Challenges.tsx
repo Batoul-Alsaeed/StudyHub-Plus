@@ -1,284 +1,509 @@
-import React, { useEffect, useState } from "react";
+// src/pages/Challenges.tsx
+import React, { useEffect, useMemo, useState } from "react";
 import "../css/Challenges.css";
 import { useAuth } from "../contexts/AuthContext";
 import ChallengeModal from "../components/ChallengeModal";
 import { useNavigate } from "react-router-dom";
+import MainLayout from "../layout/MainLayout";
+
+type AnyObj = Record<string, any>;
+type Challenge = AnyObj;
+
+type Normalized = Challenge & {
+  _participantIds: number[];
+  _participantsCount: number;
+  _status?: "Upcoming" | "Active" | "Ended" | string;
+};
 
 export default function Challenges() {
-  const [challenges, setChallenges] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState("browse");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingChallenge, setEditingChallenge] = useState<any | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState<string>("");
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  const currentUserId =
+    Number((user as any)?.id) || Number(localStorage.getItem("user_id")) || 0;
+  const currentUserName =
+    (user as any)?.name || localStorage.getItem("username") || "Guest";
+
+  const [raw, setRaw] = useState<Challenge[]>([]);
+  const [list, setList] = useState<Normalized[]>([]);
+  const [activeTab, setActiveTab] = useState<"browse" | "my">("browse");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingChallenge, setEditingChallenge] = useState<Challenge | null>(
+    null
+  );
+  const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState<string>("");
+
+  /** ===== Toast ===== **/
   const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(""), 2200);
   };
 
+  /** ===== Fetch Helpers ===== **/
+  const safeJSON = async (res: Response) => {
+    try {
+      const ct = res.headers.get("content-type") || "";
+      if (ct.includes("application/json")) return await res.json();
+    } catch {}
+    return null;
+  };
+
+  /** ===== Normalize ===== **/
+  const extractParticipantIds = (c: Challenge): number[] => {
+    const src = c?.participants;
+    if (!src) return [];
+    if (Array.isArray(src) && src.length > 0) {
+      const first = src[0];
+      if (typeof first === "number") return Array.from(new Set(src));
+      if (typeof first === "object" && first)
+        return Array.from(
+          new Set(
+            (src as AnyObj[])
+              .map((p) =>
+                Number(p?.id ?? p?.user_id ?? (typeof p === "string" ? p : NaN))
+              )
+              .filter((n) => Number.isFinite(n))
+          )
+        );
+    }
+    return [];
+  };
+
+  const normalizeOne = (c: Challenge): Normalized => {
+    const ids = extractParticipantIds(c);
+    const pc = typeof c?.participants_count === "number"
+      ? c.participants_count
+      : ids.length;
+    const status: Normalized["_status"] =
+      typeof c?.status === "string" ? c.status : undefined;
+    return { ...c, _participantIds: ids, _participantsCount: pc, _status: status };
+  };
+
+  const normalizeAll = (arr: Challenge[]) =>
+    (Array.isArray(arr) ? arr : []).map(normalizeOne);
+
+  /** ===== Fetch ===== **/
   const fetchChallenges = () => {
     setLoading(true);
-    fetch("http://127.0.0.1:8000/api/challenges")
-      .then((res) => res.json())
-      .then((data) => setChallenges(data))
+    fetch(`http://127.0.0.1:8000/api/challenges`)
+      .then(async (res) => (await safeJSON(res)) ?? [])
+      .then((data) => {
+        setRaw(data);
+        setList(normalizeAll(data));
+      })
       .catch(() => showToast("Failed to load challenges"))
       .finally(() => setLoading(false));
   };
 
   useEffect(() => {
     fetchChallenges();
-  }, []);
+  }, [activeTab]);
 
+  /** ===== Derived Lists ===== **/
+  const filtered = useMemo(
+    () =>
+      activeTab === "my"
+        ? list.filter(
+            (c) =>
+              Number(c.creator_id) === Number(currentUserId) ||
+              c._participantIds.includes(Number(currentUserId))
+          )
+        : list,
+    [activeTab, list, currentUserId]
+  );
+
+  /** ===== Modal ===== **/
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingChallenge(null);
   };
 
-  const handleSaveChallenge = (data: any) => {
+  /** ===== CRUD ===== **/
+  const handleSaveChallenge = (data: AnyObj) => {
     const method = editingChallenge ? "PUT" : "POST";
     const url = editingChallenge
       ? `http://127.0.0.1:8000/api/challenges/${editingChallenge.id}`
       : "http://127.0.0.1:8000/api/challenges";
 
+    const payload = {
+      ...data,
+      creator_id: currentUserId,
+      creator_name: currentUserName,
+    };
+
     setLoading(true);
     fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     })
-      .then((res) => res.json())
+      .then(async (res) => {
+        if (!res.ok) {
+          const err = (await safeJSON(res)) || {};
+          throw new Error(err.detail || err.message || "Save failed");
+        }
+        return safeJSON(res);
+      })
       .then(() => {
         fetchChallenges();
         closeModal();
         showToast("Saved");
       })
-      .catch(() => showToast("Save failed"))
+      .catch((e: any) => showToast(String(e.message || e)))
       .finally(() => setLoading(false));
   };
 
-  const handleJoin = (id: number) => {
-    setLoading(true);
-    fetch(`http://127.0.0.1:8000/api/challenges/${id}/join`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user_name: user?.name || "Guest" }),
-    })
-      .then(async (res) => {
-        if (!res.ok) throw new Error((await res.json()).detail || "Join failed");
-        return res.json();
-      })
-      .then(() => {
-        fetchChallenges();
-        showToast("Joined");
-      })
-      .catch((e) => showToast(`${e.message}`))
-      .finally(() => setLoading(false));
-  };
+  /** ===== Helpers ===== **/
+  const isOwner = (c: Normalized) =>
+    Number(c.creator_id) === Number(currentUserId);
+  const isMember = (c: Normalized) =>
+    c._participantIds.includes(Number(currentUserId));
+  const isFull = (c: Normalized) =>
+    typeof c.max_participants === "number" &&
+    c._participantsCount >= c.max_participants;
 
-  const handleLeave = (id: number) => {
-    setLoading(true);
-    fetch(`http://127.0.0.1:8000/api/challenges/${id}/leave`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user_name: user?.name || "Guest" }),
-    })
-      .then(async (res) => {
-        if (!res.ok) throw new Error((await res.json()).detail || "Leave failed");
-        return res.json();
-      })
-      .then(() => {
-        fetchChallenges();
-        showToast("Left");
-      })
-      .catch((e) => showToast(`${e.message}`))
-      .finally(() => setLoading(false));
-  };
+  const userProgressOf = (c: Normalized) =>
+    typeof c.progress?.[String(currentUserId)] === "number"
+      ? c.progress[String(currentUserId)]
+      : 0;
 
-  const handleEdit = (c: any) => {
-    setEditingChallenge(c);
-    setIsModalOpen(true);
-  };
+  const groupProgressOf = (c: Normalized) =>
+    typeof c.group_progress === "number" ? c.group_progress : 0;
 
-  const handleDelete = (id: number) => {
+  /** ===== Join / Leave ===== **/
+  const handleJoin = async (id: number) => {
+  const tempUserId = currentUserId;
+  const tempUserName = currentUserName;
+
+  // Optimistic UI update
+  setList((prev) =>
+    prev.map((c) =>
+      c.id === id && !c._participantIds.includes(tempUserId)
+        ? {
+            ...c,
+            _participantIds: [...c._participantIds, tempUserId],
+            _participantsCount: c._participantsCount + 1,
+          }
+        : c
+    )
+  );
+  showToast("Joined");
+
+  setLoading(true);
+  try {
+    const res = await fetch(
+      `http://127.0.0.1:8000/api/challenges/${id}/join?user_id=${tempUserId}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_name: tempUserName }),
+      }
+    );
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.detail || "Failed to join");
+
+    // ✅ Sync updated participants list from backend response
+    setList((prev) =>
+      prev.map((c) =>
+        c.id === id
+          ? {
+              ...c,
+              _participantIds: Array.isArray(data.participants)
+                ? data.participants.map((p: any) => Number(p))
+                : [],
+              _participantsCount: Array.isArray(data.participants)
+                ? data.participants.length
+                : c._participantsCount,
+            }
+          : c
+      )
+    );
+
+    setActiveTab("my"); // switch tab automatically
+    showToast("Joined successfully!");
+  } catch (e: any) {
+    showToast(e.message || "Failed to join");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+
+
+  const handleLeave = async (id: number) => {
+  const tempUserId = currentUserId;
+
+  // Optimistic UI update
+  setList((prev) =>
+    prev.map((c) =>
+      c.id === id
+        ? {
+            ...c,
+            _participantIds: c._participantIds.filter(
+              (pid) => pid !== tempUserId
+            ),
+            _participantsCount: Math.max(0, c._participantsCount - 1),
+          }
+        : c
+    )
+  );
+  showToast("Left");
+
+  setLoading(true);
+  try {
+    const res = await fetch(
+      `http://127.0.0.1:8000/api/challenges/${id}/leave?user_id=${tempUserId}`,
+      {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.detail || "Failed to leave");
+
+    // ✅ Sync updated participants list from backend
+    setList((prev) =>
+      prev.map((c) =>
+        c.id === id
+          ? {
+              ...c,
+              _participantIds: Array.isArray(data.participants)
+                ? data.participants.map((p: any) => Number(p))
+                : [],
+              _participantsCount: Array.isArray(data.participants)
+                ? data.participants.length
+                : c._participantsCount,
+            }
+          : c
+      )
+    );
+
+    showToast("Left challenge");
+  } catch (e: any) {
+    showToast(e.message || "Failed to leave");
+  } finally {
+    setLoading(false);
+  }
+};
+
+const handleEdit = (challenge: Challenge) => {
+  setEditingChallenge(challenge);
+  setIsModalOpen(true);
+};
+
+  /** ===== Delete Challenge ===== **/
+  const handleDelete = async (id: number) => {
     if (!confirm("Delete this challenge?")) return;
+    
     setLoading(true);
-    fetch(`http://127.0.0.1:8000/api/challenges/${id}`, { method: "DELETE" })
-      .then(() => {
-        fetchChallenges();
-        showToast("Deleted");
-      })
-      .catch(() => showToast("Delete failed"))
-      .finally(() => setLoading(false));
+    try {
+      const res = await fetch(`http://127.0.0.1:8000/api/challenges/${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed to delete challenge");
+      
+      showToast("Challenge deleted");
+      fetchChallenges();
+    } catch (e: any) {
+      showToast(e.message || "Error deleting challenge");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const filtered =
-    activeTab === "my"
-      ? challenges.filter((c) => c.creator_name === (user?.name || "Guest"))
-      : challenges;
 
+  /** ===== UI ===== **/
   return (
-    <div className="challenges-container">
-      <div className="challenges-header">
-        <h1>Challenges</h1>
-        <button className="create-btn" onClick={openModal}>
-          + Create New
-        </button>
-      </div>
+    <MainLayout>
+      <div className="challenges-container">
+        {/* HEADER */}
+        <div className="challenges-header">
+          <h1>Challenges</h1>
+          <button className="challenges-create-btn" onClick={openModal}>
+            + Create New
+          </button>
+        </div>
 
-      <div className="tabs">
-        <button
-          className={activeTab === "browse" ? "tab active" : "tab"}
-          onClick={() => setActiveTab("browse")}
-        >
-          Browse All
-        </button>
-        <button
-          className={activeTab === "my" ? "tab active" : "tab"}
-          onClick={() => setActiveTab("my")}
-        >
-          My Challenges
-        </button>
-      </div>
+        {/* TABS */}
+        <div className="challenges-tabs">
+          <button
+            className={
+              activeTab === "browse" ? "challenges-tab active" : "challenges-tab"
+            }
+            onClick={() => setActiveTab("browse")}
+          >
+            Browse All
+          </button>
 
-      {loading && <div className="spinner" />}
+          <button
+            className={
+              activeTab === "my" ? "challenges-tab active" : "challenges-tab"
+            }
+            onClick={() => setActiveTab("my")}
+          >
+            My Challenges
+          </button>
+        </div>
 
-      <div className="challenge-grid">
-        {filtered.map((c) => {
-          const isOwner = c.creator_name === (user?.name || "Guest");
-          const isFull = c.participants >= c.max_participants;
+        {loading && <div className="spinner" />}
 
-          const userProgress = c.user_progress || 40; // مؤقت للتجربة
-          const groupProgress = c.group_progress || 70; // مؤقت للتجربة
+        {/* GRID */}
+        <div className="challenges-grid">
+          {filtered.map((c) => {
+            const owner = isOwner(c);
+            const member = isMember(c);
+            const full = isFull(c);
+            const showProgress = owner || member;
+            const uProg = userProgressOf(c);
+            const gProg = groupProgressOf(c);
 
-          return (
-            <div
-              className={`challenge-card ${c.level?.toLowerCase()}`}
-              key={c.id}
-              onClick={() => navigate(`/challenges/${c.id}`)}
-              style={{ cursor: "pointer" }}
-            >
-              <h2>{c.title}</h2>
-              <div className="creator-level-row">
-  <p className="creator">By {c.creator_name}</p>
-  <div className="level-row">
-    <span className="material-icons level-icon">bar_chart</span>
-    <p>{c.level} Level</p>
-  </div>
-</div>
+            const renderTask = (t: any) => (typeof t === "string" ? t : t?.title ?? "");
+            const isDone = (t: any) =>
+              typeof t === "object" && t ? Boolean(t.done) : false;
 
-<p className="desc">{c.description}</p>
+            
 
-
-              <div className="participants-row">
-                <span className="material-icons">group</span>
-                <p>Total {c.max_participants} Participants</p>
-              </div>
-
-              <div className="awards-row">
-                <span className="material-icons">emoji_events</span>
-                <p>There are awards when you’re done</p>
-              </div>
-
-              {/* ===== شريط التقدم الفردي والجماعي (منسق مثل تصميم Figma) ===== */}
-              <div className="progress-section">
-                {/* التقدم الفردي */}
-                <div className="progress-row">
-                  <div className="progress-label">
-                    <span>You Progress</span>
-                    <span className="progress-percent">{userProgress}%</span>
-                  </div>
-                  <div className="progress-bar">
-                    <div
-                      className="progress-fill user"
-                      style={{ width: `${userProgress}%` }}
-                    ></div>
+            return (
+              <div
+                key={c.id}
+                className={`challenges-card ${c.level?.toLowerCase?.() || ""}`}
+                onClick={() =>
+                  !loading &&
+                  navigate(`/challenges/${c.id}`, {
+                    state: { joined: member },
+                  })
+                }
+              >
+                <h2>{c.title}</h2>
+                <div className="challenges-creator-level-row">
+                  <p className="challenges-creator">By {c.creator_name}</p>
+                  <div className="challenges-level-row">
+                    <span className="material-icons">bar_chart</span>
+                    <p>{c.level} Level</p>
                   </div>
                 </div>
 
-                {/* التقدم الجماعي */}
-                <div className="progress-row">
-                  <div className="progress-label">
-                    <span>Group Progress</span>
-                    <span className="progress-percent">{groupProgress}%</span>
-                  </div>
-                  <div className="progress-bar">
-                    <div
-                      className="progress-fill group"
-                      style={{ width: `${groupProgress}%` }}
-                    ></div>
+                <p className="challenges-desc">{c.description}</p>
+
+                <div className="challenges-participants-row">
+                  <span className="material-icons">group</span>
+                  <span className="challenges-participants-text">
+                    {c._participantsCount}/{c.max_participants} Participants
+                  </span>
+                </div>
+
+                {/* Progress */}
+                <div className="challenges-progress-section">
+                  {showProgress && (
+                    <div className="challenges-progress-row">
+                      <div className="challenges-progress-label">
+                        <span>Your Progress</span>
+                        <span className="challenges-progress-percent">
+                          {uProg}%
+                        </span>
+                      </div>
+                      <div className="challenges-progress-bar">
+                        <div
+                          className="challenges-progress-fill user"
+                          style={{ width: `${uProg}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="challenges-progress-row">
+                    <div className="challenges-progress-label">
+                      <span>Group Progress</span>
+                      <span className="challenges-progress-percent">
+                        {gProg}%
+                      </span>
+                    </div>
+                    <div className="challenges-progress-bar">
+                      <div
+                        className="challenges-progress-fill group"
+                        style={{ width: `${gProg}%` }}
+                      ></div>
+                    </div>
                   </div>
                 </div>
+
+                {/* Requirements */}
+                <div className="challenges-requirements-section">
+                  <h4>Requirements</h4>
+                  <ul className="challenges-requirements-list">
+                    {Array.isArray(c.tasks) &&
+                      c.tasks.map((task: any, idx: number) => (
+                        <li key={`${c.id}-task-${idx}`}>
+                          <span className="material-icons">
+                            {isDone(task)
+                              ? "check_circle"
+                              : "radio_button_unchecked"}
+                          </span>
+                          <span>{renderTask(task)}</span>
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+
+                {/* ACTIONS */}
+                <div
+                  className="challenges-card-actions"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {owner ? (
+                    <>
+                      <button
+                        className="challenges-edit-btn"
+                        onClick={() => handleEdit(c)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="challenges-delete-btn"
+                        onClick={() => handleDelete(c.id)}
+                      >
+                        Delete
+                      </button>
+                    </>
+                  ) : member ? (
+                    <button
+                      className="challenges-leave-btn"
+                      onClick={() => handleLeave(c.id)}
+                    >
+                      Leave Challenge
+                    </button>
+                  ) : full ? (
+                    <button className="challenges-join-btn full" disabled>
+                      Full
+                    </button>
+                  ) : (
+                    <button
+                      className="challenges-join-btn"
+                      onClick={() => handleJoin(c.id)}
+                    >
+                      Join Challenge
+                    </button>
+                  )}
+                </div>
               </div>
-              
-<div className="requirements-section">
-  <h4>Requirements</h4>
-  <ul className="requirements-list">
-    {c.tasks?.map((task, index) => (
-      <li key={index}>
-        <span className="material-icons">check_circle</span>
-        <span>{task}</span>
-      </li>
-    ))}
-  </ul>
-</div>
+            );
+          })}
+        </div>
 
-              {/* ===== الأزرار ===== */}
-              <div className="card-actions" onClick={(e) => e.stopPropagation()}>
-  {isOwner ? (
-    <>
-      <button className="edit-btn" onClick={() => handleEdit(c)}>
-        Edit
-      </button>
-      <button
-        className="delete-btn"
-        onClick={() => handleDelete(c.id)}
-      >
-        Delete
-      </button>
-    </>
-  ) : (
-    <>
-      {/* إذا المستخدم منضم → يظهر فقط زر Leave */}
-      {c.participants?.includes(user?.name || "Guest") ? (
-        <button
-          className={`leave-btn ${c.level?.toLowerCase()}`}
-          onClick={() => handleLeave(c.id)}
-        >
-          Leave Challenge
-        </button>
-      ) : isFull ? (
-        <button className="join-btn full" disabled>
-          Full
-        </button>
-      ) : (
-        <button
-          className="join-btn"
-          onClick={() => handleJoin(c.id)}
-        >
-          Join Challenge
-        </button>
-      )}
-    </>
-  )}
-</div>
+        <ChallengeModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          onSave={handleSaveChallenge}
+          {...(editingChallenge ? { initialData: editingChallenge } : {})}
+        />
 
-            </div>
-          );
-        })}
+        {toast && <div className="toast">{toast}</div>}
       </div>
-
-      <ChallengeModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        onSave={handleSaveChallenge}
-        {...(editingChallenge ? { initialData: editingChallenge } : {})}
-      />
-
-      {toast && <div className="toast">{toast}</div>}
-    </div>
+    </MainLayout>
   );
 }

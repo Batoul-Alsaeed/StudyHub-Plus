@@ -1,0 +1,63 @@
+.plant-image-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 160px;
+  transition: transform 0.6s ease, opacity 0.6s ease;
+}
+
+.plant-stage {
+  width: 120px;
+  height: auto;
+  transition: all 0.6s ease;
+}
+
+.growing {
+  animation: growUp 1.5s ease-in-out;
+}
+
+.plant-growth-section {
+  text-align: center;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.growth-percent {
+  font-size: 18px;
+  font-weight: 600;
+  color: #3140c4;
+  margin-top: 10px;
+  transition: color 0.3s ease;
+}
+
+.growth-message {
+  font-size: 15px;
+  font-weight: 500;
+  color: #001b44;
+  margin-top: 6px;
+  max-width: 270px;
+  line-height: 1.3;
+}
+
+.plant-image-wrapper.growing {
+  transform: scale(1.05);
+  transition: transform 0.5s ease-in-out;
+}
+
+
+@keyframes growUp {
+  0% {
+    transform: scale(0.8) translateY(10px);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.15) translateY(-5px);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}

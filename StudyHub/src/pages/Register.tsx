@@ -4,6 +4,8 @@ import illustration from '../assets/images/Register Image.png';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from "../contexts/AuthContext";
 
+const API_URL = "http://127.0.0.1:8000";
+
 
 function Register() {
   const [name, setName] = useState<string>('');
@@ -12,6 +14,7 @@ function Register() {
   const [error, setError] = useState<string>('');
   const navigate = useNavigate();
   const [success, setSuccess] = useState<string>('');
+  const [loading, setLoading] = useState(false);
   const { setUser } = useAuth();
 
 
@@ -27,27 +30,31 @@ function Register() {
     }
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch(`${API_URL}/api/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
       });
 
       const data = await response.json();
+      setLoading(false);
+
 
       if (response.ok) {
         alert(`Welcome, ${data.name}! Registration successful.`);
         setName('');
         setEmail('');
         setPassword('');
-        setUser({ name: data.name, email: data.email });
+        setUser({ id: data.id, name: data.name, email: data.email });
         navigate('/dashboard'); // redirect to dashboard
       } else {
         setError(data.detail || data.message || 'Registration failed.');
       }
     } catch (err) {
-      console.error(err);
+      console.error("Registration error:", err);
       setError('Unable to connect to the server.');
+      setLoading(false);
+
     }
   };
 

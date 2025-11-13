@@ -1,0 +1,242 @@
+.focus-page {
+  min-height: 100vh;
+  padding: 40px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: "Inter", sans-serif;
+}
+
+.focus-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.focus-header h2 {
+  font-size: 28px;
+  color: #001b44;
+  font-weight: 700;
+}
+
+.start-btn {
+  background-color: #8b7cd3;
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.start-btn:hover {
+  background-color: #7263b9;
+}
+
+.focus-setup-card {
+  margin-top: 60px;
+  background: #fff;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 400px;
+  text-align: center;
+}
+
+.focus-setup-card input {
+  border: 1px solid #ddd;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 16px;
+  outline: none;
+}
+
+.confirm-btn {
+  background-color: #8b7cd3;
+  color: #fff;
+  border: none;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.back-btn {
+  background-color: transparent;
+  color: #8b7cd3;
+  border: 2px solid #8b7cd3;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  background-color: #8b7cd3;
+  color: #fff;
+}
+
+.focus-timer-card {
+  margin-top: 60px;
+  background: url("../assets/images/Background.png") center/cover no-repeat;
+  border-radius: 30px;
+  padding: 70px 60px;
+  text-align: center;
+  width: 85%;
+  max-width: 850px;
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 0px 20px 40px rgba(150, 120, 180, 0.25);
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(6px);
+}
+
+.focus-timer-card.break {
+  background: linear-gradient(135deg, #76a1957f 0%, #79abe180 100%);
+  color: #003b2f;
+}
+
+
+.focus-timer-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 40%, rgba(255,255,255,0.08), transparent 70%);
+  pointer-events: none;
+}
+
+
+/* 
+.focus-timer-card {
+  animation: gentleMove 16s ease-in-out infinite;
+  background-size: 200% 200%;
+    background: 
+    radial-gradient(circle at 25% 30%, rgba(188, 150, 191, 0.85), transparent 70%),
+    radial-gradient(circle at 75% 75%, rgba(236, 113, 131, 0.85), transparent 70%),
+    radial-gradient(circle at 50% 50%, rgba(217, 177, 203, 0.75), transparent 80%),
+    linear-gradient(135deg, #e3c5ff 0%, #f5aecd 100%);
+  
+  border-radius: 30px;
+  padding: 70px 60px;
+  text-align: center;
+  width: 85%;
+  max-width: 850px;
+  margin: 60px auto 0 auto;
+  
+  box-shadow:
+    0px 25px 45px rgba(140, 110, 170, 0.25),
+    inset 0 0 60px rgba(255, 255, 255, 0.08);
+  
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+  animation: gentleMove 25s ease-in-out infinite;
+  
+}
+*/
+
+/* 
+.focus-timer-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.1), transparent 70%);
+  opacity: 0.9;
+  pointer-events: none;
+}
+*/
+
+.focus-timer-card h3 {
+  font-size: 36px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 20px;
+}
+
+.timer-display {
+  font-size: 110px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 15px;
+}
+
+.timer-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.pause-btn {
+  background-color: #8b7cd3;
+  color: #fff;
+  padding: 12px 40px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.break-btn {
+  background-color: transparent;
+  color: #fff;
+  border: 2px solid #fff;
+  padding: 12px 40px;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.reset-btn {
+  background: transparent;
+  border: none;
+  font-size: 60px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.reset-btn:active {
+  transform: rotate(360deg);
+  transition: transform 0.3s ease-in-out;
+}
+
+.resume-btn {
+  background-color: #8b7cd3;
+  color: #fff;
+  padding: 12px 40px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.done-message {
+  font-size: 18px;
+  color: #fff;
+  font-weight: 600;
+}
+
+@keyframes gentleMove {
+  0% {
+    background-position: 25% 30%, 75% 75%, 50% 50%;
+  }
+  50% {
+    background-position: 30% 35%, 70% 70%, 55% 55%;
+  }
+  100% {
+    background-position: 25% 30%, 75% 75%, 50% 50%;
+  }
+}

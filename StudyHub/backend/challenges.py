@@ -1,29 +1,14 @@
-from fastapi import FastAPI, Depends, HTTPException
-from passlib.context import CryptContext
-from fastapi.middleware.cors import CORSMiddleware
-import json
-from pathlib import Path
-
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.orm import Session
 from . import models, schemas
-from .database import engine, SessionLocal
+from .database import SessionLocal
+import json
 
-# Create database tables
-models.Base.metadata.create_all(bind=engine)
+router = APIRouter(prefix="/api/challenges", tags=["challenges"])
 
-app = FastAPI()
-
-# Password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Database dependency
+# ============================================================
+# Database Dependency
+# ============================================================
 def get_db():
     db = SessionLocal()
     try:
@@ -31,69 +16,17 @@ def get_db():
     finally:
         db.close()
 
-
-DB_FILE = Path("db.json")
-
-def save_to_json(data):
-    """Save all users to db.json"""
-    if DB_FILE.exists():
-        with open(DB_FILE, "r") as f:
-            content = json.load(f)
-    else:
-        content = {"users": []}
-    content["users"].append(data)
-    with open(DB_FILE, "w") as f:
-        json.dump(content, f, indent=4)
-
-
-@app.get("/")
-def root():
-    return {"message": "FastAPI backend is working!"}
-
-
 # ============================================================
-# 👤 Register endpoint
+# 🏁 Create Challenge
 # ============================================================
-@app.post("/api/register")
-def register(user: schemas.UserCreate, db: SessionLocal = Depends(get_db)):
-    existing_user = db.query(models.User).filter(models.User.email == user.email).first()
-    if existing_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-
-    hashed_password = pwd_context.hash(user.password)
-    new_user = models.User(name=user.name, email=user.email, password=hashed_password)
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-
-    save_to_json({"name": user.name, "email": user.email, "password": user.password})
-    return {"message": "User registered successfully", "name": user.name}
-
-
-# ============================================================
-# 🔐 Login endpoint
-# ============================================================
-@app.post("/api/login")
-def login(data: dict, db: SessionLocal = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.email == data.get("email")).first()
-    if not user or not pwd_context.verify(data.get("password"), user.password):
-        raise HTTPException(status_code=401, detail="Invalid email or password")
-
-    return {"message": "Login successful", "user": user.name}
-
-
-# ============================================================
-# 🏁 Challenges Endpoints
-# ============================================================
-
-# Create a new Challenge (POST)
-@app.post("/api/challenges", response_model=schemas.ChallengeResponse)
-def create_challenge(challenge: schemas.ChallengeCreate, db: SessionLocal = Depends(get_db)):
+@router.post("", response_model=schemas.ChallengeResponse)
+def create_challenge(challenge: schemas.ChallengeCreate, db: Session = Depends(get_db)):
     new_challenge = models.Challenge(
         title=challenge.title,
         description=challenge.description,
         level=challenge.level,
         creator_name=challenge.creator_name,
+        creator_id=challenge.creator_id,
         start_date=challenge.start_date,
         end_date=challenge.end_date,
         participants=challenge.participants or [],
@@ -107,31 +40,54 @@ def create_challenge(challenge: schemas.ChallengeCreate, db: SessionLocal = Depe
     db.refresh(new_challenge)
     return new_challenge
 
+# ============================================================
+# 📋 Get All Challenges
+# ============================================================
+@router.get("", response_model=list[schemas.ChallengeResponse])
+def get_challenges(db: Session = Depends(get_db)):
+    challenges = db.query(models.Challenge).all()
+    for c in challenges:
+        if isinstance(c.tasks, str):
+            try:
+                c.tasks = json.loads(c.tasks)
+            except:
+                c.tasks = []
+        if not isinstance(c.tasks, list):
+            c.tasks = []
+    return challenges
 
-# Get All Challenges (GET)
-@app.get("/api/challenges", response_model=list[schemas.ChallengeResponse])
-def get_challenges(db: SessionLocal = Depends(get_db)):
-    return db.query(models.Challenge).all()
-
-
-# Get Single Challenge by ID (GET)
-@app.get("/api/challenges/{challenge_id}", response_model=schemas.ChallengeResponse)
-def get_challenge(challenge_id: int, db: SessionLocal = Depends(get_db)):
+# ============================================================
+# 🔍 Get Single Challenge by ID
+# ============================================================
+@router.get("/{challenge_id}", response_model=schemas.ChallengeResponse)
+def get_challenge(challenge_id: int, db: Session = Depends(get_db)):
     challenge = db.query(models.Challenge).filter(models.Challenge.id == challenge_id).first()
     if not challenge:
         raise HTTPException(status_code=404, detail="Challenge not found")
-    return challenge
 
+    # ✅ Always return tasks as a list
+    if isinstance(challenge.tasks, str):
+        try:
+            challenge.tasks = json.loads(challenge.tasks)
+        except Exception:
+            challenge.tasks = []
+    elif challenge.tasks is None:
+        challenge.tasks = []
+    elif not isinstance(challenge.tasks, list):
+        challenge.tasks = []
+
+    return challenge
 
 # ============================================================
 # 🤝 Join Challenge
 # ============================================================
-@app.post("/api/challenges/{challenge_id}/join")
-def join_challenge(challenge_id: int, user_id: int, db: SessionLocal = Depends(get_db)):
+@router.post("/{challenge_id}/join")
+def join_challenge(challenge_id: int, user_id: int = Query(...), db: Session = Depends(get_db)):
     challenge = db.query(models.Challenge).filter(models.Challenge.id == challenge_id).first()
     if not challenge:
         raise HTTPException(status_code=404, detail="Challenge not found")
 
+    # Convert to list if needed
     participants = challenge.participants or []
 
     if user_id in participants:
@@ -142,18 +98,22 @@ def join_challenge(challenge_id: int, user_id: int, db: SessionLocal = Depends(g
 
     participants.append(user_id)
     challenge.participants = participants
-    challenge.progress[str(user_id)] = 0  # يبدأ التقدم من 0%
+    challenge.progress[str(user_id)] = 0
+
+    # Recalculate group progress
+    progresses = list(challenge.progress.values())
+    challenge.group_progress = round(sum(progresses) / len(progresses), 2) if progresses else 0
+
     db.commit()
     db.refresh(challenge)
-
-    return {"message": "Joined successfully", "participants": len(participants)}
+    return {"message": "Joined successfully", "participants": participants}
 
 
 # ============================================================
 # 🚪 Leave Challenge
 # ============================================================
-@app.delete("/api/challenges/{challenge_id}/leave")
-def leave_challenge(challenge_id: int, user_id: int, db: SessionLocal = Depends(get_db)):
+@router.delete("/{challenge_id}/leave")
+def leave_challenge(challenge_id: int, user_id: int = Query(...), db: Session = Depends(get_db)):
     challenge = db.query(models.Challenge).filter(models.Challenge.id == challenge_id).first()
     if not challenge:
         raise HTTPException(status_code=404, detail="Challenge not found")
@@ -165,75 +125,118 @@ def leave_challenge(challenge_id: int, user_id: int, db: SessionLocal = Depends(
 
     participants.remove(user_id)
     challenge.participants = participants
+
+    # Remove user progress entry
     challenge.progress.pop(str(user_id), None)
 
-    # تحديث التقدم الجماعي
+    # Update group progress safely
     progresses = list(challenge.progress.values())
     challenge.group_progress = round(sum(progresses) / len(progresses), 2) if progresses else 0
 
     db.commit()
     db.refresh(challenge)
-
-    return {"message": "Left challenge successfully", "participants": len(participants)}
-
+    return {"message": "Left challenge successfully", "participants": participants}
 
 # ============================================================
-# 📈 Update Progress
+# ✏️ Update Challenge
 # ============================================================
-@app.patch("/api/challenges/{challenge_id}/progress")
-def update_progress(challenge_id: int, user_id: int, progress: float, db: SessionLocal = Depends(get_db)):
+@router.put("/{challenge_id}", response_model=schemas.ChallengeResponse)
+def update_challenge(challenge_id: int, challenge_data: schemas.ChallengeCreate, db: Session = Depends(get_db)):
     challenge = db.query(models.Challenge).filter(models.Challenge.id == challenge_id).first()
     if not challenge:
         raise HTTPException(status_code=404, detail="Challenge not found")
 
-    # تحديث تقدم المستخدم
-    challenge.progress[str(user_id)] = progress
-
-    # تحديث متوسط تقدم المجموعة
-    progresses = list(challenge.progress.values())
-    challenge.group_progress = round(sum(progresses) / len(progresses), 2) if progresses else 0
-
-    db.commit()
-    db.refresh(challenge)
-
-    return {
-        "message": "Progress updated successfully",
-        "user_progress": challenge.progress[str(user_id)],
-        "group_progress": challenge.group_progress
-    }
-
-
-# ============================================================
-# ✏️ Update Challenge (PUT)
-# ============================================================
-@app.put("/api/challenges/{challenge_id}", response_model=schemas.ChallengeResponse)
-def update_challenge(challenge_id: int, challenge_data: schemas.ChallengeCreate, db: SessionLocal = Depends(get_db)):
-    challenge = db.query(models.Challenge).filter(models.Challenge.id == challenge_id).first()
-    if not challenge:
-        raise HTTPException(status_code=404, detail="Challenge not found")
-
-    # تحديث البيانات
     challenge.title = challenge_data.title
     challenge.description = challenge_data.description
     challenge.level = challenge_data.level
     challenge.start_date = challenge_data.start_date
     challenge.end_date = challenge_data.end_date
     challenge.max_participants = challenge_data.max_participants
-    challenge.tasks = challenge_data.tasks or challenge.tasks
+
+    # ✅ Safely update tasks
+    if challenge_data.tasks:
+        challenge.tasks = challenge_data.tasks
 
     db.commit()
     db.refresh(challenge)
     return challenge
 
-
 # ============================================================
 # ❌ Delete Challenge
 # ============================================================
-@app.delete("/api/challenges/{challenge_id}")
-def delete_challenge(challenge_id: int, db: SessionLocal = Depends(get_db)):
+@router.delete("/{challenge_id}")
+def delete_challenge(challenge_id: int, db: Session = Depends(get_db)):
     challenge = db.query(models.Challenge).filter(models.Challenge.id == challenge_id).first()
     if not challenge:
         raise HTTPException(status_code=404, detail="Challenge not found")
     db.delete(challenge)
     db.commit()
     return {"message": "Challenge deleted successfully"}
+
+
+# ============================================================
+# 💬 Comments System (per challenge)
+# ============================================================
+
+from datetime import datetime
+
+# Temporary in-memory store (you can later move to a Comment model)
+COMMENTS = {}  # { challenge_id: [ {id, user_name, content, timestamp} ] }
+COMMENT_COUNTER = 1
+
+
+@router.get("/{challenge_id}/comments")
+def get_comments(challenge_id: int):
+    """Get all comments for a challenge"""
+    return COMMENTS.get(challenge_id, [])
+
+
+@router.post("/{challenge_id}/comments")
+def add_comment(
+    challenge_id: int,
+    user_id: int = Query(...),
+    content: str = Query(...),
+):
+    """Add a new comment"""
+    global COMMENT_COUNTER
+    if not content.strip():
+        raise HTTPException(status_code=400, detail="Empty comment")
+
+    comment = {
+        "id": COMMENT_COUNTER,
+        "user_id": user_id,
+        "user_name": f"User {user_id}",
+        "content": content.strip(),
+        "timestamp": datetime.utcnow().isoformat(),
+    }
+    COMMENT_COUNTER += 1
+
+    if challenge_id not in COMMENTS:
+        COMMENTS[challenge_id] = []
+    COMMENTS[challenge_id].append(comment)
+    return {"message": "Comment added successfully", "comment": comment}
+
+
+@router.patch("/comments/{comment_id}")
+def update_comment(comment_id: int, content: str = Query(...)):
+    """Update comment content"""
+    for challenge_id, items in COMMENTS.items():
+        for comment in items:
+            if comment["id"] == comment_id:
+                comment["content"] = content.strip()
+                return {"message": "Comment updated", "comment": comment}
+    raise HTTPException(status_code=404, detail="Comment not found")
+
+
+@router.delete("/comments/{comment_id}")
+def delete_comment(comment_id: int):
+    """Delete a comment"""
+    for challenge_id, items in COMMENTS.items():
+        for comment in items:
+            if comment["id"] == comment_id:
+                COMMENTS[challenge_id] = [
+                    c for c in items if c["id"] != comment_id
+                ]
+                return {"message": "Comment deleted"}
+    raise HTTPException(status_code=404, detail="Comment not found")
+

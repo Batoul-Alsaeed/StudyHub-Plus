@@ -4,11 +4,13 @@ import illustration from '../assets/images/Login Image.png';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from "../contexts/AuthContext";
 
+const API_URL = "http://127.0.0.1:8000";
 
 function Login() {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { setUser } = useAuth();
 
@@ -16,6 +18,7 @@ function Login() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
 
     if (!email || !password) {
       setError('Please enter both email and password.');
@@ -23,25 +26,27 @@ function Login() {
     }
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch(`${API_URL}/api/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
+      setLoading(false);
 
       if (response.ok) {
         alert('Welcome Back!');
-        setUser({ name: data.user || data.name || "User", email });
+        setUser({ id: data.id, name: data.user || data.name || "User", email: data.email });
         setError('');
         navigate('/dashboard'); // redirect to dashboard
       } else {
         setError(data.detail || data.message || 'Invalid email or password.');
       }
     } catch (err) {
-      console.error(err);
+      console.error("Login error:", err);
       setError('Unable to connect to the server.');
+      setLoading(false);
     }
   };
 
