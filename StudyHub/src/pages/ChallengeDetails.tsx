@@ -13,7 +13,7 @@ type CommentRow = {
   timestamp: string;
 };
 
-const API_BASE = "http://127.0.0.1:8000/api";
+const API_BASE = "https://studyhub-backend-81w7.onrender.com/api";
 
 async function safeFetch<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, options);
