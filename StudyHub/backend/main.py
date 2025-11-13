@@ -21,15 +21,18 @@ app = FastAPI()
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://studyhub-frontend-aim2.onrender.com",
-                   "http://localhost:5173"
-                   ],
+    allow_origins=[
+        "https://studyhub-frontend-aim2.onrender.com",
+        "http://localhost:5173"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 app.include_router(focus_router)
 app.include_router(challenges_router)
 
