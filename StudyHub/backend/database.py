@@ -3,17 +3,14 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
 
-# نقرأ رابط القاعدة من متغير البيئة
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = "postgresql://postgres:B4709903atoul@db.guyoesmoykuioothbewe.supabase.co:5432/postgres"
 
-# إنشاء الاتصال
-engine = create_engine(DATABASE_URL)
+engine = create_engine(DATABASE_URL, connect_args={"sslmode": "require"})
 
-# إعداد الـ Session
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# الأساس لجميع النماذج
 Base = declarative_base()
+
 
 #SQLALCHEMY_DATABASE_URL = "sqlite:///./users.db"
 
