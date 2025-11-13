@@ -6,11 +6,10 @@ import json
 from pathlib import Path
 from .focusTime import router as focus_router
 from .challenges import router as challenges_router
-models.Base.metadata.create_all(bind=engine)
-
 
 from . import models, schemas
 from .database import engine, SessionLocal
+models.Base.metadata.create_all(bind=engine)
 
 print("✅ Loaded: backend/main.py")
 
