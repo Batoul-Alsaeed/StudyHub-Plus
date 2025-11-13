@@ -13,10 +13,12 @@ from .database import engine, SessionLocal
 print("✅ Loaded: backend/main.py")
 
 
-# Create database tables
-models.Base.metadata.create_all(bind=engine)
+
 
 app = FastAPI()
+
+
+
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -35,6 +37,11 @@ app.add_middleware(
 )
 
 
+# Create database tables
+@app.on_event("startup")
+def init_tables():
+    models.Base.metadata.create_all(bind=engine)
+    
 app.include_router(focus_router)
 app.include_router(challenges_router)
 
