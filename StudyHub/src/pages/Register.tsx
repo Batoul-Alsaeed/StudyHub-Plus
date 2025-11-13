@@ -14,7 +14,7 @@ function Register() {
   const [error, setError] = useState<string>('');
   const navigate = useNavigate();
   const [success, setSuccess] = useState<string>('');
-  const [loading, setLoading] = useState(false);
+  const [_loading, setLoading] = useState(false);
   const { setUser } = useAuth();
 
 

@@ -128,13 +128,15 @@ export default function ChallengeDetails() {
     ? challenge.participants
     : [];
 
+  // @ts-ignore
   const participantIds = participantsArray
     .map((p) =>
       typeof p === "object" && p !== null ? (p as any).id : Number(p)
     )
     .filter(Boolean) as number[];
-
-  const participantNames = participantsArray
+    
+  // @ts-ignore
+    const participantNames = participantsArray
     .map((p) => (typeof p === "object" && p !== null ? (p as any).name : p))
     .filter(Boolean) as string[];
 

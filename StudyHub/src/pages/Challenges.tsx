@@ -1,5 +1,5 @@
 // src/pages/Challenges.tsx
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "../css/Challenges.css";
 import { useAuth } from "../contexts/AuthContext";
 import ChallengeModal from "../components/ChallengeModal";
@@ -24,7 +24,7 @@ export default function Challenges() {
   const currentUserName =
     (user as any)?.name || localStorage.getItem("username") || "Guest";
 
-  const [raw, setRaw] = useState<Challenge[]>([]);
+  const [_raw, setRaw] = useState<Challenge[]>([]);
   const [list, setList] = useState<Normalized[]>([]);
   const [activeTab, setActiveTab] = useState<"browse" | "my">("browse");
   const [isModalOpen, setIsModalOpen] = useState(false);
