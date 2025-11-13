@@ -7,8 +7,6 @@ from pathlib import Path
 from .focusTime import router as focus_router
 from .challenges import router as challenges_router
 
-
-
 from . import models, schemas
 from .database import engine, SessionLocal
 
@@ -25,7 +23,9 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["https://studyhub-frontend-aim2.onrender.com",
+                   "http://localhost:5173",
+                   ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
