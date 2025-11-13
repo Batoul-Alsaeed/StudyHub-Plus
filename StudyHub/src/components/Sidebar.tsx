@@ -6,8 +6,8 @@ import { useAuth } from "../contexts/AuthContext";
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, setUser } = useAuth();
-
+  const { setUser } = useAuth();
+  /*const { user } = useAuth();*/
 
   const activePath = location.pathname;
 

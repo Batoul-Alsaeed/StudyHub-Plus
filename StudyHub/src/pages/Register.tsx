@@ -4,7 +4,7 @@ import illustration from '../assets/images/Register Image.png';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from "../contexts/AuthContext";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = "https://studyhub-backend-81w7.onrender.com";
 
 
 function Register() {
@@ -14,7 +14,7 @@ function Register() {
   const [error, setError] = useState<string>('');
   const navigate = useNavigate();
   const [success, setSuccess] = useState<string>('');
-  const [loading, setLoading] = useState(false);
+  const [_loading, setLoading] = useState(false);
   const { setUser } = useAuth();
 
 

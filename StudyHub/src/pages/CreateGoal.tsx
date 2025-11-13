@@ -9,6 +9,7 @@ export default function CreateGoal() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { addGoal } = useGoals();
+  // @ts-ignore
   const { user } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {

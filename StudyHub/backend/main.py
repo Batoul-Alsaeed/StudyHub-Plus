@@ -7,29 +7,41 @@ from pathlib import Path
 from .focusTime import router as focus_router
 from .challenges import router as challenges_router
 
-
-
 from . import models, schemas
 from .database import engine, SessionLocal
 
 print("✅ Loaded: backend/main.py")
 
 
-# Create database tables
-models.Base.metadata.create_all(bind=engine)
+
 
 app = FastAPI()
+
+
+
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "https://study-hub-plus.vercel.app",
+        "http://localhost:5173",
+        "https://studyhub-backend-81w7.onrender.com"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# Create database tables
+@app.on_event("startup")
+def init_tables():
+    models.Base.metadata.create_all(bind=engine)
+    
 app.include_router(focus_router)
 app.include_router(challenges_router)
 

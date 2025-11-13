@@ -1,5 +1,5 @@
 // src/pages/Challenges.tsx
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "../css/Challenges.css";
 import { useAuth } from "../contexts/AuthContext";
 import ChallengeModal from "../components/ChallengeModal";
@@ -24,7 +24,7 @@ export default function Challenges() {
   const currentUserName =
     (user as any)?.name || localStorage.getItem("username") || "Guest";
 
-  const [raw, setRaw] = useState<Challenge[]>([]);
+  const [_raw, setRaw] = useState<Challenge[]>([]);
   const [list, setList] = useState<Normalized[]>([]);
   const [activeTab, setActiveTab] = useState<"browse" | "my">("browse");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -86,7 +86,7 @@ export default function Challenges() {
   /** ===== Fetch ===== **/
   const fetchChallenges = () => {
     setLoading(true);
-    fetch(`http://127.0.0.1:8000/api/challenges`)
+    fetch(`https://studyhub-backend-81w7.onrender.com/api/challenges`)
       .then(async (res) => (await safeJSON(res)) ?? [])
       .then((data) => {
         setRaw(data);
@@ -124,8 +124,8 @@ export default function Challenges() {
   const handleSaveChallenge = (data: AnyObj) => {
     const method = editingChallenge ? "PUT" : "POST";
     const url = editingChallenge
-      ? `http://127.0.0.1:8000/api/challenges/${editingChallenge.id}`
-      : "http://127.0.0.1:8000/api/challenges";
+      ? `https://studyhub-backend-81w7.onrender.com/api/challenges/${editingChallenge.id}`
+      : "https://studyhub-backend-81w7.onrender.com/api/challenges";
 
     const payload = {
       ...data,
@@ -194,7 +194,7 @@ export default function Challenges() {
   setLoading(true);
   try {
     const res = await fetch(
-      `http://127.0.0.1:8000/api/challenges/${id}/join?user_id=${tempUserId}`,
+      `https://studyhub-backend-81w7.onrender.com/api/challenges/${id}/join?user_id=${tempUserId}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -256,7 +256,7 @@ export default function Challenges() {
   setLoading(true);
   try {
     const res = await fetch(
-      `http://127.0.0.1:8000/api/challenges/${id}/leave?user_id=${tempUserId}`,
+      `https://studyhub-backend-81w7.onrender.com/api/challenges/${id}/leave?user_id=${tempUserId}`,
       {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
@@ -302,7 +302,7 @@ const handleEdit = (challenge: Challenge) => {
     
     setLoading(true);
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/challenges/${id}`, {
+      const res = await fetch(`https://studyhub-backend-81w7.onrender.com/api/challenges/${id}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Failed to delete challenge");
