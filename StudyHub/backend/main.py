@@ -9,13 +9,12 @@ from .challenges import router as challenges_router
 
 from . import models, schemas
 from .database import engine, SessionLocal
-models.Base.metadata.create_all(bind=engine)
 
 print("✅ Loaded: backend/main.py")
 
 
 # Create database tables
-models.Base.metadata.create_all(bind=engine)
+#models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -27,12 +26,14 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://study-hub-plus.vercel.app",
-        "http://localhost:5173"
+        "http://localhost:5173",
+        "https://studyhub-backend-81w7.onrender.com"
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 app.include_router(focus_router)
 app.include_router(challenges_router)
