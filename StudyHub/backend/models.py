@@ -79,7 +79,7 @@ class Challenge(Base):
     start_date = Column(Date, nullable=True)
     end_date = Column(Date, nullable=True)
 
-    participants = Column(JSON, default=list)
+    participants = Column(ARRAY(Integer), default=list)
     tasks = Column(JSON, default=list)
     progress = Column(JSON, default=dict)
 
