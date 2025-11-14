@@ -19,7 +19,7 @@ def get_db():
 
 
 # ============================================================
-# 🏁 Create Challenge
+# Create Challenge
 # ============================================================
 @router.post("", response_model=schemas.ChallengeResponse)
 def create_challenge(challenge: schemas.ChallengeCreate, db: Session = Depends(get_db)):
@@ -44,7 +44,7 @@ def create_challenge(challenge: schemas.ChallengeCreate, db: Session = Depends(g
 
 
 # ============================================================
-# 📋 Get All Challenges
+# Get All Challenges
 # ============================================================
 @router.get("", response_model=list[schemas.ChallengeResponse])
 def get_challenges(db: Session = Depends(get_db)):
@@ -61,7 +61,7 @@ def get_challenges(db: Session = Depends(get_db)):
 
 
 # ============================================================
-# 🔍 Get Single Challenge by ID
+# Get Single Challenge by ID
 # ============================================================
 @router.get("/{challenge_id}", response_model=schemas.ChallengeResponse)
 def get_challenge(challenge_id: int, db: Session = Depends(get_db)):
@@ -71,7 +71,7 @@ def get_challenge(challenge_id: int, db: Session = Depends(get_db)):
     if not challenge:
         raise HTTPException(status_code=404, detail="Challenge not found")
 
-    # ✅ Always return tasks as a list
+    # Always return tasks as a list
     if isinstance(challenge.tasks, str):
         try:
             challenge.tasks = json.loads(challenge.tasks)
@@ -86,7 +86,7 @@ def get_challenge(challenge_id: int, db: Session = Depends(get_db)):
 
 
 # ============================================================
-# 🤝 Join Challenge
+# Join Challenge
 # ============================================================
 @router.post("/{challenge_id}/join")
 def join_challenge(
@@ -95,38 +95,56 @@ def join_challenge(
     challenge = (
         db.query(models.Challenge).filter(models.Challenge.id == challenge_id).first()
     )
+    
     if not challenge:
         raise HTTPException(status_code=404, detail="Challenge not found")
 
-    # Convert to list if needed
+    # Participants list
     participants = challenge.participants or []
 
+    # Already joined?
     if user_id in participants:
         raise HTTPException(
             status_code=400, detail="User already joined this challenge"
         )
-
+    
+    # Check max capacity
     if len(participants) >= challenge.max_participants:
         raise HTTPException(status_code=400, detail="This challenge is already full")
     
-
+    # Add participant
     participants.append(user_id)
     challenge.participants = participants
-    challenge.progress[str(user_id)] = 0
 
-    if str(user_id) not in challenge.progress:
+    # Initialize user progress array for tasks
+    if challenge.tasks:
         challenge.progress[str(user_id)] = [False] * len(challenge.tasks)
+    else:
+        challenge.progress[str(user_id)] = []
 
-    # Recalculate group progress
-    progresses = list(challenge.progress.values())
+    #Recalculate group progress
+    all_progress_values = []
+    for p in challenge.progress.values():
+        # Each p is: list of booleans for tasks
+        if isinstance(p, list) and p:
+            percentage = round((p.count(True) / len(p)) * 100, 2)
+            all_progress_values.append(percentage)
+
     challenge.group_progress = (
-        round(sum(progresses) / len(progresses), 2) if progresses else 0
+        round(sum(all_progress_values) / len(all_progress_values), 2)
+        if all_progress_values
+        else 0
     )
-
+    
+    db.add(challenge)
     db.commit()
     db.refresh(challenge)
-    return {"message": "Joined successfully", "participants": participants}
 
+    return {"message": "Joined successfully", "participants": challenge.participants}
+
+# ============================================================
+# task-toggle
+# ============================================================
 @router.patch("/{challenge_id}/task-toggle")
 def toggle_task(
     challenge_id: int,
@@ -178,7 +196,7 @@ def toggle_task(
     }
 
 # ============================================================
-# 🚪 Leave Challenge
+# Leave Challenge
 # ============================================================
 @router.delete("/{challenge_id}/leave")
 def leave_challenge(
