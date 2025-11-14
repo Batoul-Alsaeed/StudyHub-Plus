@@ -12,6 +12,7 @@ typing-inspection==0.4.2
 typing_extensions==4.15.0
 uvicorn==0.37.0
 sqlalchemy==2.0.36
+bcrypt==4.0.1
 passlib[bcrypt]==1.7.4
 python-multipart==0.0.6
 psycopg2-binary
