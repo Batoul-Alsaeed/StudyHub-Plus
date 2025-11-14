@@ -1,13 +1,13 @@
 from pydantic import BaseModel, Field
-from typing import Optional, Literal
-from datetime import datetime
-from typing import Optional, List, Dict
+from typing import Optional, Literal, List, Dict
+from datetime import datetime, date
 
 
 class UserCreate(BaseModel):
     name: str
     email: str
     password: str
+
 
 class UserResponse(BaseModel):
     id: int
@@ -17,8 +17,6 @@ class UserResponse(BaseModel):
     class Config:
         from_attributes = True
         orm_mode = True
-
-
 
 
 class GoalBase(BaseModel):
@@ -47,6 +45,7 @@ class FocusCreate(BaseModel):
     duration_min: int
     user_id: Optional[int] = None
 
+
 class FocusResponse(BaseModel):
     id: int
     user_id: Optional[int] = None
@@ -55,7 +54,7 @@ class FocusResponse(BaseModel):
     elapsed_sec: float
     pauses_count: int
     did_pause: bool
-    status: Literal["created","running","paused","completed","canceled"]
+    status: Literal["created", "running", "paused", "completed", "canceled"]
     started_at: Optional[datetime]
     completed_at: Optional[datetime]
     updated_at: Optional[datetime]
@@ -64,16 +63,22 @@ class FocusResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
 class FocusTick(BaseModel):
     """Sent by client only when pausing or completing, to sync elapsed time."""
+
     elapsed_sec: float = Field(ge=0)
+
 
 class FocusSummary(BaseModel):
     date: str
     total_elapsed_sec: float
-    active_timer: Optional[int] = None       # remaining seconds for the latest running session (if any)
-    daily_plant_growth: float                 # 0, 0.5, or 1        
+    active_timer: Optional[int] = (
+        None  # remaining seconds for the latest running session (if any)
+    )
+    daily_plant_growth: float  # 0, 0.5, or 1
 
+# -------------------- CHALLENGES --------------------
 # (Request Body)
 class ChallengeCreate(BaseModel):
     title: str
@@ -81,10 +86,10 @@ class ChallengeCreate(BaseModel):
     level: Optional[str] = None
     creator_name: str
     creator_id: Optional[int] = None
-    start_date: Optional[str] = None
-    end_date: Optional[str] = None
+    start_date: date
+    end_date: date
     max_participants: int = 10
-    tasks: List[str] = Field(default_factory=list)
+    tasks: List[str]
     participants: List[int] = Field(default_factory=list)
     progress: Dict[str, float] = Field(default_factory=dict)
     group_progress: float = 0.0
@@ -97,19 +102,34 @@ class ChallengeResponse(BaseModel):
     level: Optional[str]
     creator_name: str
     creator_id: Optional[int] = None
-    start_date: Optional[str]
-    end_date: Optional[str]
-    tasks: List[str] = Field(default_factory=list)
+    start_date: date
+    end_date: date
+    tasks: List[str]
     participants: List[int] = Field(default_factory=list)
-    progress: Dict[str, float] = Field(default_factory=dict)
+    participants_count: int = 0
+    progress: Dict[str, List[bool]] = Field(default_factory=dict)
     group_progress: float = 0.0
     max_participants: int
+    status: Optional[str] = None
+    is_creator: Optional[bool] = False
+    is_joined: Optional[bool] = False
 
     class Config:
         from_attributes = True
         orm_mode = True
-    
+
+
 class ChallengeJoin(BaseModel):
     user_id: int
 
+# -------------------- COMMENTS --------------------
+class CommentResponse(BaseModel):
+    id: int
+    user_id: int
+    user_name: str
+    content: str
+    timestamp: datetime
 
+    class Config:
+        from_attributes = True
+        orm_mode = True

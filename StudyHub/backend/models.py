@@ -1,8 +1,7 @@
-from sqlalchemy import Column, Integer, String, Boolean, Float, DateTime, Enum, ForeignKey, Date, Text
+from sqlalchemy import (Column,Integer,String,Boolean,Float,DateTime,Enum,ForeignKey,Date,Text)
 import enum
 from datetime import datetime
 from sqlalchemy.orm import relationship
-from sqlalchemy import Column, Integer, String
 from .database import Base
 from sqlalchemy.types import JSON
 
@@ -17,10 +16,9 @@ class User(Base):
 
     challenges_created = relationship("Challenge", back_populates="creator")
 
-
-
     # Link to goals
     goals = relationship("Goal", back_populates="user")
+
 
 class Goal(Base):
     __tablename__ = "goals"
@@ -37,11 +35,12 @@ class Goal(Base):
 
 
 class SessionStatus(str, enum.Enum):
-    created = "created"     # saved but not started
+    created = "created"  # saved but not started
     running = "running"
     paused = "paused"
     completed = "completed"
     canceled = "canceled"
+
 
 class FocusSession(Base):
     __tablename__ = "focus_sessions"
@@ -51,8 +50,8 @@ class FocusSession(Base):
     user_id = Column(Integer, nullable=True, index=True)
 
     title = Column(String, nullable=False)
-    duration_min = Column(Integer, nullable=False)        # planned minutes
-    elapsed_sec = Column(Float, default=0.0)              # server-tracked
+    duration_min = Column(Integer, nullable=False)  # planned minutes
+    elapsed_sec = Column(Float, default=0.0)  # server-tracked
     pauses_count = Column(Integer, default=0)
     did_pause = Column(Boolean, default=False)
 
@@ -63,8 +62,7 @@ class FocusSession(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # final growth score for this session (0, 0.5, 1) set at completion
-    plant_growth = Column(Float, default=0.0) 
-
+    plant_growth = Column(Float, default=0.0)
 
 
 # (Challenge Table)
@@ -76,14 +74,32 @@ class Challenge(Base):
     description = Column(Text, nullable=True)
     level = Column(String, nullable=True)
     creator_name = Column(String, nullable=False)
-    start_date = Column(String, nullable=True)
-    end_date = Column(String, nullable=True)
-    participants = Column(JSON, default=[])
-    #participants = Column(Integer, default=0)
+    start_date = Column(Date, nullable=True)
+    end_date = Column(Date, nullable=True)
+
+    participants = Column(JSON, default=list)
+    tasks = Column(JSON, default=list)
+    progress = Column(JSON, default=dict)
+
     max_participants = Column(Integer, nullable=False, default=10)
-    tasks = Column(JSON, default=[])
-    progress = Column(JSON, default={})
     group_progress = Column(Integer, default=0)
+
     creator_id = Column(Integer, ForeignKey("users.id"))
     creator = relationship("User", back_populates="challenges_created")
-   
+    comments = relationship("Comment", back_populates="challenge", cascade="all, delete")
+
+
+class Comment(Base):
+    __tablename__ = "comments"
+
+    id = Column(Integer, primary_key=True, index=True)
+    challenge_id = Column(Integer, ForeignKey("challenges.id"), nullable=False)
+
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_name = Column(String, nullable=False)
+
+    content = Column(Text, nullable=False)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+
+    challenge = relationship("Challenge", back_populates="comments")
+    user = relationship("User")

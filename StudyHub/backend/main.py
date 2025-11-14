@@ -10,26 +10,19 @@ from .challenges import router as challenges_router
 from . import models, schemas
 from .database import engine, SessionLocal
 
-print("✅ Loaded: backend/main.py")
-
-
+print("Loaded: backend/main.py")
 
 
 app = FastAPI()
-
-
-
-
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://study-hub-plus.vercel.app",
         "http://localhost:5173",
-        "https://studyhub-backend-81w7.onrender.com"
+        "https://studyhub-frontend-aim2.onrender.com",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -41,10 +34,10 @@ app.add_middleware(
 @app.on_event("startup")
 def init_tables():
     models.Base.metadata.create_all(bind=engine)
-    
+
+
 app.include_router(focus_router)
 app.include_router(challenges_router)
-
 
 
 # Database dependency
@@ -56,9 +49,9 @@ def get_db():
         db.close()
 
 
-#DB_FILE = Path("db.json")
+# DB_FILE = Path("db.json")
 
-#def save_to_json(data):
+# def save_to_json(data):
 #    """Save all users to db.json"""
 #    if DB_FILE.exists():
 #        with open(DB_FILE, "r") as f:
@@ -78,7 +71,9 @@ def root():
 # Register endpoint
 @app.post("/api/register")
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    existing_user = db.query(models.User).filter(models.User.email == user.email).first()
+    existing_user = (
+        db.query(models.User).filter(models.User.email == user.email).first()
+    )
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
@@ -91,7 +86,12 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     # Save to db.json
     # save_to_json({"id": new_user.id, "name": new_user.name, "email": new_user.email, "password": user.password})
 
-    return {"message": "User registered successfully", "id": new_user.id, "name": new_user.name, "email": new_user.email}
+    return {
+        "message": "User registered successfully",
+        "id": new_user.id,
+        "name": new_user.name,
+        "email": new_user.email,
+    }
 
 
 # Login endpoint
@@ -100,31 +100,29 @@ def login(user: dict, db: Session = Depends(get_db)):
     email = user.get("email")
     password = user.get("password")
 
-        # Read from db.json
-    #if not DB_FILE.exists():
-        #raise HTTPException(status_code=404, detail="Database not found")
+    # Read from db.json
+    # if not DB_FILE.exists():
+    # raise HTTPException(status_code=404, detail="Database not found")
 
-    #with open(DB_FILE, "r") as f:
-        #data = json.load(f)
+    # with open(DB_FILE, "r") as f:
+    # data = json.load(f)
 
-    #found_user = next((u for u in data["users"] if u["email"] == email and u["password"] == password), None)
+    # found_user = next((u for u in data["users"] if u["email"] == email and u["password"] == password), None)
 
-    #if not found_user:
-        #raise HTTPException(status_code=401, detail="Invalid email or password")
-    
+    # if not found_user:
+    # raise HTTPException(status_code=401, detail="Invalid email or password")
+
     db_user = db.query(models.User).filter(models.User.email == email).first()
 
     if not db_user or not pwd_context.verify(password, db_user.password):
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
-
     return {
         "message": "Login successful",
         "id": db_user.id,
         "name": db_user.name,
-        "email": db_user.email
+        "email": db_user.email,
     }
-
 
 
 # Goals endpoint
@@ -140,7 +138,7 @@ def create_goal(goal: schemas.GoalCreate, db: Session = Depends(get_db)):
         completed=goal.completed,
         date=goal.date,
         user_id=goal.user_id,
-        color=goal.color 
+        color=goal.color,
     )
     db.add(new_goal)
     db.commit()
@@ -165,8 +163,9 @@ def update_goal(goal_id: int, db: Session = Depends(get_db)):
     db.refresh(goal)
     return goal
 
+
 @app.on_event("startup")
 def show_routes():
-    print("\n🚀 Registered FastAPI Routes:")
+    print("\n Registered FastAPI Routes:")
     for route in app.routes:
         print(" →", route.path)
