@@ -55,8 +55,12 @@ export default function Challenges() {
     if (!src) return [];
     if (Array.isArray(src) && src.length > 0) {
       const first = src[0];
+
+      // participants: [1, 2, 3]
       if (typeof first === "number") return Array.from(new Set(src));
-      if (typeof first === "object" && first)
+
+      // participants: [{ id: 1 }, { user_id: 2 }, "3"]
+      if (typeof first === "object" && first) {
         return Array.from(
           new Set(
             (src as AnyObj[])
@@ -66,18 +70,25 @@ export default function Challenges() {
               .filter((n) => Number.isFinite(n))
           )
         );
+      }
     }
     return [];
   };
 
   const normalizeOne = (c: Challenge): Normalized => {
     const ids = extractParticipantIds(c);
-    const pc = typeof c?.participants_count === "number"
-      ? c.participants_count
-      : ids.length;
+    const pc =
+      typeof c?.participants_count === "number"
+        ? c.participants_count
+        : ids.length;
     const status: Normalized["_status"] =
       typeof c?.status === "string" ? c.status : undefined;
-    return { ...c, _participantIds: ids, _participantsCount: pc, _status: status };
+    return {
+      ...c,
+      _participantIds: ids,
+      _participantsCount: pc,
+      _status: status,
+    };
   };
 
   const normalizeAll = (arr: Challenge[]) =>
@@ -174,139 +185,151 @@ export default function Challenges() {
 
   /** ===== Join / Leave ===== **/
   const handleJoin = async (id: number) => {
-  const tempUserId = currentUserId;
-  const tempUserName = currentUserName;
+    const tempUserId = currentUserId;
+    const tempUserName = currentUserName;
 
-  // Optimistic UI update
-  setList((prev) =>
-    prev.map((c) =>
-      c.id === id && !c._participantIds.includes(tempUserId)
-        ? {
-            ...c,
-            _participantIds: [...c._participantIds, tempUserId],
-            _participantsCount: c._participantsCount + 1,
-          }
-        : c
-    )
-  );
-  showToast("Joined");
+    if (!tempUserId) {
+      showToast("Please login first");
+      return;
+    }
 
-  setLoading(true);
-  try {
-    const res = await fetch(
-      `https://studyhub-backend-81w7.onrender.com/api/challenges/${id}/join?user_id=${tempUserId}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_name: tempUserName }),
-      }
-    );
-
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.detail || "Failed to join");
-
-    // ✅ Sync updated participants list from backend response
+    // Optimistic UI update
     setList((prev) =>
       prev.map((c) =>
-        c.id === id
+        c.id === id && !c._participantIds.includes(tempUserId)
           ? {
               ...c,
-              _participantIds: Array.isArray(data.participants)
-                ? data.participants.map((p: any) => Number(p))
-                : [],
-              _participantsCount: Array.isArray(data.participants)
-                ? data.participants.length
-                : c._participantsCount,
+              _participantIds: [...c._participantIds, tempUserId],
+              _participantsCount: c._participantsCount + 1,
             }
           : c
       )
     );
+    showToast("Joined");
 
-    setActiveTab("my"); // switch tab automatically
-    showToast("Joined successfully!");
-  } catch (e: any) {
-    showToast(e.message || "Failed to join");
-  } finally {
-    setLoading(false);
-  }
-};
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `https://studyhub-backend-81w7.onrender.com/api/challenges/${id}/join?user_id=${tempUserId}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_name: tempUserName }),
+        }
+      );
 
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.detail || "Failed to join");
 
+      // ✅ Sync updated participants list from backend response
+      setList((prev) =>
+        prev.map((c) =>
+          c.id === id
+            ? {
+                ...c,
+                _participantIds: Array.isArray(data.participants)
+                  ? data.participants.map((p: any) => Number(p))
+                  : [],
+                _participantsCount: Array.isArray(data.participants)
+                  ? data.participants.length
+                  : c._participantsCount,
+              }
+            : c
+        )
+      );
 
+      setActiveTab("my"); // switch tab automatically
+      showToast("Joined successfully!");
+    } catch (e: any) {
+      showToast(e.message || "Failed to join");
+      // (ممكن لاحقًا نرجع التغيير لو حبيتي)
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLeave = async (id: number) => {
-  const tempUserId = currentUserId;
+    const tempUserId = currentUserId;
 
-  // Optimistic UI update
-  setList((prev) =>
-    prev.map((c) =>
-      c.id === id
-        ? {
-            ...c,
-            _participantIds: c._participantIds.filter(
-              (pid) => pid !== tempUserId
-            ),
-            _participantsCount: Math.max(0, c._participantsCount - 1),
-          }
-        : c
-    )
-  );
-  showToast("Left");
+    if (!tempUserId) {
+      showToast("Please login first");
+      return;
+    }
 
-  setLoading(true);
-  try {
-    const res = await fetch(
-      `https://studyhub-backend-81w7.onrender.com/api/challenges/${id}/leave?user_id=${tempUserId}`,
-      {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.detail || "Failed to leave");
-
-    // ✅ Sync updated participants list from backend
+    // Optimistic UI update
     setList((prev) =>
       prev.map((c) =>
         c.id === id
           ? {
               ...c,
-              _participantIds: Array.isArray(data.participants)
-                ? data.participants.map((p: any) => Number(p))
-                : [],
-              _participantsCount: Array.isArray(data.participants)
-                ? data.participants.length
-                : c._participantsCount,
+              _participantIds: c._participantIds.filter(
+                (pid) => pid !== tempUserId
+              ),
+              _participantsCount: Math.max(0, c._participantsCount - 1),
             }
           : c
       )
     );
+    showToast("Left");
 
-    showToast("Left challenge");
-  } catch (e: any) {
-    showToast(e.message || "Failed to leave");
-  } finally {
-    setLoading(false);
-  }
-};
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `https://studyhub-backend-81w7.onrender.com/api/challenges/${id}/leave?user_id=${tempUserId}`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
-const handleEdit = (challenge: Challenge) => {
-  setEditingChallenge(challenge);
-  setIsModalOpen(true);
-};
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.detail || "Failed to leave");
+
+      // ✅ Sync updated participants list from backend
+      setList((prev) =>
+        prev.map((c) =>
+          c.id === id
+            ? {
+                ...c,
+                _participantIds: Array.isArray(data.participants)
+                  ? data.participants.map((p: any) => Number(p))
+                  : [],
+                _participantsCount: Array.isArray(data.participants)
+                  ? data.participants.length
+                  : c._participantsCount,
+              }
+            : c
+        )
+      );
+
+      showToast("Left challenge");
+    } catch (e: any) {
+      showToast(e.message || "Failed to leave");
+      // (ممكن لاحقًا نرجع التغيير لو حبيتي)
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEdit = (challenge: Challenge) => {
+    setEditingChallenge(challenge);
+    setIsModalOpen(true);
+  };
 
   /** ===== Delete Challenge ===== **/
   const handleDelete = async (id: number) => {
     if (!confirm("Delete this challenge?")) return;
-    
+
     setLoading(true);
     try {
-      const res = await fetch(`https://studyhub-backend-81w7.onrender.com/api/challenges/${id}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(
+        `https://studyhub-backend-81w7.onrender.com/api/challenges/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
       if (!res.ok) throw new Error("Failed to delete challenge");
-      
+
       showToast("Challenge deleted");
       fetchChallenges();
     } catch (e: any) {
@@ -315,7 +338,6 @@ const handleEdit = (challenge: Challenge) => {
       setLoading(false);
     }
   };
-
 
   /** ===== UI ===== **/
   return (
@@ -362,11 +384,10 @@ const handleEdit = (challenge: Challenge) => {
             const uProg = userProgressOf(c);
             const gProg = groupProgressOf(c);
 
-            const renderTask = (t: any) => (typeof t === "string" ? t : t?.title ?? "");
+            const renderTask = (t: any) =>
+              typeof t === "string" ? t : t?.title ?? "";
             const isDone = (t: any) =>
               typeof t === "object" && t ? Boolean(t.done) : false;
-
-            
 
             return (
               <div
@@ -475,7 +496,7 @@ const handleEdit = (challenge: Challenge) => {
                       className="challenges-leave-btn"
                       onClick={() => handleLeave(c.id)}
                     >
-                      Leave Challenge
+                      Leave
                     </button>
                   ) : full ? (
                     <button className="challenges-join-btn full" disabled>
@@ -486,7 +507,7 @@ const handleEdit = (challenge: Challenge) => {
                       className="challenges-join-btn"
                       onClick={() => handleJoin(c.id)}
                     >
-                      Join Challenge
+                      Join
                     </button>
                   )}
                 </div>
