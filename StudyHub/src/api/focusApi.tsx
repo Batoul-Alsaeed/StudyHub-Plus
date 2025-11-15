@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Change this URL if your backend runs on another port
-const API_BASE = "http://127.0.0.1:8000/focus";
+const API_BASE = "https://studyhub-backend-81w7.onrender.com/focus";
 
 // -------- Create new focus session --------
 export async function createSession(title: string, duration_min: number) {

@@ -3,7 +3,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
 import type { Goal } from "../models/goal";
 
-const API_URL = "http://127.0.0.1:8000"; ; 
+const API_URL = "https://studyhub-backend-81w7.onrender.com"; ; 
 
 interface GoalContextType {
   goals: Goal[];

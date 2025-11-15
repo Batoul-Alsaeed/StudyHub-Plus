@@ -13,7 +13,7 @@ type CommentRow = {
   timestamp: string;
 };
 
-const API_BASE = "http://127.0.0.1:8000/api";
+const API_BASE = "https://studyhub-backend-81w7.onrender.com/api";
 
 async function safeFetch<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, options);
@@ -128,13 +128,15 @@ export default function ChallengeDetails() {
     ? challenge.participants
     : [];
 
+  // @ts-ignore
   const participantIds = participantsArray
     .map((p) =>
       typeof p === "object" && p !== null ? (p as any).id : Number(p)
     )
     .filter(Boolean) as number[];
-
-  const participantNames = participantsArray
+    
+  // @ts-ignore
+    const participantNames = participantsArray
     .map((p) => (typeof p === "object" && p !== null ? (p as any).name : p))
     .filter(Boolean) as string[];
 
