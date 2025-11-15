@@ -360,6 +360,52 @@ def delete_challenge(
 
 
 # ============================================================
+# Leaderboard
+# ============================================================
+@router.get("/{challenge_id}/leaderboard")
+def get_leaderboard(
+    challenge_id: int,
+    db: Session = Depends(get_db)
+):
+    challenge = (
+        db.query(models.Challenge)
+        .filter(models.Challenge.id == challenge_id)
+        .first()
+    )
+
+    if not challenge:
+        raise HTTPException(status_code=404, detail="Challenge not found")
+
+    participants = challenge.participants or []
+    progress = challenge.progress or {}
+
+    leaderboard = []
+
+    for uid in participants:
+        uid_str = str(uid)
+        user_prog_arr = progress.get(uid_str, [])
+
+        if len(user_prog_arr) > 0:
+            pct = round((sum(user_prog_arr) / len(user_prog_arr)) * 100, 2)
+        else:
+            pct = 0.0
+
+        user = db.query(models.User).filter(models.User.id == uid).first()
+        username = user.name if user else f"User {uid}"
+
+        leaderboard.append({
+            "user_id": uid,
+            "user_name": username,
+            "progress": pct
+        })
+
+    # ترتيب الأعلى أولاً
+    leaderboard.sort(key=lambda x: x["progress"], reverse=True)
+
+    return leaderboard
+
+
+# ============================================================
 # Comments System (Database Based)
 # ============================================================
 @router.get("/{challenge_id}/comments", response_model=list[schemas.CommentResponse])
