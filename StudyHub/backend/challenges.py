@@ -148,7 +148,23 @@ def join_challenge(
     if challenge.end_date and today > challenge.end_date:
         raise HTTPException(status_code=400, detail="Challenge already ended")
 
-    participants = challenge.participants or []
+    # ================================
+    # FIX: normalize participants JSONB
+    # ================================
+    raw_participants = challenge.participants
+
+    if isinstance(raw_participants, str):
+        try:
+            participants = json.loads(raw_participants)
+        except:
+            participants = []
+    elif isinstance(raw_participants, list):
+        participants = raw_participants
+    else:
+        participants = []
+
+    participants = [int(p) for p in participants if str(p).isdigit()]
+    # ================================
 
     if user_id in participants:
         raise HTTPException(status_code=400, detail="User already joined")
@@ -159,18 +175,17 @@ def join_challenge(
     participants.append(user_id)
     challenge.participants = participants
 
+    # progress
     challenge.progress[str(user_id)] = [False] * len(challenge.tasks)
 
-    # update group progress
+    # group progress
     all_p = []
     for arr in challenge.progress.values():
         if len(arr) > 0:
             pct = (sum(arr) / len(arr)) * 100
             all_p.append(pct)
 
-    challenge.group_progress = round(
-        sum(all_p) / len(all_p), 2
-    ) if all_p else 0
+    challenge.group_progress = round(sum(all_p) / len(all_p), 2) if all_p else 0
 
     db.commit()
     db.refresh(challenge)
