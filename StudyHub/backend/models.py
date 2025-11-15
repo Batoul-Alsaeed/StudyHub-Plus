@@ -82,8 +82,27 @@ class Challenge(Base):
     #participants = Column(Integer, default=0)
     max_participants = Column(Integer, nullable=False, default=10)
     tasks = Column(JSON, default=[])
-    progress = Column(JSON, default={})
+    progress = Column(JSON, default=dict)
     group_progress = Column(Integer, default=0)
     creator_id = Column(Integer, ForeignKey("users.id"))
     creator = relationship("User", back_populates="challenges_created")
+
+    tasks = relationship(
+        "ChallengeTask",
+        back_populates="challenge",
+        cascade="all, delete-orphan",
+        lazy="joined",    
+    )
+
+
+class ChallengeTask(Base):
+    __tablename__ = "challenge_tasks"
+
+    id = Column(Integer, primary_key=True, index=True)
+    challenge_id = Column(Integer, ForeignKey("challenges.id", ondelete="CASCADE"))
+    title = Column(String, nullable=False)
+    done = Column(Boolean, default=False)
+
+    challenge = relationship("Challenge", back_populates="tasks")
+
    

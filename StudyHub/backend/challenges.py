@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 from . import models, schemas
 from .database import SessionLocal
 import json
+from typing import List
+
 
 router = APIRouter(prefix="/api/challenges", tags=["challenges"])
 
@@ -43,17 +45,9 @@ def create_challenge(challenge: schemas.ChallengeCreate, db: Session = Depends(g
 # ============================================================
 # 📋 Get All Challenges
 # ============================================================
-@router.get("", response_model=list[schemas.ChallengeResponse])
+@router.get("", response_model=List[schemas.ChallengeResponse])
 def get_challenges(db: Session = Depends(get_db)):
     challenges = db.query(models.Challenge).all()
-    for c in challenges:
-        if isinstance(c.tasks, str):
-            try:
-                c.tasks = json.loads(c.tasks)
-            except:
-                c.tasks = []
-        if not isinstance(c.tasks, list):
-            c.tasks = []
     return challenges
 
 # ============================================================
@@ -64,18 +58,6 @@ def get_challenge(challenge_id: int, db: Session = Depends(get_db)):
     challenge = db.query(models.Challenge).filter(models.Challenge.id == challenge_id).first()
     if not challenge:
         raise HTTPException(status_code=404, detail="Challenge not found")
-
-    # ✅ Always return tasks as a list
-    if isinstance(challenge.tasks, str):
-        try:
-            challenge.tasks = json.loads(challenge.tasks)
-        except Exception:
-            challenge.tasks = []
-    elif challenge.tasks is None:
-        challenge.tasks = []
-    elif not isinstance(challenge.tasks, list):
-        challenge.tasks = []
-
     return challenge
 
 # ============================================================
@@ -98,11 +80,15 @@ def join_challenge(challenge_id: int, user_id: int = Query(...), db: Session = D
 
     participants.append(user_id)
     challenge.participants = participants
-    challenge.progress[str(user_id)] = 0
+    progress_map = challenge.progress or {}
+    progress_map[str(user_id)] = 0.0
+    challenge.progress = progress_map
 
-    # Recalculate group progress
-    progresses = list(challenge.progress.values())
-    challenge.group_progress = round(sum(progresses) / len(progresses), 2) if progresses else 0
+    # recompute group progress
+    progresses = list(progress_map.values())
+    challenge.group_progress = (
+        round(sum(progresses) / len(progresses), 2) if progresses else 0.0
+    )
 
     db.commit()
     db.refresh(challenge)
@@ -127,11 +113,15 @@ def leave_challenge(challenge_id: int, user_id: int = Query(...), db: Session = 
     challenge.participants = participants
 
     # Remove user progress entry
-    challenge.progress.pop(str(user_id), None)
+    progress_map = challenge.progress or {}
+    progress_map.pop(str(user_id), None)
+    challenge.progress = progress_map
 
     # Update group progress safely
-    progresses = list(challenge.progress.values())
-    challenge.group_progress = round(sum(progresses) / len(progresses), 2) if progresses else 0
+    progresses = list(progress_map.values())
+    challenge.group_progress = (
+        round(sum(progresses) / len(progresses), 2) if progresses else 0.0
+    )
 
     db.commit()
     db.refresh(challenge)
@@ -154,7 +144,7 @@ def update_challenge(challenge_id: int, challenge_data: schemas.ChallengeCreate,
     challenge.max_participants = challenge_data.max_participants
 
     # ✅ Safely update tasks
-    if challenge_data.tasks:
+    if challenge_data.tasks is not None:
         challenge.tasks = challenge_data.tasks
 
     db.commit()
@@ -240,3 +230,53 @@ def delete_comment(comment_id: int):
                 return {"message": "Comment deleted"}
     raise HTTPException(status_code=404, detail="Comment not found")
 
+
+
+# ============================================================
+# ✅ Tasks + Progress update
+# ============================================================
+@router.patch(
+    "/{challenge_id}/tasks",
+    response_model=schemas.ChallengeResponse,
+)
+def update_tasks(
+    challenge_id: int,
+    updated_tasks: List[schemas.ChallengeTaskUpdate],
+    user_id: int = Query(...),
+    db: Session = Depends(get_db),
+):
+    challenge = (
+        db.query(models.Challenge)
+        .filter(models.Challenge.id == challenge_id)
+        .first()
+    )
+    if not challenge:
+        raise HTTPException(status_code=404, detail="Challenge not found")
+
+    # convert Pydantic models to plain dicts for storage
+    tasks_payload = [t.model_dump() for t in updated_tasks]
+    challenge.tasks = tasks_payload
+
+    # only valid tasks with non-empty title
+    valid_tasks = [t for t in tasks_payload if t.get("title")]
+
+    total = len(valid_tasks)
+    if total == 0:
+        user_progress = 0.0
+    else:
+        completed = len([t for t in valid_tasks if bool(t.get("done"))])
+        user_progress = round((completed / total) * 100.0, 2)
+
+    progress_map = challenge.progress or {}
+    progress_map[str(user_id)] = user_progress
+    challenge.progress = progress_map
+
+    # recompute group progress (average of all users)
+    progresses = list(progress_map.values())
+    challenge.group_progress = (
+        round(sum(progresses) / len(progresses), 2) if progresses else 0.0
+    )
+
+    db.commit()
+    db.refresh(challenge)
+    return challenge

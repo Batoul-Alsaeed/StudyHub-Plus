@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import Optional, Literal
 from datetime import datetime
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Any
 
 
 class UserCreate(BaseModel):
@@ -72,9 +72,18 @@ class FocusSummary(BaseModel):
     date: str
     total_elapsed_sec: float
     active_timer: Optional[int] = None       # remaining seconds for the latest running session (if any)
-    daily_plant_growth: float                 # 0, 0.5, or 1        
+    daily_plant_growth: float                      
 
 # (Request Body)
+
+class ChallengeTaskOut(BaseModel):
+    id: int
+    title: str
+    done: bool
+
+    class Config:
+        orm_mode = True
+
 class ChallengeCreate(BaseModel):
     title: str
     description: Optional[str] = None
@@ -89,6 +98,11 @@ class ChallengeCreate(BaseModel):
     progress: Dict[str, float] = Field(default_factory=dict)
     group_progress: float = 0.0
 
+class ChallengeTaskUpdate(BaseModel):
+    title: str
+    done: bool = False
+
+
 # (Response Body)
 class ChallengeResponse(BaseModel):
     id: int
@@ -99,7 +113,7 @@ class ChallengeResponse(BaseModel):
     creator_id: Optional[int] = None
     start_date: Optional[str]
     end_date: Optional[str]
-    tasks: List[str] = Field(default_factory=list)
+    tasks: List[ChallengeTaskUpdate] = Field(default_factory=list)
     participants: List[int] = Field(default_factory=list)
     progress: Dict[str, float] = Field(default_factory=dict)
     group_progress: float = 0.0

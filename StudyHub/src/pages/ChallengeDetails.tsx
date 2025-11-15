@@ -4,7 +4,7 @@ import React from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
-type Task = string | { title?: string; done?: boolean };
+type Task = string | { id?: number; title?: string; done?: boolean };
 type LeaderRow = { id: number; name: string; progress: number };
 type CommentRow = {
   id: number;
@@ -167,7 +167,7 @@ export default function ChallengeDetails() {
   const rawTasks: Task[] = Array.isArray(challenge?.tasks)
     ? challenge.tasks
     : [];
-  const tasks = rawTasks.map((t) =>
+  const tasks = rawTasks.map((t: any) =>
     typeof t === "string"
       ? { title: t, done: false }
       : t || { title: "", done: false }
