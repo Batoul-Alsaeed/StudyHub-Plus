@@ -211,7 +211,7 @@ export default function ChallengeDetails() {
   }
 
   // Toggle task
-  async function handleToggleTask(index: number, isDone: boolean) {
+  async function handleToggleTask(index: number) {
     if (!challenge || !isJoined) return;
 
     setUpdating(true);
@@ -370,7 +370,7 @@ export default function ChallengeDetails() {
                   <li
                     key={i}
                     className={`challenge-task-item ${t.done ? "done" : ""}`}
-                    onClick={() => handleToggleTask(i, t.done || false)}
+                    onClick={() => handleToggleTask(i)}
                     style={{ cursor: isJoined ? "pointer" : "default" }}
                   >
                     <span className="material-icons">
