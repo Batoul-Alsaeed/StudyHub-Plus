@@ -85,14 +85,14 @@ class ChallengeCreate(BaseModel):
     description: Optional[str] = None
     level: Optional[str] = None
     creator_name: str
-    creator_id: Optional[int] = None
+    creator_id: int
     start_date: date
     end_date: date
     max_participants: int = 10
     tasks: List[str]
     participants: List[int] = Field(default_factory=list)
-    progress: Dict[str, float] = Field(default_factory=dict)
-    group_progress: float = 0.0
+    #progress: Dict[str, float] = Field(default_factory=dict)
+    #group_progress: float = 0.0
 
 # (Response Body)
 class ChallengeResponse(BaseModel):
@@ -101,14 +101,14 @@ class ChallengeResponse(BaseModel):
     description: Optional[str]
     level: Optional[str]
     creator_name: str
-    creator_id: Optional[int] = None
+    creator_id: int
     start_date: date
     end_date: date
-    tasks: List[str]
+    tasks: List[str] = Field(default_factory=list)
     participants: List[int] = Field(default_factory=list)
     participants_count: int = 0
     progress: Dict[str, List[bool]] = Field(default_factory=dict)
-    group_progress: float = 0.0
+    group_progress: int = 0
     max_participants: int
     status: Optional[str] = None
     is_creator: Optional[bool] = False

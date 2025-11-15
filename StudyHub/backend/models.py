@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy.orm import relationship
 from .database import Base
 from sqlalchemy.types import JSON
-from sqlalchemy.dialects.postgresql import ARRAY, JSONB
+from sqlalchemy.dialects.postgresql import JSONB
 
 
 
@@ -79,7 +79,7 @@ class Challenge(Base):
     start_date = Column(Date, nullable=True)
     end_date = Column(Date, nullable=True)
 
-    participants = Column(ARRAY(Integer), default=list)
+    participants = Column(JSONB, default=list)
     tasks = Column(JSONB, default=list)
     progress = Column(JSONB, default=dict)
 
