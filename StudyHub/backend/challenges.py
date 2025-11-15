@@ -374,7 +374,7 @@ def add_comment(
 
     today = datetime.utcnow().date()
     if challenge.end_date and today > challenge.end_date:
-        raise.HTTPException(status_code=400, detail="Challenge ended")
+        raise HTTPException(status_code=400, detail="Challenge ended")
 
     if user_id not in challenge.participants:
         raise HTTPException(status_code=403, detail="Join challenge first")
