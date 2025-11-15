@@ -252,16 +252,30 @@ export default function ChallengeDetails() {
     );
 
   // Convert tasks
-  const tasks: Task[] = Array.isArray(challenge.tasks)
-    ? challenge.tasks.map((t: any) =>
-        typeof t === "string" ? { title: t, done: false } : t
-      )
-    : [];
+  //const tasks: Task[] = Array.isArray(challenge.tasks)
+    //? challenge.tasks.map((t: any) =>
+   //     typeof t === "string" ? { title: t, done: false } : t
+  //    )
+  //  : [];
 
   // Progress
-  const progressMap = challenge.progress || {};
-  const userProgress = progressMap[String(currentUserId)] ?? 0;
+  //const progressMap = challenge.progress || {};
+  //const userProgress = progressMap[String(currentUserId)] ?? 0;
+  //const groupProgress = challenge.group_progress ?? 0;
+  
+  // tasks تجي جاهزة من API وتحتوي title + done
+  const tasks: Task[] = Array.isArray(challenge.tasks)
+  ? challenge.tasks
+  : [];
+
+  // حساب التقدم الفردي
+  const total = tasks.length;
+  const done = tasks.filter(t => t.done).length;
+  const userProgress = total > 0 ? Math.round((done / total) * 100) : 0;
+
+  // التقدم الجماعي
   const groupProgress = challenge.group_progress ?? 0;
+
 
   const isFull =
     challenge.max_participants &&
