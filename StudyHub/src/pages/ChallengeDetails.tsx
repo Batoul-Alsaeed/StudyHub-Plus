@@ -5,7 +5,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
 type Task = { title: string; done?: boolean };
-type LeaderRow = { id: number; name: string; progress: number };
+type LeaderRow = { user_id: number; user_name: string; progress: number };
 type CommentRow = { id: number; user_name: string; content: string; timestamp: string };
 
 const API_BASE = "https://studyhub-backend-81w7.onrender.com/api";
@@ -210,7 +210,7 @@ export default function ChallengeDetails() {
     updateJoinState("leave");
   }
 
-  // Toggle task (FINAL fixed version)
+  // Toggle task
   async function handleToggleTask(index: number, isDone: boolean) {
     if (!challenge || !isJoined) return;
 
@@ -230,7 +230,7 @@ export default function ChallengeDetails() {
     }
   }
 
-  // Handle loading
+  // Handle loading UI
   if (loading)
     return (
       <div className="challenge-container">
@@ -251,12 +251,14 @@ export default function ChallengeDetails() {
       </div>
     );
 
+  // Convert tasks
   const tasks: Task[] = Array.isArray(challenge.tasks)
     ? challenge.tasks.map((t: any) =>
         typeof t === "string" ? { title: t, done: false } : t
       )
     : [];
 
+  // Progress
   const progressMap = challenge.progress || {};
   const userProgress = progressMap[String(currentUserId)] ?? 0;
   const groupProgress = challenge.group_progress ?? 0;
@@ -265,6 +267,7 @@ export default function ChallengeDetails() {
     challenge.max_participants &&
     challenge.participants_count >= challenge.max_participants;
 
+  // Dates & Status
   const today = new Date();
   const start = new Date(challenge.start_date);
   const end = new Date(challenge.end_date);
@@ -282,7 +285,7 @@ export default function ChallengeDetails() {
 
       <h1 className="challenge-title">{challenge.title}</h1>
 
-      {/* Tabs */}
+      {/* TABS */}
       <div className="challenge-tabs">
         <button
           className={`challenge-tab-btn ${activeTab === "details" ? "active" : ""}`}
@@ -290,6 +293,7 @@ export default function ChallengeDetails() {
         >
           Details
         </button>
+
         <button
           className={`challenge-tab-btn ${activeTab === "leaderboard" ? "active" : ""}`}
           onClick={() => {
@@ -299,6 +303,7 @@ export default function ChallengeDetails() {
         >
           Leaderboard
         </button>
+
         <button
           className={`challenge-tab-btn ${activeTab === "comments" ? "active" : ""}`}
           onClick={() => {
@@ -310,7 +315,7 @@ export default function ChallengeDetails() {
         </button>
       </div>
 
-      {/* DETAILS TAB */}
+      {/* DETAILS */}
       {activeTab === "details" && (
         <>
           <div className="challenge-info">
@@ -324,7 +329,6 @@ export default function ChallengeDetails() {
             </p>
           </div>
 
-          {/* Progress */}
           <div className="challenge-progress-section">
             {isJoined && (
               <>
@@ -354,7 +358,7 @@ export default function ChallengeDetails() {
             </div>
           </div>
 
-          {/* Tasks */}
+          {/* TASKS */}
           <div className="challenge-requirements">
             <h3>
               <span className="material-icons">list_alt</span> Requirements
@@ -381,7 +385,7 @@ export default function ChallengeDetails() {
             )}
           </div>
 
-          {/* Join / Leave */}
+          {/* JOIN / LEAVE */}
           <div style={{ marginTop: 24 }}>
             {status === "Ended" ? (
               <button className="challenge-cancel-btn" disabled>
@@ -420,7 +424,7 @@ export default function ChallengeDetails() {
           ) : leaderboard.length > 0 ? (
             <ul>
               {leaderboard.map((row, index) => (
-                <li key={row.id} className="challenge-leaderboard-item">
+                <li key={row.user_id} className="challenge-leaderboard-item">
                   <span className="material-icons">
                     {index === 0
                       ? "emoji_events"
@@ -430,7 +434,8 @@ export default function ChallengeDetails() {
                       ? "workspace_premium"
                       : "person"}
                   </span>
-                  <span>{row.name}</span>
+
+                  <span>{row.user_name}</span>
                   <span>{row.progress}%</span>
                 </li>
               ))}
