@@ -84,24 +84,46 @@ class Challenge(Base):
     progress = Column(JSONB, default=dict)
 
     max_participants = Column(Integer, nullable=False, default=10)
+    tasks = Column(JSON, default=[])
+    progress = Column(JSON, default=dict)
     group_progress = Column(Integer, default=0)
 
     creator_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     creator = relationship("User", back_populates="challenges_created")
-    comments = relationship("Comment", back_populates="challenge", cascade="all, delete")
+    #comments = relationship("Comment", back_populates="challenge", cascade="all, delete")
 
 
-class Comment(Base):
-    __tablename__ = "comments"
+#class Comment(Base):
+    #__tablename__ = "comments"
+
+  #  id = Column(Integer, primary_key=True, index=True)
+   # challenge_id = Column(Integer, ForeignKey("challenges.id"), nullable=False)
+
+   # user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+   # user_name = Column(String, nullable=False)
+
+   # content = Column(Text, nullable=False)
+    #timestamp = Column(DateTime, default=datetime.utcnow)
+
+    #challenge = relationship("Challenge", back_populates="comments")
+    #user = relationship("User")
+
+    tasks = relationship(
+        "ChallengeTask",
+        back_populates="challenge",
+        cascade="all, delete-orphan",
+        lazy="joined",    
+    )
+
+
+class ChallengeTask(Base):
+    __tablename__ = "challenge_tasks"
 
     id = Column(Integer, primary_key=True, index=True)
-    challenge_id = Column(Integer, ForeignKey("challenges.id"), nullable=False)
+    challenge_id = Column(Integer, ForeignKey("challenges.id", ondelete="CASCADE"))
+    title = Column(String, nullable=False)
+    done = Column(Boolean, default=False)
 
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    user_name = Column(String, nullable=False)
+    challenge = relationship("Challenge", back_populates="tasks")
 
-    content = Column(Text, nullable=False)
-    timestamp = Column(DateTime, default=datetime.utcnow)
-
-    challenge = relationship("Challenge", back_populates="comments")
-    user = relationship("User")
+   

@@ -4,6 +4,8 @@ from datetime import datetime
 from . import models, schemas
 from .database import SessionLocal
 import json
+from typing import List
+
 
 router = APIRouter(prefix="/api/challenges", tags=["challenges"])
 
@@ -106,14 +108,18 @@ def create_challenge(challenge: schemas.ChallengeCreate, db: Session = Depends(g
 # ============================================================
 # Get All Challenges
 # ============================================================
-@router.get("", response_model=list[schemas.ChallengeResponse])
-def get_challenges(
-    current_user_id: int = Query(None),
-    db: Session = Depends(get_db)
-):
-    challenges = db.query(models.Challenge).all()
-    return [format_challenge_response(c, current_user_id) for c in challenges]
+#@router.get("", response_model=list[schemas.ChallengeResponse])
+#def get_challenges(
+#    current_user_id: int = Query(None),
+#    db: Session = Depends(get_db)
+#):
+#    challenges = db.query(models.Challenge).all()
+#    return [format_challenge_response(c, current_user_id) for c in challenges]
 
+@router.get("", response_model=List[schemas.ChallengeResponse])
+def get_challenges(db: Session = Depends(get_db)):
+    challenges = db.query(models.Challenge).all()
+    return challenges
 
 # ============================================================
 # Get Single Challenge
@@ -127,8 +133,9 @@ def get_challenge(
     challenge = db.query(models.Challenge).filter(models.Challenge.id == challenge_id).first()
     if not challenge:
         raise HTTPException(status_code=404, detail="Challenge not found")
-    return format_challenge_response(challenge, current_user_id)
+    #return format_challenge_response(challenge, current_user_id)
 
+    return challenge
 
 # ============================================================
 # Join Challenge
@@ -179,13 +186,22 @@ def join_challenge(
     challenge.progress[str(user_id)] = [False] * len(challenge.tasks)
 
     # group progress
-    all_p = []
-    for arr in challenge.progress.values():
-        if len(arr) > 0:
-            pct = (sum(arr) / len(arr)) * 100
-            all_p.append(pct)
+    #all_p = []
+    #for arr in challenge.progress.values():
+    #    if len(arr) > 0:
+    #        pct = (sum(arr) / len(arr)) * 100
+    #        all_p.append(pct)
+    #challenge.group_progress = round(sum(all_p) / len(all_p), 2) if all_p else 0
+    
+    progress_map = challenge.progress or {}
+    progress_map[str(user_id)] = 0.0
+    challenge.progress = progress_map
 
-    challenge.group_progress = round(sum(all_p) / len(all_p), 2) if all_p else 0
+    # recompute group progress
+    progresses = list(progress_map.values())
+    challenge.group_progress = (
+        round(sum(progresses) / len(progresses), 2) if progresses else 0.0
+    )
 
     db.commit()
     db.refresh(challenge)
@@ -270,17 +286,29 @@ def leave_challenge(
     participants.remove(user_id)
     challenge.participants = participants
 
-    challenge.progress.pop(str(user_id), None)
+#    challenge.progress.pop(str(user_id), None)
 
-    all_p = []
-    for arr in challenge.progress.values():
-        if len(arr) > 0:
-            pct = (sum(arr) / len(arr)) * 100
-            all_p.append(pct)
+    #all_p = []
+    #for arr in challenge.progress.values():
+    #    if len(arr) > 0:
+    #        pct = (sum(arr) / len(arr)) * 100
+    #        all_p.append(pct)
 
-    challenge.group_progress = round(
-        sum(all_p) / len(all_p), 2
-    ) if all_p else 0
+    #challenge.group_progress = round(
+    #    sum(all_p) / len(all_p), 2
+    #) if all_p else 0
+
+
+    # Remove user progress entry
+    progress_map = challenge.progress or {}
+    progress_map.pop(str(user_id), None)
+    challenge.progress = progress_map
+
+    # Update group progress safely
+    progresses = list(progress_map.values())
+    challenge.group_progress = (
+        round(sum(progresses) / len(progresses), 2) if progresses else 0.0
+    )
 
     db.commit()
     db.refresh(challenge)
@@ -316,10 +344,13 @@ def update_challenge(
     challenge.end_date = challenge_data.end_date
     challenge.max_participants = challenge_data.max_participants
 
-    old_count = len(challenge.tasks)
-    new_count = len(challenge_data.tasks)
+   # old_count = len(challenge.tasks)
+   # new_count = len(challenge_data.tasks)
 
-    if challenge_data.tasks:
+    #if challenge_data.tasks:
+    
+    # ✅ Safely update tasks
+    if challenge_data.tasks is not None:
         challenge.tasks = challenge_data.tasks
 
     if new_count != old_count:
@@ -495,12 +526,62 @@ def delete_comment(
     if not comment:
         raise HTTPException(status_code=404, detail="Comment not found")
 
-    challenge = db.query(models.Challenge).filter(models.Challenge.id == comment.challenge_id).first()
+   # challenge = db.query(models.Challenge).filter(models.Challenge.id == comment.challenge_id).first()
 
-    if user_id != comment.user_id and user_id != challenge.creator_id:
-        raise HTTPException(status_code=403, detail="Not allowed")
+   # if user_id != comment.user_id and user_id != challenge.creator_id:
+    #    raise HTTPException(status_code=403, detail="Not allowed")
 
-    db.delete(comment)
+    #db.delete(comment)
+    #db.commit()
+
+    #return {"message": "Comment deleted"}
+
+
+# ============================================================
+# ✅ Tasks + Progress update
+# ============================================================
+@router.patch(
+    "/{challenge_id}/tasks",
+    response_model=schemas.ChallengeResponse,
+)
+def update_tasks(
+    challenge_id: int,
+    updated_tasks: List[schemas.ChallengeTaskUpdate],
+    user_id: int = Query(...),
+    db: Session = Depends(get_db),
+):
+    challenge = (
+        db.query(models.Challenge)
+        .filter(models.Challenge.id == challenge_id)
+        .first()
+    )
+    if not challenge:
+        raise HTTPException(status_code=404, detail="Challenge not found")
+
+    # convert Pydantic models to plain dicts for storage
+    tasks_payload = [t.model_dump() for t in updated_tasks]
+    challenge.tasks = tasks_payload
+
+    # only valid tasks with non-empty title
+    valid_tasks = [t for t in tasks_payload if t.get("title")]
+
+    total = len(valid_tasks)
+    if total == 0:
+        user_progress = 0.0
+    else:
+        completed = len([t for t in valid_tasks if bool(t.get("done"))])
+        user_progress = round((completed / total) * 100.0, 2)
+
+    progress_map = challenge.progress or {}
+    progress_map[str(user_id)] = user_progress
+    challenge.progress = progress_map
+
+    # recompute group progress (average of all users)
+    progresses = list(progress_map.values())
+    challenge.group_progress = (
+        round(sum(progresses) / len(progresses), 2) if progresses else 0.0
+    )
+
     db.commit()
-
-    return {"message": "Comment deleted"}
+    db.refresh(challenge)
+    return challenge

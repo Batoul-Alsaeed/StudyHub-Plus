@@ -16,27 +16,26 @@
   flex: 0 0 66%;
   background-color: #f8cfc6 !important;
   border-radius: 15px;
-  padding: 40px;
+  padding: 40px 30px;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   border: 1.5px solid #e1a79c !important; 
-  min-height: 330px;
+  min-height: 300px;
   box-sizing: border-box;
 }
 .welcome-text {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;;
-  align-items: flex-start; 
-  gap: 6px; 
-  margin-top: -25px;
-  margin-left: 10px;
+  gap: 8px; 
+  margin: 0;
+  padding: 0;
+  margin-bottom: 80px;
 }
 
 .welcome-text h2 {
   color: #001b44;
-  font-size: 64px !important;
+  font-size: 48px !important;
   font-weight: lighter;
   margin-bottom: 5px;
   margin: 0;
@@ -45,7 +44,7 @@
 
 .welcome-text h3 {
   color: #001b44;
-  font-size: 50px !important;
+  font-size: 44px !important;
   font-weight: 700;
   margin-top: 20px;
   line-height: 1.1;
@@ -290,7 +289,7 @@
 
 
 
-/* ðŸ“± Responsive Top Section */
+/* Responsive Top Section */
 @media (max-width: 900px) {
     .dashboard-container {
     overflow-x: hidden; 
@@ -312,7 +311,16 @@
   }
 
   .welcome-card {
-    min-height: 220px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    padding: 25px 20px;
+    min-height: 260px;
+
+    border-radius: 15px;
   }
 
   .streak-card {
@@ -328,22 +336,50 @@
   }
 
   .welcome-img {
-    width: 220px;
-    margin-top: 10px;
-    margin-left: -10px;
+    width: 190px;
+    height: auto;
+    margin-top: 15px;
+    margin-left: 0;     
+    margin-right: 0;
+    display: block;
   }
 
   .welcome-text {
-    align-items: center; 
+    align-items: center;
     text-align: center;
+    margin: 0;
+    padding: 0;
   }
 
-  .welcome-text .card h2 {
-    font-size: 42px;
+
+  .welcome-text h2 {
+    font-size: 30px !important;
+    line-height: 1.1;
+    margin-bottom: 5px;
   }
 
-  .welcome-text .card h3 {
+  .welcome-text h3 {
     font-size: 28px !important;
-    margin-right: 1px;
+    margin-top: 5px;
+  }
+
+    .goal-top a {
+    width: auto !important;
+    padding: 10px 18px;
+    font-size: 0.85rem;
+    border-radius: 10px;
+  }
+  
+  .goal-form .add-goal-btn {
+    width: 100% !important;
+    background-color: #8b7cd3;
+    color: white;
+    padding: 14px !important;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    border: none;
+    margin-top: 15px;
   }
 }

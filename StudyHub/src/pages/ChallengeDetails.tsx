@@ -4,9 +4,18 @@ import React from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
-type Task = { title: string; done?: boolean };
-type LeaderRow = { user_id: number; user_name: string; progress: number };
-type CommentRow = { id: number; user_name: string; content: string; timestamp: string };
+//type Task = { title: string; done?: boolean };
+// type LeaderRow = { user_id: number; user_name: string; progress: number };
+// type CommentRow = { id: number; user_name: string; content: string; timestamp: string };
+
+type Task = string | { id?: number; title?: string; done?: boolean };
+type LeaderRow = { id: number; name: string; progress: number };
+type CommentRow = {
+  id: number;
+  user_name: string;
+  content: string;
+  timestamp: string;
+};
 
 const API_BASE = "https://studyhub-backend-81w7.onrender.com/api";
 
@@ -105,7 +114,91 @@ export default function ChallengeDetails() {
     fetchChallengeSafe();
   }, [id, currentUserId]);
 
-  // Leaderboard
+  // ===== Auto-refresh comments every 10 seconds =====
+  React.useEffect(() => {
+    if (activeTab === "comments") {
+      const interval = setInterval(() => handleFetchComments(), 10000);
+      return () => clearInterval(interval);
+    }
+  }, [activeTab]);
+
+  // ===== Participants =====
+  const participantsArray: any[] = Array.isArray(challenge?.participants)
+    ? challenge.participants
+    : [];
+
+  // @ts-ignore
+  const participantIds = participantsArray
+    .map((p) =>
+      typeof p === "object" && p !== null ? (p as any).id : Number(p)
+    )
+    .filter(Boolean) as number[];
+    
+  // @ts-ignore
+    const participantNames = participantsArray
+    .map((p) => (typeof p === "object" && p !== null ? (p as any).name : p))
+    .filter(Boolean) as string[];
+
+  React.useEffect(() => {
+    if (!challenge) return;
+     const participantIds = [];
+  const participantNames = [];
+
+  if (Array.isArray(challenge.participants)) {
+    for (const p of challenge.participants) {
+      if (typeof p === "number") participantIds.push(p);
+      else if (p && typeof p === "object") {
+        if (p.id) participantIds.push(Number(p.id));
+        if (p.name) participantNames.push(p.name);
+      }
+    }
+  }
+
+  const joined =
+    participantIds.includes(Number(currentUserId)) ||
+    participantNames.includes(String(currentUserName)) ||
+    challenge.is_joined === true;
+
+  setIsJoined(joined);
+}, [challenge, currentUserId, currentUserName]);
+
+  // ===== Tasks =====
+  const rawTasks: Task[] = Array.isArray(challenge?.tasks)
+    ? challenge.tasks
+    : [];
+  const tasks = rawTasks.map((t: any) =>
+    typeof t === "string"
+      ? { title: t, done: false }
+      : t || { title: "", done: false }
+  );
+
+  const progressMap =
+    (typeof challenge?.progress === "object" && challenge?.progress) || {};
+  const userProgress =
+    progressMap[String(currentUserId)] ??
+    (typeof challenge?.user_progress === "number"
+      ? challenge.user_progress
+      : 0);
+  const groupProgress = Number.isFinite(challenge?.group_progress)
+    ? challenge.group_progress
+    : 0;
+
+  const currentCount =
+    challenge?.participants_count ?? participantsArray.length ?? 0;
+  const maxCount = challenge?.max_participants ?? 0;
+  const isFull = maxCount > 0 && currentCount >= maxCount;
+
+  // ===== Challenge status =====
+  const today = new Date();
+  const start = challenge?.start_date ? new Date(challenge.start_date) : null;
+  const end = challenge?.end_date ? new Date(challenge.end_date) : null;
+
+  let challengeStatus: "Upcoming" | "Active" | "Ended" = "Upcoming";
+  if (start && today >= start && end && today <= end) challengeStatus = "Active";
+  else if (end && today > end) challengeStatus = "Ended";
+  else if (start && today < start) challengeStatus = "Upcoming";
+
+  // ===== Leaderboard =====
   function handleFetchLeaderboard() {
     if (!id) return;
     fetchList<LeaderRow>(
