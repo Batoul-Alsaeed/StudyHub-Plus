@@ -264,32 +264,36 @@ export default function ChallengeDetails() {
   //const groupProgress = challenge.group_progress ?? 0;
   
   // tasks تجي جاهزة من API وتحتوي title + done
-  // Convert tasks but include user's progress from backend
-  let tasks: Task[] = [];
+  // Progress from backend: { "2": [1,0,1], "3": [0,1,0], ... }
+  const rawProgressMap = (challenge.progress || {}) as Record<string, number[]>;
+  const userArray = rawProgressMap[String(currentUserId)] || [];
 
-  if (Array.isArray(challenge.tasks)) {
-  const userProgressArray =
-    challenge.progress?.[String(currentUserId)] || [];
+  // حساب التقدم الفردي كنسبة مئوية
+  const userProgress =
+    userArray.length > 0
+      ? Math.round(
+          (userArray.reduce((sum, v) => sum + (v ? 1 : 0), 0) / userArray.length) *
+            100
+        )
+      : 0;
 
-  tasks = challenge.tasks.map((t: any, i: number) => ({
-    title: typeof t === "string" ? t : t.title,
-    done: userProgressArray[i] === 1
-    }));
-  }
-
-
-  // حساب التقدم الفردي
-  const total = tasks.length;
-  const done = tasks.filter(t => t.done).length;
-  const userProgress = total > 0 ? Math.round((done / total) * 100) : 0;
-
-  // التقدم الجماعي
+  // التقدم الجماعي كما يرجع من الباك
   const groupProgress = challenge.group_progress ?? 0;
 
+  // ربط حالة كل مهمة مع مصفوفة التقدم للمستخدم
+  const tasks: Task[] = Array.isArray(challenge.tasks)
+    ? challenge.tasks.map((t: any, index: number) => {
+        const doneFlag = userArray[index] === 1;
 
-  const isFull =
-    challenge.max_participants &&
-    challenge.participants_count >= challenge.max_participants;
+        if (typeof t === "string") {
+          return { title: t, done: doneFlag };
+        }
+        return { ...t, done: doneFlag };
+      })
+    : [];
+  const isFull = challenge.max_participants
+    ? challenge.participants_count >= challenge.max_participants
+    : false;
 
   // Dates & Status
   const today = new Date();
