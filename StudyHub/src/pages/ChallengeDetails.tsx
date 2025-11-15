@@ -264,9 +264,19 @@ export default function ChallengeDetails() {
   //const groupProgress = challenge.group_progress ?? 0;
   
   // tasks تجي جاهزة من API وتحتوي title + done
-  const tasks: Task[] = Array.isArray(challenge.tasks)
-  ? challenge.tasks
-  : [];
+  // Convert tasks but include user's progress from backend
+  let tasks: Task[] = [];
+
+  if (Array.isArray(challenge.tasks)) {
+  const userProgressArray =
+    challenge.progress?.[String(currentUserId)] || [];
+
+  tasks = challenge.tasks.map((t: any, i: number) => ({
+    title: typeof t === "string" ? t : t.title,
+    done: userProgressArray[i] === 1
+    }));
+  }
+
 
   // حساب التقدم الفردي
   const total = tasks.length;
