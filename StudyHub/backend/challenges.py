@@ -222,7 +222,10 @@ def toggle_task(
     if task_index < 0 or task_index >= len(challenge.tasks):
         raise HTTPException(status_code=400, detail="Invalid task index")
 
-    challenge.progress[user_key][task_index] = not challenge.progress[user_key][task_index]
+    #challenge.progress[user_key][task_index] = not challenge.progress[user_key][task_index]
+    
+    current = challenge.progress[user_key][task_index]
+    challenge.progress[user_key][task_index] = 0 if current else 1
 
     # recalc group progress
     all_p = []
