@@ -240,3 +240,111 @@
     background-position: 25% 30%, 75% 75%, 50% 50%;
   }
 }
+
+
+@media (max-width: 900px) {
+
+  .focus-page {
+    padding: 20px 15px;
+    align-items: center;
+  }
+
+  /* HEADER */
+  .focus-header {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .focus-header h2 {
+    font-size: 20px;
+  }
+
+  .start-btn {
+    width: 140px;
+    padding: 10px;
+    font-size: 0.85rem;
+    border-radius: 10px;
+  }
+
+  /* SETUP CARD */
+  .focus-setup-card {
+    width: 100%;
+    max-width: 350px;
+    padding: 25px 20px;
+    margin-top: 30px;
+  }
+
+  .focus-setup-card input {
+    font-size: 14px;
+  }
+
+  .confirm-btn,
+  .back-btn {
+    padding: 12px;
+    font-size: 15px;
+    width: 100%;
+  }
+
+  /* TIMER CARD */
+  .focus-timer-card {
+    width: 100%;
+    max-width: 330px;         
+    padding: 28px 20px;        
+    border-radius: 22px;
+    margin-top: 25px;
+    box-shadow: 0px 10px 25px rgba(120, 120, 160, 0.15);
+  }
+
+  .focus-timer-card h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+
+  .timer-display {
+    font-size: 52px;
+    margin-bottom: 10px;
+  }
+
+  /* TIMER BUTTONS (Pause / Break / Reset) */
+  .timer-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+
+  .pause-btn,
+  .break-btn,
+  .resume-btn {
+    padding: 10px 20px;
+    font-size: 14px;
+    border-radius: 8px;
+  }
+
+  .reset-btn {
+    font-size: 40px;
+    margin-top: 5px;
+  }
+
+  /* BREAK MODE COLORS */
+  .focus-timer-card.break {
+    max-width: 330px;
+    padding: 30px 22px;
+    border-radius: 22px;
+  }
+
+  /* NOTIFICATION */
+  .Toastify__toast-container {
+    bottom: 90px !important;
+    width: 90%;
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+  }
+}

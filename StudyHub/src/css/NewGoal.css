@@ -55,3 +55,31 @@
   color: #d9534f;
   font-size: 14px;
 }
+
+@media (max-width: 900px) {
+
+  .new-goal-container {
+    padding: 25px 20px;
+    margin: 40px 10px;
+    width: 100%;
+    max-width: 370px;
+  }
+
+  .goal-form label {
+    font-size: 16px;
+  }
+
+  .goal-form input {
+    width: 95% !important;
+    font-size: 15px;
+    padding: 12px;
+  }
+
+  .goal-form button {
+    width: 101% !important;
+    padding: 14px !important;
+    font-size: 16px;
+    border-radius: 12px;
+    font-weight: 600;
+  }
+}
