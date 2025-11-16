@@ -440,6 +440,10 @@
   flex-direction: column;
   gap: 6px;
 }
+.challenge-requirements li {
+  list-style: none;
+}
+
 
 /* =====================================================
    RESPONSIVE
