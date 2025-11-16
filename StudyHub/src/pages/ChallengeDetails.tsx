@@ -15,7 +15,6 @@ type CommentRow = {
 
 const API_BASE = "https://studyhub-backend-81w7.onrender.com/api";
 
-// Safe fetch wrapper
 async function safeFetch<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, options);
   let data: any = {};
@@ -26,19 +25,17 @@ async function safeFetch<T>(url: string, options?: RequestInit): Promise<T> {
   return data as T;
 }
 
-// Generic fetcher for lists
-async function fetchList<T>(
-  path: string,
-  setData: React.Dispatch<React.SetStateAction<T[]>>,
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>
-) {
-  setLoading(true);
-  try {
-    const data = await safeFetch<T[]>(`${API_BASE}${path}`);
-    setData(Array.isArray(data) ? data : []);
-  } finally {
-    setLoading(false);
-  }
+function getChallengeStatus(
+  startDate: string,
+  endDate: string
+): "Upcoming" | "Active" | "Ended" {
+  const now = new Date();
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  if (now < start) return "Upcoming";
+  if (now > end) return "Ended";
+  return "Active";
 }
 
 export default function ChallengeDetails() {
@@ -46,6 +43,8 @@ export default function ChallengeDetails() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
+
+  const challengeFromState = (location.state as any)?.challenge;
 
   const currentUserId =
     (user as any)?.id ?? Number(localStorage.getItem("user_id")) ?? 0;
@@ -55,7 +54,9 @@ export default function ChallengeDetails() {
   const joinedFromList = (location.state as any)?.joined || false;
 
   const [isJoined, setIsJoined] = React.useState(joinedFromList);
-  const [challenge, setChallenge] = React.useState<any | null>(null);
+  const [challenge, setChallenge] = React.useState<any | null>(
+    challengeFromState || null
+  );
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState("");
   const [updating, setUpdating] = React.useState(false);
@@ -83,21 +84,16 @@ export default function ChallengeDetails() {
     setTimeout(() => setToast(""), 2500);
   };
 
-  // Fetch challenge details
+  // Fetch challenge
   async function fetchChallengeSafe() {
-    if (!id) return;
+    if (!id || challengeFromState) return;
 
     setLoading(true);
     setError("");
 
     try {
-      let url = `${API_BASE}/challenges/${id}?current_user_id=${currentUserId}`;
-      let res = await fetch(url);
-
-      if (!res.ok) res = await fetch(`${API_BASE}/challenges/${id}`);
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.detail || "Request failed");
+      let url = `${API_BASE}/challenges/${id}`;
+      let data = await safeFetch<any>(url);
 
       setChallenge(data);
       setIsJoined(data.is_joined === true);
@@ -110,50 +106,23 @@ export default function ChallengeDetails() {
 
   React.useEffect(() => {
     fetchChallengeSafe();
-  }, [id, currentUserId]);
+  }, [id]);
 
-  // ===== Auto-refresh comments every 10 seconds =====
-  React.useEffect(() => {
-    if (activeTab === "comments") {
-      const interval = setInterval(() => handleFetchComments(), 10000);
-      return () => clearInterval(interval);
-    }
-  }, [activeTab]);
+  // ===== STATUS =====
+  const status: "Upcoming" | "Active" | "Ended" = challenge
+    ? getChallengeStatus(challenge.start_date, challenge.end_date)
+    : "Upcoming";
 
-  // ===== Participants =====
-  
-  React.useEffect(() => {
-    if (!challenge) return;
+  const challengeEnded = status === "Ended";
 
-    const ids: number[] = [];
-    const names: string[] = [];
+  // ===== Progress Mapping =====
+  const rawProgressMap = (challenge?.progress || {}) as Record<
+    string,
+    number[]
+  >;
 
-    if (Array.isArray(challenge.participants)) {
-      for (const p of challenge.participants) {
-        if (typeof p === "number") {
-          ids.push(p);
-        } else if (p && typeof p === "object") {
-          const obj = p as any;
-          if (obj.id != null) ids.push(Number(obj.id));
-          if (obj.name) names.push(String(obj.name));
-        }
-      }
-    }
-
-    const joined =
-      ids.includes(Number(currentUserId)) ||
-      names.includes(String(currentUserName)) ||
-      challenge.is_joined === true;
-
-    setIsJoined(joined);
-  }, [challenge, currentUserId, currentUserName]);
-
-  // ========== PROGRESS & TASKS (يحافظ على التقدم الفردي والمجموعة) ==========
-  // Progress from backend: { "2": [1,0,1], "3": [0,1,0], ... }
-  const rawProgressMap = (challenge?.progress || {}) as Record<string, number[]>;
   const userArray = rawProgressMap[String(currentUserId)] || [];
 
-  // حساب التقدم الفردي كنسبة مئوية (محفوظ في الباك، والفرونت بس يعرضه)
   const userProgress =
     userArray.length > 0
       ? Math.round(
@@ -163,70 +132,76 @@ export default function ChallengeDetails() {
         )
       : 0;
 
-  // التقدم الجماعي كما يرجع من الباك
   const groupProgress: number = challenge?.group_progress ?? 0;
 
-  // ربط حالة كل مهمة مع مصفوفة التقدم للمستخدم
- // const tasks: Task[] = Array.isArray(
-  // challenge?.tasks
-  //)
-    //? challenge.tasks.map((t: any, index: number) => {
-      //  const doneFlag = userArray[index] === 1;
-        //if (typeof t === "string") {
-          //return { title: t, done: doneFlag };
-        //}
-        //return { ...t, done: doneFlag };
-      //})
-    //: [];
-
-  //
+  // TASKS
   const tasks: Task[] = Array.isArray(challenge?.tasks)
     ? challenge.tasks.map((t: any) => {
-        const userArr = rawProgressMap[String(currentUserId)] || [];
-        const doneFlag = userArr[t.id] === 1;
+        const doneFlag =
+          (rawProgressMap[String(currentUserId)] || [])[t.id] === 1;
         return { id: t.id, title: t.title, done: doneFlag };
       })
     : [];
 
-  // هل التحدي ممتلئ؟
-  const isFull =
-    challenge?.max_participants && challenge?.participants_count != null
-      ? challenge.participants_count >= challenge.max_participants
-      : false;
-
-  // Dates & Status
-  const today = new Date();
-  const start = challenge?.start_date
-    ? new Date(challenge.start_date)
-    : new Date();
-  const end = challenge?.end_date ? new Date(challenge.end_date) : new Date();
-
-  let status: "Upcoming" | "Active" | "Ended" = "Upcoming";
-  if (today < start) status = "Upcoming";
-  else if (today > end) status = "Ended";
-  else status = "Active";
-
-  // ===== Leaderboard =====
-  function handleFetchLeaderboard() {
-    if (!id) return;
-    fetchList<LeaderRow>(
-      `/challenges/${id}/leaderboard`,
-      setLeaderboard,
-      setLoadingLeaderboard
-    );
+  // ====== JOIN / LEAVE ======
+  async function updateJoinState(action: "join" | "leave") {
+    if (!challengeEnded && challenge) {
+      setUpdating(true);
+      try {
+        await safeFetch(
+          `${API_BASE}/challenges/${challenge.id}/${action}?user_id=${currentUserId}`,
+          { method: action === "join" ? "POST" : "DELETE" }
+        );
+        await fetchChallengeSafe();
+        setIsJoined(action === "join");
+      } catch (e: any) {
+        showToast(e.message);
+      } finally {
+        setUpdating(false);
+      }
+    }
   }
 
-  // ===== Comments =====
+  function handleJoin() {
+    if (!challengeEnded) updateJoinState("join");
+  }
+
+  function handleLeave() {
+    if (!challengeEnded) updateJoinState("leave");
+  }
+
+  // ===== TOGGLE TASK =====
+  async function handleToggleTask(taskId: number) {
+    if (challengeEnded || !isJoined) return;
+
+    setUpdating(true);
+
+    try {
+      await safeFetch(
+        `${API_BASE}/challenges/${challenge.id}/task-toggle?user_id=${currentUserId}&task_id=${taskId}`,
+        { method: "PATCH" }
+      );
+      await fetchChallengeSafe();
+    } catch (e: any) {
+      showToast(e.message);
+    } finally {
+      setUpdating(false);
+    }
+  }
+
+  // ===== COMMENTS =====
   function handleFetchComments() {
     if (!id) return;
-    fetchList<CommentRow>(
-      `/challenges/${id}/comments`,
-      setComments,
-      setLoadingComments
-    );
+
+    fetch(`${API_BASE}/challenges/${id}/comments`)
+      .then((res) => res.json())
+      .then((data) => {
+        setComments(Array.isArray(data) ? data : []);
+      });
   }
 
   async function handleAddComment() {
+    if (challengeEnded) return;
     if (!newComment.trim() || !id) return;
 
     try {
@@ -246,8 +221,7 @@ export default function ChallengeDetails() {
   }
 
   async function handleDeleteComment(commentId: number) {
-    if (!window.confirm("Delete this comment?")) return;
-
+    if (challengeEnded) return;
     try {
       await safeFetch(`${API_BASE}/comments/${commentId}?user_id=${currentUserId}`, {
         method: "DELETE",
@@ -260,6 +234,7 @@ export default function ChallengeDetails() {
   }
 
   async function handleSaveEditedComment(commentId: number) {
+    if (challengeEnded) return;
     if (!editContent.trim()) return;
 
     try {
@@ -278,84 +253,12 @@ export default function ChallengeDetails() {
     }
   }
 
-  // Join / Leave
-  async function updateJoinState(action: "join" | "leave") {
-    if (!challenge) return;
-
-    setUpdating(true);
-
-    try {
-      await safeFetch(
-        `${API_BASE}/challenges/${challenge.id}/${action}?user_id=${currentUserId}`,
-        { method: action === "join" ? "POST" : "DELETE" }
-      );
-
-      await fetchChallengeSafe();
-      setIsJoined(action === "join");
-
-      showToast(action === "join" ? "Joined!" : "Left challenge");
-    } catch (e: any) {
-      showToast(e.message);
-    } finally {
-      setUpdating(false);
-    }
-  }
-
-  function handleJoin() {
-    if (!challenge || updating) return;
-    updateJoinState("join");
-  }
-
-  function handleLeave() {
-    if (!challenge || updating) return;
-    updateJoinState("leave");
-  }
-
-  // Toggle task
-  //async function handleToggleTask(index: number) {
-    //if (!challenge || !isJoined) return;
-
-    //setUpdating(true);
-
-    //try {
-      //await safeFetch(
-        //`${API_BASE}/challenges/${challenge.id}/task-toggle?user_id=${currentUserId}&task_index=${index}`,
-        //{ method: "PATCH" }
-      //);
-
-      //await fetchChallengeSafe();
-    //} catch (e: any) {
-     // showToast(e.message);
-    //} finally {
-      //setUpdating(false);
-    //}
-  //}
-
-  async function handleToggleTask(taskId: number) {
-    if (!challenge || !isJoined) return;
-
-    setUpdating(true);
-
-    try {
-      await safeFetch(
-        `${API_BASE}/challenges/${challenge.id}/task-toggle?user_id=${currentUserId}&task_id=${taskId}`,
-        { method: "PATCH" }
-      );
-
-      await fetchChallengeSafe();
-    } catch (e: any) {
-      showToast(e.message);
-    } finally {
-      setUpdating(false);
-    }
-  }
-
-  // Handle loading UI
+  // ===== Loading UI =====
   if (loading)
     return (
       <div className="challenge-container">
         <button className="challenge-back-btn" onClick={() => navigate(-1)}>
-          ← Back to Challenges
+          ← Back
         </button>
         <div className="challenge-spinner"></div>
       </div>
@@ -365,17 +268,16 @@ export default function ChallengeDetails() {
     return (
       <div className="challenge-container">
         <button className="challenge-back-btn" onClick={() => navigate(-1)}>
-          ← Back to Challenges
+          ← Back
         </button>
         <p style={{ color: "#c0392b" }}>{error}</p>
       </div>
     );
 
-
   return (
     <div className="challenge-container">
       <button className="challenge-back-btn" onClick={() => navigate(-1)}>
-        ← Back to Challenges
+        ← Back
       </button>
 
       <h1 className="challenge-title">{challenge.title}</h1>
@@ -395,7 +297,9 @@ export default function ChallengeDetails() {
           }`}
           onClick={() => {
             setActiveTab("leaderboard");
-            handleFetchLeaderboard();
+            fetch(`${API_BASE}/challenges/${id}/leaderboard`)
+              .then((res) => res.json())
+              .then((data) => setLeaderboard(data));
           }}
         >
           Leaderboard
@@ -418,18 +322,30 @@ export default function ChallengeDetails() {
       {activeTab === "details" && (
         <>
           <div className="challenge-info">
-            <p className="challenge-creator">By {challenge.creator_name}</p>
+            <p className="challenge-creator">
+              <span className="material-icons">person</span>
+              {challenge.creator_name}
+            </p>
+
             <div className="challenge-level">
               <span className="material-icons">bar_chart</span>
               {challenge.level} Level
             </div>
+
             <p className="challenge-dates">
-              {challenge.start_date} → {challenge.end_date}
+              <span className="material-icons">calendar_month</span>
+              {challenge.start_date}
+
+              <span style={{ margin: "0 8px" }}>→</span>
+
+              <span className="material-icons">event</span>
+              {challenge.end_date}
             </p>
           </div>
 
+          {/* PROGRESS */}
           <div className="challenge-progress-section">
-            {isJoined && (
+            {isJoined && !challengeEnded && (
               <>
                 <div className="challenge-progress-label">
                   <span>Your Progress</span>
@@ -470,7 +386,10 @@ export default function ChallengeDetails() {
                     key={t.id}
                     className={`challenge-task-item ${t.done ? "done" : ""}`}
                     onClick={() => handleToggleTask(t.id!)}
-                    style={{ cursor: isJoined ? "pointer" : "default" }}
+                    style={{
+                      cursor: challengeEnded ? "not-allowed" : "pointer",
+                      opacity: challengeEnded ? 0.5 : 1,
+                    }}
                   >
                     <span className="material-icons">
                       {t.done ? "check_circle" : "radio_button_unchecked"}
@@ -486,7 +405,7 @@ export default function ChallengeDetails() {
 
           {/* JOIN / LEAVE */}
           <div style={{ marginTop: 24 }}>
-            {status === "Ended" ? (
+            {challengeEnded ? (
               <button className="challenge-cancel-btn" disabled>
                 Challenge Ended
               </button>
@@ -494,9 +413,9 @@ export default function ChallengeDetails() {
               <button
                 className="challenge-save-btn"
                 onClick={handleJoin}
-                disabled={isFull || updating}
+                disabled={updating || challenge.participants_count >= challenge.max_participants}
               >
-                {isFull ? "Full" : updating ? "Joining..." : "Join Challenge"}
+                Join Challenge
               </button>
             ) : (
               <button
@@ -504,7 +423,7 @@ export default function ChallengeDetails() {
                 onClick={handleLeave}
                 disabled={updating}
               >
-                {updating ? "Leaving..." : "Leave Challenge"}
+                Leave Challenge
               </button>
             )}
           </div>
@@ -518,9 +437,7 @@ export default function ChallengeDetails() {
             <span className="material-icons">emoji_events</span> Leaderboard
           </h3>
 
-          {loadingLeaderboard ? (
-            <p>Loading...</p>
-          ) : leaderboard.length > 0 ? (
+          {leaderboard.length > 0 ? (
             <ul>
               {leaderboard.map((row, index) => (
                 <li key={row.user_id} className="challenge-leaderboard-item">
@@ -552,46 +469,51 @@ export default function ChallengeDetails() {
             <span className="material-icons">chat</span> Comments
           </h3>
 
-          {loadingComments ? (
-            <p>Loading comments...</p>
-          ) : comments.length > 0 ? (
+          {comments.length > 0 ? (
             <ul className="challenge-comments-list">
               {comments.map((c) => (
                 <li key={c.id} className="challenge-comment-item">
                   <div className="comment-header">
                     <strong>{c.user_name}</strong>
 
-                    <div className="comment-actions">
-                      <span className="timestamp">
-                        {new Date(c.timestamp).toISOString().slice(0, 10)}{" "}
-                        {new Date(c.timestamp).toISOString().slice(11, 16)}
+                    {/* Date + Time Icons */}
+                    <div className="comment-meta">
+                      <span className="material-icons comment-icon">calendar_today</span>
+                      <span className="comment-date">
+                        {new Date(c.timestamp).toISOString().slice(0, 10)}
                       </span>
 
-                      {c.user_name === currentUserName && (
-                        <>
-                          <button
-                            className="challenge-icon-btn"
-                            onClick={() => {
-                              setEditingCommentId(c.id);
-                              setEditContent(c.content);
-                            }}
-                          >
-                            <span className="material-icons">edit</span>
-                          </button>
-
-                          <button
-                            className="challenge-icon-btn"
-                            onClick={() => handleDeleteComment(c.id)}
-                          >
-                            <span className="material-icons">delete</span>
-                          </button>
-                        </>
-                      )}
+                      <span className="material-icons comment-icon">schedule</span>
+                      <span className="comment-time">
+                        {new Date(c.timestamp).toISOString().slice(11, 16)}
+                      </span>
                     </div>
+
+                    {/* Comment actions */}
+                    {!challengeEnded && c.user_name === currentUserName && (
+                      <div className="comment-actions">
+                        <button
+                          className="comment-icon-btn"
+                          onClick={() => {
+                            setEditingCommentId(c.id);
+                            setEditContent(c.content);
+                          }}
+                        >
+                          <span className="material-icons">edit</span>
+                        </button>
+
+                        <button
+                          className="comment-icon-btn"
+                          onClick={() => handleDeleteComment(c.id)}
+                        >
+                          <span className="material-icons">delete</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   {editingCommentId === c.id ? (
-                    <div>
+                    <div className="edit-comment-section">
                       <textarea
                         value={editContent}
                         onChange={(e) => setEditContent(e.target.value)}
@@ -610,7 +532,7 @@ export default function ChallengeDetails() {
                       </button>
                     </div>
                   ) : (
-                    <p>{c.content}</p>
+                    <p className="comment-content">{c.content}</p>
                   )}
                 </li>
               ))}
@@ -619,8 +541,9 @@ export default function ChallengeDetails() {
             <p>No comments yet.</p>
           )}
 
-          {status === "Ended" ? (
-            <p className="comments-closed">Comments closed (challenge ended)</p>
+          {/* Comment form */}
+          {challengeEnded ? (
+            <p className="comments-closed">Comments are closed.</p>
           ) : isJoined ? (
             <div className="challenge-comment-form">
               <textarea
@@ -631,7 +554,7 @@ export default function ChallengeDetails() {
               <button onClick={handleAddComment}>Send</button>
             </div>
           ) : (
-            <p className="comments-closed">Join the challenge to comment</p>
+            <p className="comments-closed">Join the challenge to comment.</p>
           )}
         </div>
       )}

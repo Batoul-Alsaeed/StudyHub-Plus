@@ -12,7 +12,7 @@ type Challenge = AnyObj;
 type Normalized = Challenge & {
   _participantIds: number[];
   _participantsCount: number;
-  _status?: "Upcoming" | "Active" | "Ended" | string;
+  _status: "Upcoming" | "Active" | "Ended";
 };
 
 export default function Challenges() {
@@ -49,17 +49,28 @@ export default function Challenges() {
     return null;
   };
 
+  /** ===== Compute Status ===== **/
+  const computeStatus = (start: string, end: string) => {
+    const now = new Date();
+    const s = new Date(start);
+    const e = new Date(end);
+    if (now < s) return "Upcoming";
+    if (now > e) return "Ended";
+    return "Active";
+  };
+
   /** ===== Normalize ===== **/
   const extractParticipantIds = (c: Challenge): number[] => {
     const src = c?.participants;
     if (!src) return [];
+
     if (Array.isArray(src) && src.length > 0) {
       const first = src[0];
 
-      // participants: [1, 2, 3]
+      // [1,2,3]
       if (typeof first === "number") return Array.from(new Set(src));
 
-      // participants: [{ id: 1 }, { user_id: 2 }, "3"]
+      // [{id}, {user_id}, "3"]
       if (typeof first === "object" && first) {
         return Array.from(
           new Set(
@@ -77,12 +88,17 @@ export default function Challenges() {
 
   const normalizeOne = (c: Challenge): Normalized => {
     const ids = extractParticipantIds(c);
+
     const pc =
       typeof c?.participants_count === "number"
         ? c.participants_count
         : ids.length;
-    const status: Normalized["_status"] =
-      typeof c?.status === "string" ? c.status : undefined;
+
+    const status =
+      typeof c?.status === "string"
+        ? (c.status as any)
+        : computeStatus(c.start_date, c.end_date);
+
     return {
       ...c,
       _participantIds: ids,
@@ -169,59 +185,46 @@ export default function Challenges() {
   /** ===== Helpers ===== **/
   const isOwner = (c: Normalized) =>
     Number(c.creator_id) === Number(currentUserId);
+
   const isMember = (c: Normalized) =>
     c._participantIds.includes(Number(currentUserId));
+
   const isFull = (c: Normalized) =>
     typeof c.max_participants === "number" &&
     c._participantsCount >= c.max_participants;
 
-  const userProgressOf = (c: Normalized) =>
-    typeof c.progress?.[String(currentUserId)] === "number"
-      ? c.progress[String(currentUserId)]
-      : 0;
-
-  const groupProgressOf = (c: Normalized) =>
-    typeof c.group_progress === "number" ? c.group_progress : 0;
-
   /** ===== Join / Leave ===== **/
   const handleJoin = async (id: number) => {
-    const tempUserId = currentUserId;
-    const tempUserName = currentUserName;
-
-    if (!tempUserId) {
+    if (!currentUserId) {
       showToast("Please login first");
       return;
     }
 
-    // Optimistic UI update
+    // Optimistic update
     setList((prev) =>
       prev.map((c) =>
-        c.id === id && !c._participantIds.includes(tempUserId)
+        c.id === id
           ? {
               ...c,
-              _participantIds: [...c._participantIds, tempUserId],
+              _participantIds: [...c._participantIds, currentUserId],
               _participantsCount: c._participantsCount + 1,
             }
           : c
       )
     );
-    showToast("Joined");
 
     setLoading(true);
+
     try {
       const res = await fetch(
-        `https://studyhub-backend-81w7.onrender.com/api/challenges/${id}/join?user_id=${tempUserId}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ user_name: tempUserName }),
-        }
+        `https://studyhub-backend-81w7.onrender.com/api/challenges/${id}/join?user_id=${currentUserId}`,
+        { method: "POST" }
       );
 
       const data = await res.json();
       if (!res.ok) throw new Error(data?.detail || "Failed to join");
 
-      // ✅ Sync updated participants list from backend response
+      // Sync from backend
       setList((prev) =>
         prev.map((c) =>
           c.id === id
@@ -238,54 +241,47 @@ export default function Challenges() {
         )
       );
 
-      setActiveTab("my"); // switch tab automatically
+      setActiveTab("my");
       showToast("Joined successfully!");
     } catch (e: any) {
       showToast(e.message || "Failed to join");
-      // (ممكن لاحقًا نرجع التغيير لو حبيتي)
     } finally {
       setLoading(false);
     }
   };
 
   const handleLeave = async (id: number) => {
-    const tempUserId = currentUserId;
-
-    if (!tempUserId) {
+    if (!currentUserId) {
       showToast("Please login first");
       return;
     }
 
-    // Optimistic UI update
+    // Optimistic update
     setList((prev) =>
       prev.map((c) =>
         c.id === id
           ? {
               ...c,
               _participantIds: c._participantIds.filter(
-                (pid) => pid !== tempUserId
+                (pid) => pid !== currentUserId
               ),
               _participantsCount: Math.max(0, c._participantsCount - 1),
             }
           : c
       )
     );
-    showToast("Left");
 
     setLoading(true);
     try {
       const res = await fetch(
-        `https://studyhub-backend-81w7.onrender.com/api/challenges/${id}/leave?user_id=${tempUserId}`,
-        {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-        }
+        `https://studyhub-backend-81w7.onrender.com/api/challenges/${id}/leave?user_id=${currentUserId}`,
+        { method: "DELETE" }
       );
 
       const data = await res.json();
       if (!res.ok) throw new Error(data?.detail || "Failed to leave");
 
-      // ✅ Sync updated participants list from backend
+      // Sync
       setList((prev) =>
         prev.map((c) =>
           c.id === id
@@ -305,15 +301,14 @@ export default function Challenges() {
       showToast("Left challenge");
     } catch (e: any) {
       showToast(e.message || "Failed to leave");
-      // (ممكن لاحقًا نرجع التغيير لو حبيتي)
     } finally {
       setLoading(false);
     }
   };
 
   const handleEdit = (challenge: Challenge) => {
-    setEditingChallenge(challenge);
-    setIsModalOpen(true);
+  setEditingChallenge(challenge);
+  setIsModalOpen(true);
   };
 
   /** ===== Delete Challenge ===== **/
@@ -324,11 +319,9 @@ export default function Challenges() {
     try {
       const res = await fetch(
         `https://studyhub-backend-81w7.onrender.com/api/challenges/${id}`,
-        {
-          method: "DELETE",
-        }
+        { method: "DELETE" }
       );
-      if (!res.ok) throw new Error("Failed to delete challenge");
+      if (!res.ok) throw new Error("Delete failed");
 
       showToast("Challenge deleted");
       fetchChallenges();
@@ -380,14 +373,6 @@ export default function Challenges() {
             const owner = isOwner(c);
             const member = isMember(c);
             const full = isFull(c);
-            const showProgress = owner || member;
-            const uProg = userProgressOf(c);
-            const gProg = groupProgressOf(c);
-
-            const renderTask = (t: any) =>
-              typeof t === "string" ? t : t?.title ?? "";
-            const isDone = (t: any) =>
-              typeof t === "object" && t ? Boolean(t.done) : false;
 
             return (
               <div
@@ -396,13 +381,16 @@ export default function Challenges() {
                 onClick={() =>
                   !loading &&
                   navigate(`/challenges/${c.id}`, {
-                    state: { joined: member },
+                    state: { joined: member, challenge: c },
                   })
                 }
               >
                 <h2>{c.title}</h2>
+
                 <div className="challenges-creator-level-row">
-                  <p className="challenges-creator">By {c.creator_name}</p>
+                  <p className="challenges-creator">
+                    By {c.creator_name}
+                  </p>
                   <div className="challenges-level-row">
                     <span className="material-icons">bar_chart</span>
                     <p>{c.level} Level</p>
@@ -418,65 +406,16 @@ export default function Challenges() {
                   </span>
                 </div>
 
-                {/* Progress */}
-                <div className="challenges-progress-section">
-                  {showProgress && (
-                    <div className="challenges-progress-row">
-                      <div className="challenges-progress-label">
-                        <span>Your Progress</span>
-                        <span className="challenges-progress-percent">
-                          {uProg}%
-                        </span>
-                      </div>
-                      <div className="challenges-progress-bar">
-                        <div
-                          className="challenges-progress-fill user"
-                          style={{ width: `${uProg}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="challenges-progress-row">
-                    <div className="challenges-progress-label">
-                      <span>Group Progress</span>
-                      <span className="challenges-progress-percent">
-                        {gProg}%
-                      </span>
-                    </div>
-                    <div className="challenges-progress-bar">
-                      <div
-                        className="challenges-progress-fill group"
-                        style={{ width: `${gProg}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Requirements */}
-                <div className="challenges-requirements-section">
-                  <h4>Requirements</h4>
-                  <ul className="challenges-requirements-list">
-                    {Array.isArray(c.tasks) &&
-                      c.tasks.map((task: any, idx: number) => (
-                        <li key={`${c.id}-task-${idx}`}>
-                          <span className="material-icons">
-                            {isDone(task)
-                              ? "check_circle"
-                              : "radio_button_unchecked"}
-                          </span>
-                          <span>{renderTask(task)}</span>
-                        </li>
-                      ))}
-                  </ul>
-                </div>
-
                 {/* ACTIONS */}
                 <div
                   className="challenges-card-actions"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  {owner ? (
+                  {c._status === "Ended" ? (
+                    <button className="challenges-ended-btn" disabled>
+                      Ended
+                    </button>
+                  ) : owner ? (
                     <>
                       <button
                         className="challenges-edit-btn"
@@ -499,7 +438,7 @@ export default function Challenges() {
                       Leave
                     </button>
                   ) : full ? (
-                    <button className="challenges-join-btn full" disabled>
+                    <button className="challenges-full-btn" disabled>
                       Full
                     </button>
                   ) : (
