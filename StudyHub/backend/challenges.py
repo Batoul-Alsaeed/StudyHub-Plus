@@ -252,43 +252,62 @@ def join_challenge(
 def toggle_task(
     challenge_id: int,
     user_id: int = Query(...),
-    task_index: int = Query(...),
+    task_id: int = Query(...),
     db: Session = Depends(get_db),
 ):
-    challenge = db.query(models.Challenge).filter(models.Challenge.id == challenge_id).first()
+    challenge = (
+        db.query(models.Challenge)
+        .filter(models.Challenge.id == challenge_id)
+        .first()
+    )
     if not challenge:
         raise HTTPException(status_code=404, detail="Challenge not found")
 
+    # Ensure challenge active
     today = datetime.utcnow().date()
     if challenge.end_date and today > challenge.end_date:
         raise HTTPException(status_code=400, detail="Challenge already ended")
 
-    participants = challenge.participants or []
-    if user_id not in participants:
+    # User must be joined
+    if user_id not in (challenge.participants or []):
         raise HTTPException(status_code=403, detail="You must join first")
 
-    tasks_count = len(challenge.tasks or [])
-    if task_index < 0 or task_index >= tasks_count:
-        raise HTTPException(status_code=400, detail="Invalid task index")
+    # ===== Get the task from the DB =====
+    task = (
+        db.query(models.ChallengeTask)
+        .filter(
+            models.ChallengeTask.id == task_id,
+            models.ChallengeTask.challenge_id == challenge_id
+        )
+        .first()
+    )
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
 
-    user_key = str(user_id)
+    # Toggle database task
+    task.done = not task.done
+
+    # ===== Update user progress =====
+    # Count all valid tasks
+    all_tasks = challenge.tasks
+    total = len(all_tasks)
+
+    if total == 0:
+        user_progress = 0.0
+    else:
+        completed = len([t for t in all_tasks if t.done])
+        user_progress = round((completed / total) * 100.0, 2)
+
     progress_map = challenge.progress or {}
-
-    # إذا ما كان له progress من قبل نهيئه
-    if user_key not in progress_map or not isinstance(progress_map[user_key], list):
-        progress_map[user_key] = [0] * tasks_count
-
-    # تأكد أن طول الليست يساوي عدد المهام
-    if len(progress_map[user_key]) != tasks_count:
-        progress_map[user_key] = (progress_map[user_key] + [0] * tasks_count)[:tasks_count]
-
-    current = progress_map[user_key][task_index]
-    progress_map[user_key][task_index] = 0 if current else 1  # 0/1
-
+    progress_map[str(user_id)] = user_progress
     challenge.progress = progress_map
 
-    # recalc group progress
-    recompute_group_progress(challenge)
+    # ===== Update group progress (average) =====
+    progresses = list(progress_map.values())
+    challenge.group_progress = (
+        round(sum(progresses) / len(progresses), 2)
+        if progresses else 0.0
+    )
 
     db.commit()
     db.refresh(challenge)
