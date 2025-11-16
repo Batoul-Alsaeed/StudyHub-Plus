@@ -67,10 +67,8 @@ export default function Challenges() {
     if (Array.isArray(src) && src.length > 0) {
       const first = src[0];
 
-      // [1,2,3]
       if (typeof first === "number") return Array.from(new Set(src));
 
-      // [{id}, {user_id}, "3"]
       if (typeof first === "object" && first) {
         return Array.from(
           new Set(
@@ -200,7 +198,6 @@ export default function Challenges() {
       return;
     }
 
-    // Optimistic update
     setList((prev) =>
       prev.map((c) =>
         c.id === id
@@ -224,7 +221,6 @@ export default function Challenges() {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.detail || "Failed to join");
 
-      // Sync from backend
       setList((prev) =>
         prev.map((c) =>
           c.id === id
@@ -256,7 +252,6 @@ export default function Challenges() {
       return;
     }
 
-    // Optimistic update
     setList((prev) =>
       prev.map((c) =>
         c.id === id
@@ -281,7 +276,6 @@ export default function Challenges() {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.detail || "Failed to leave");
 
-      // Sync
       setList((prev) =>
         prev.map((c) =>
           c.id === id
@@ -307,8 +301,8 @@ export default function Challenges() {
   };
 
   const handleEdit = (challenge: Challenge) => {
-  setEditingChallenge(challenge);
-  setIsModalOpen(true);
+    setEditingChallenge(challenge);
+    setIsModalOpen(true);
   };
 
   /** ===== Delete Challenge ===== **/
@@ -336,7 +330,7 @@ export default function Challenges() {
   return (
     <MainLayout>
       <div className="challenges-container">
-        {/* HEADER */}
+
         <div className="challenges-header">
           <h1>Challenges</h1>
           <button className="challenges-create-btn" onClick={openModal}>
@@ -344,7 +338,6 @@ export default function Challenges() {
           </button>
         </div>
 
-        {/* TABS */}
         <div className="challenges-tabs">
           <button
             className={
@@ -374,6 +367,9 @@ export default function Challenges() {
             const member = isMember(c);
             const full = isFull(c);
 
+            // 🔥 حساب انتهاء التحدي مباشرة بدون الاعتماد على _status
+            const isEnded = new Date(c.end_date) < new Date();
+
             return (
               <div
                 key={c.id}
@@ -388,9 +384,7 @@ export default function Challenges() {
                 <h2>{c.title}</h2>
 
                 <div className="challenges-creator-level-row">
-                  <p className="challenges-creator">
-                    By {c.creator_name}
-                  </p>
+                  <p className="challenges-creator">By {c.creator_name}</p>
                   <div className="challenges-level-row">
                     <span className="material-icons">bar_chart</span>
                     <p>{c.level} Level</p>
@@ -411,7 +405,7 @@ export default function Challenges() {
                   className="challenges-card-actions"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  {c._status === "Ended" ? (
+                  {isEnded ? (
                     <button className="challenges-ended-btn" disabled>
                       Ended
                     </button>
@@ -455,6 +449,7 @@ export default function Challenges() {
           })}
         </div>
 
+        {/* ==== مودال التحدي (مكانه الصحيح) ==== */}
         <ChallengeModal
           isOpen={isModalOpen}
           onClose={closeModal}
@@ -462,6 +457,7 @@ export default function Challenges() {
           {...(editingChallenge ? { initialData: editingChallenge } : {})}
         />
 
+        {/* ==== Toast ==== */}
         {toast && <div className="toast">{toast}</div>}
       </div>
     </MainLayout>
