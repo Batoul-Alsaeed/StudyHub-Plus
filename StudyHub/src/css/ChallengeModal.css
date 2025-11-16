@@ -1,0 +1,264 @@
+/* =====================================================
+   CHALLENGE MODAL — CLEAN VERSION
+   File: ChallengeModal.css
+===================================================== */
+
+/* ===== Overlay ===== */
+.challenge-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+/* ===== Modal Box ===== */
+.challenge-modal {
+  background: #ffffff;
+  width: 90%;
+  max-width: 550px;
+  max-height: 85vh;
+  border-radius: 20px;
+  padding: 35px;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  animation: slideUp 0.35s ease;
+  font-family: "DM Sans", sans-serif;
+
+  scrollbar-width: thin;
+  scrollbar-color: #b5b5b5 transparent;
+}
+
+.challenge-modal::-webkit-scrollbar {
+  width: 6px;
+}
+.challenge-modal::-webkit-scrollbar-thumb {
+  background: rgba(150, 150, 150, 0.4);
+  border-radius: 10px;
+}
+.challenge-modal::-webkit-scrollbar-thumb:hover {
+  background: rgba(120, 120, 120, 0.6);
+}
+
+/* ===== Modal Title ===== */
+.challenge-modal h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #001b44;
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+/* =====================================================
+   FORM ELEMENTS
+===================================================== */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #001b44;
+  margin-bottom: 6px;
+  font-size: 15px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 14px;
+  background-color: #fafafa;
+  outline: none;
+  transition: 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: #3140c4;
+  background-color: #fff;
+  box-shadow: 0 0 0 2px rgba(49, 64, 196, 0.15);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 70px;
+  max-height: 120px;
+}
+
+/* =====================================================
+   DIFFICULTY SELECTOR
+===================================================== */
+.difficulty-options {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.difficulty-btn {
+  padding: 6px 16px;
+  border: 1.5px solid #ccc;
+  background-color: white;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.difficulty-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* Easy */
+.difficulty-btn.easy.active,
+.difficulty-btn.easy:hover {
+  background-color: #e8ecff;
+  color: #3140c4;
+  border-color: #3140c4;
+}
+
+/* Medium */
+.difficulty-btn.medium.active,
+.difficulty-btn.medium:hover {
+  background-color: #fff7df;
+  color: #d6a400;
+  border-color: #d6a400;
+}
+
+/* Hard */
+.difficulty-btn.hard.active,
+.difficulty-btn.hard:hover {
+  background-color: #ffe7ea;
+  color: #e34a65;
+  border-color: #e34a65;
+}
+
+/* =====================================================
+   REQUIREMENTS SYSTEM
+===================================================== */
+.requirements-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.requirements-input input {
+  flex: 1;
+}
+
+.requirements-input button {
+  background-color: #3140c4;
+  padding: 8px 14px;
+  border-radius: 10px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: 0.25s ease;
+}
+
+.requirements-input button:hover {
+  background-color: #2633a5;
+}
+
+/* List */
+.requirements-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.requirements-list li {
+  background: #f7f7fa;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #333;
+}
+
+.remove-btn {
+  background: none;
+  border: none;
+  color: #e34a65;
+  cursor: pointer;
+  font-size: 16px;
+  transition: transform 0.2s ease;
+}
+.remove-btn:hover {
+  transform: scale(1.2);
+}
+
+/* =====================================================
+   MODAL ACTIONS
+===================================================== */
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 25px;
+  padding-bottom: 10px;
+}
+
+.cancel-btn {
+  background-color: #ddd;
+  color: #333;
+  padding: 10px 25px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+.cancel-btn:hover {
+  background-color: #ccc;
+}
+
+.save-btn {
+  padding: 10px 25px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background 0.25s ease, transform 0.2s ease;
+}
+
+/* Easy */
+.save-btn.easy { background-color: #3140c4; color: #fff; }
+.save-btn.easy:hover { background-color: #2633a5; transform: translateY(-2px); }
+
+/* Medium */
+.save-btn.medium { background-color: #f9cf62; color: #000; }
+.save-btn.medium:hover { background-color: #e6b941; transform: translateY(-2px); }
+
+/* Hard */
+.save-btn.hard { background-color: #f36b80; color: #fff; }
+.save-btn.hard:hover { background-color: #e34a65; transform: translateY(-2px); }
+
+/* =====================================================
+   ANIMATIONS
+===================================================== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

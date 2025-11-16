@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/icon?family=Material+Icons");
 
 /* =====================================================
-   ROOT CONTAINER
+   ROOT CONTAINER — الصفحة العامة
 ===================================================== */
 .challenges-container {
   min-height: 100vh;
@@ -9,11 +9,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-family: "Inter", sans-serif;
+  font-family: "DM Sans", sans-serif;
 }
 
 /* =====================================================
-   HEADER
+   HEADER — العنوان وزر إنشاء تحدي
 ===================================================== */
 .challenges-header {
   width: 100%;
@@ -25,28 +25,29 @@
 }
 
 .challenges-header h1 {
-  font-size: 28px;
   color: #001b44;
   font-weight: 700;
+  font-size: 28px;
+  margin: 0;
 }
 
 .challenges-create-btn {
-  background-color: #8b7cd3;
-  color: #fff;
+  background-color: #8a80c9;
+  color: white;
   border: none;
   padding: 12px 24px;
   border-radius: 12px;
-  font-weight: 500;
-  font-size: 0.9rem;
+  font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.2s ease;
 }
 .challenges-create-btn:hover {
-  background-color: #7263b9;
+  background-color: #7b6bd9;
 }
 
 /* =====================================================
-   TABS
+   TABS — تبويبات (تصفح / تحدياتي)
 ===================================================== */
 .challenges-tabs {
   display: flex;
@@ -62,654 +63,68 @@
   font-weight: 600;
   color: #001b44;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.25s ease;
 }
 .challenges-tab.active {
   background-color: #8c7ae6;
-  color: #fff;
+  color: white;
 }
 
 /* =====================================================
-   GRID
+   GRID — توزيع الكروت
 ===================================================== */
 .challenges-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
   gap: 25px;
   width: 100%;
   max-width: 1200px;
-  align-items: start;
 }
 
 /* =====================================================
-   CARD STYLING
+   CARD — تنسيق الكرت
 ===================================================== */
 .challenges-card {
-  border-radius: 18px;
-  padding: 28px;
-  transition: all 0.3s ease;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
-  cursor: pointer;
+  border-radius: 16px;
+  padding: 24px;
+  min-height: 430px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  height: auto;
-  min-height: 420px;
+  transition: all 0.25s ease;
+  cursor: pointer;
 }
 .challenges-card:hover {
   transform: translateY(-3px);
 }
 
-/* Difficulty backgrounds */
-.challenges-card.easy { background-color: #eef0ff; }
-.challenges-card.medium { background-color: #fff9e9; }
-.challenges-card.hard { background-color: #ffeef1; }
+/* خلفيات حسب الصعوبة (Pastel) — معتمدة */
+.challenges-card.easy {
+  background-color: rgba(49, 64, 196, 0.09);
+}
+.challenges-card.medium {
+  background-color: rgba(249, 207, 98, 0.09);
+}
+.challenges-card.hard {
+  background-color: rgba(243, 107, 128, 0.09);
+}
 
 /* =====================================================
    CARD TITLE + CREATOR + LEVEL
 ===================================================== */
 .challenges-card h2 {
-  font-size: 22px;
   text-align: center;
+  font-size: 20px;
   font-weight: 800;
-  color: #000;
-  margin-bottom: 8px;
-}
-
-.challenges-creator-level-row {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 16px;
-}
-
-.challenges-creator-level-row .challenges-creator {
-  color: #aaa;
-  font-size: 14px;
-}
-
-.challenges-creator-level-row .challenges-level-row {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-weight: 600;
-}
-
-.challenges-creator-level-row .material-icons {
-  font-size: 18px;
-}
-
-/* =====================================================
-   DESCRIPTION
-===================================================== */
-.challenges-desc {
-  text-align: center;
-  font-size: 14px;
-  color: #222;
-  line-height: 1.6;
-  margin-bottom: 18px;
-  padding: 0 10px;
-  min-height: 55px;
-}
-
-/* =====================================================
-   PARTICIPANTS ROW
-===================================================== */
-.challenges-participants-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  margin-bottom: 6px;
-  color: #000;
-}
-
-.challenges-participants-row .material-icons {
-  font-size: 18px;
-}
-
-.challenges-participants-text {
-  font-size: 12px;
-  font-weight: 500;
-  color: #181818;
-}
-
-/* =====================================================
-   PROGRESS SECTION
-===================================================== */
-.challenges-progress-section {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-top: 18px;
-}
-
-.challenges-progress-row {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.challenges-progress-label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 13px;
-  font-weight: 700;
-  color: #000;
-}
-
-.challenges-progress-bar {
-  width: 100%;
-  height: 10px;
-  background: #e0e0e0;
-  border-radius: 50px;
-  overflow: hidden;
-}
-
-.challenges-progress-fill {
-  height: 100%;
-  border-radius: 50px;
-  transition: width 0.4s ease-in-out;
-}
-
-/* Percent color */
-.challenges-progress-percent {
-  font-size: 13px;
-  color: #444;
-}
-
-/* Difficulty colors */
-.easy .challenges-progress-fill.user { background-color: #3140c4; }
-.easy .challenges-progress-fill.group { background-color: #7b89f3; }
-
-.medium .challenges-progress-fill.user { background-color: #f9cf62; }
-.medium .challenges-progress-fill.group { background-color: #f6dd92; }
-
-.hard .challenges-progress-fill.user { background-color: #f36b80; }
-.hard .challenges-progress-fill.group { background-color: #f8a0ae; }
-
-/* Icons tint */
-.challenges-card.easy .material-icons { color: #3140c4; }
-.challenges-card.medium .material-icons { color: #f6a623; }
-.challenges-card.hard .material-icons { color: #e74c3c; }
-
-/* Percent tint */
-.challenges-card.easy .challenges-progress-percent { color: #3140c4; }
-.challenges-card.medium .challenges-progress-percent { color: #f6a623; }
-.challenges-card.hard .challenges-progress-percent { color: #e74c3c; }
-
-/* =====================================================
-   REQUIREMENTS LIST
-===================================================== */
-.challenges-requirements-section {
-  margin-top: 20px;
-}
-
-.challenges-requirements-section h4 {
-  font-size: 15px;
-  font-weight: 700;
   margin-bottom: 10px;
-}
-
-.challenges-requirements-list {
-  list-style: none;
-  padding: 0;
-}
-
-.challenges-requirements-list li {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  margin-bottom: 4px;
-  color: #000;
-  background: transparent;
-  border: none;
-  padding: 0;
-}
-
-/* =====================================================
-   CARD ACTION BUTTONS
-===================================================== */
-.challenges-card-actions {
-  margin-top: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* JOIN / EDIT / DELETE / LEAVE */
-.challenges-join-btn,
-.challenges-edit-btn,
-.challenges-delete-btn,
-.challenges-leave-btn {
-  width: 100%;
-  margin-top: 10px;
-  font-size: 14px;
-  border-radius: 12px;
-  font-weight: 700;
-  padding: 12px 0;
-  border: none;
-  color: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-/* Difficulty: Join */
-.challenges-card.easy .challenges-join-btn { background-color: #3140C4; }
-.challenges-card.easy .challenges-join-btn:hover { background-color: #2633a5; }
-
-.challenges-card.medium .challenges-join-btn { background-color: #FFC727; }
-.challenges-card.medium .challenges-join-btn:hover { background-color: #e6b941; }
-
-.challenges-card.hard .challenges-join-btn { background-color: #F36B80; }
-.challenges-card.hard .challenges-join-btn:hover { background-color: #e34a65; }
-
-/* Join Full */
-.challenges-join-btn.full {
-  background-color: #ccc;
-  color: #555;
-  cursor: not-allowed;
-}
-
-/* Edit */
-.challenges-edit-btn {
-  background-color: #3498db;
-}
-.challenges-edit-btn:hover {
-  background-color: #2980b9;
-}
-
-/* Delete */
-.challenges-delete-btn {
-  background-color: #e74c3c;
-}
-.challenges-delete-btn:hover {
-  background-color: #c0392b;
-}
-
-/* Leave */
-.challenges-card.easy .challenges-leave-btn { background-color: #3140C4; }
-.challenges-card.easy .challenges-leave-btn:hover { background-color: #2633a5; }
-
-.challenges-card.medium .challenges-leave-btn { background-color: #FFC727; }
-.challenges-card.medium .challenges-leave-btn:hover { background-color: #e6b941; }
-
-.challenges-card.hard .challenges-leave-btn { background-color: #F36B80; }
-.challenges-card.hard .challenges-leave-btn:hover { background-color: #e34a65; }
-
-
-/* ===== المودال ===== */
-.challenge-overlay {
-  background-color: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(3px);
-  animation: fadeIn 0.3s ease;
-}
-
-.challenge-modal {
-  background: #ffffff;
-  padding: 40px;
-  border-radius: 20px;
-  max-width: 650px;
-  width: 90%;
-  margin: auto;
-  outline: none;
-  font-family: "DM Sans", sans-serif;
-  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.15);
-  animation: slideUp 0.4s ease;
-}
-
-.challenge-modal h2 {
-  font-size: 24px;
-  font-weight: 700;
-  color: #001b44;
-  text-align: center;
-  margin-bottom: 25px;
-}
-
-/* ===== الحقول ===== */
-.form-group {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 20px;
-}
-.form-group label {
-  font-weight: 700;
-  color: #001b44;
-  margin-bottom: 8px;
-  font-size: 15px;
-}
-input,
-textarea,
-select {
-  padding: 12px 14px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  font-size: 15px;
-  outline: none;
-  transition: 0.3s;
-  background-color: #fafafa;
-}
-input:focus,
-textarea:focus,
-select:focus {
-  border-color: #8a80c9;
-  box-shadow: 0 0 0 2px rgba(138, 128, 201, 0.15);
-  background-color: #fff;
-}
-textarea {
-  resize: none;
-  min-height: 80px;
-}
-
-/* ===== أزرار المودال ===== */
-.modal-actions {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 25px;
-}
-.cancel-btn {
-  background-color: #ddd;
-  color: #333;
-  border: none;
-  padding: 10px 25px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background 0.3s ease;
-}
-.cancel-btn:hover {
-  background-color: #ccc;
-}
-.save-btn {
-  color: white;
-  border: none;
-  padding: 10px 25px;
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
-}
-.save-btn:hover {
-  transform: translateY(-2px);
-}
-.save-btn.easy {
-  background-color: #3140c4;
-}
-.save-btn.easy:hover {
-  background-color: #2633a5;
-}
-.save-btn.medium {
-  background-color: #f9cf62;
   color: #000;
 }
-.save-btn.medium:hover {
-  background-color: #e6b941;
-}
-.save-btn.hard {
-  background-color: #f36b80;
-}
-.save-btn.hard:hover {
-  background-color: #e34a65;
-}
 
-/* ===== خلفية المودال ===== */
-.challenge-overlay {
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(3px);
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-/* ===== نافذة المودال ===== */
-.challenge-modal {
-  background: #fff;
-  border-radius: 18px;
-  width: 480px;
-  max-width: 95%;
-  padding: 35px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ===== عناصر النموذج ===== */
-.form-group {
-  margin-bottom: 18px;
-  display: flex;
-  flex-direction: column;
-}
-
-.form-group label {
-  font-weight: 600;
-  color: #001b44;
-  margin-bottom: 6px;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select,
-.date-input {
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  padding: 10px 14px;
-  font-size: 14px;
-  outline: none;
-  transition: border 0.2s ease, box-shadow 0.2s ease;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-  border-color: #3140c4;
-  box-shadow: 0 0 0 2px rgba(49, 64, 196, 0.1);
-}
-
-textarea {
-  resize: none;
-  height: 80px;
-}
-
-/* ===== تصحيح تمرير المودال ===== */
-.challenge-overlay {
-  overflow-y: auto; /* يضيف تمرير للصفحة لو المودال طويل */
-}
-
-.challenge-modal {
-  max-height: 90vh; /* يمنع المودال من تجاوز 90% من ارتفاع الشاشة */
-  overflow-y: auto; /* يفعّل التمرير داخل المودال نفسه */
-  scrollbar-width: thin;
-  scrollbar-color: #b5b5b5 transparent;
-}
-
-/* شكل لطيف لشريط التمرير داخل المودال */
-.challenge-modal::-webkit-scrollbar {
-  width: 6px;
-}
-
-.challenge-modal::-webkit-scrollbar-thumb {
-  background-color: #b5b5b5;
-  border-radius: 10px;
-}
-
-/* ===== تحسين ارتفاع المودال ===== */
-.challenge-modal {
-  max-height: 85vh; /* يمنع المودال من التمدد أكثر من الشاشة */
-  overflow-y: auto; /* التمرير يظهر فقط عند الحاجة */
-}
-
-/* ===== تصغير حجم مربع الوصف ===== */
-.form-group textarea {
-  min-height: 70px;
-  max-height: 110px;
-  resize: vertical; /* يخلي المستخدم يقدر يكبره إذا احتاج */
-}
-
-/* ===== تمرير لطيف فقط عند الحاجة ===== */
-.challenge-modal::-webkit-scrollbar {
-  width: 6px;
-}
-.challenge-modal::-webkit-scrollbar-thumb {
-  background: rgba(150, 150, 150, 0.4);
-  border-radius: 10px;
-}
-.challenge-modal::-webkit-scrollbar-thumb:hover {
-  background: rgba(120, 120, 120, 0.6);
-}
-
-/* ===== تباعد أفضل في الأسفل عشان الأزرار ما تلتصق بالنهاية ===== */
-.modal-actions {
-  margin-top: 25px;
-  padding-bottom: 10px;
-}
-
-
-
-/* ===== المهام (Requirements) ===== */
-.requirements-input {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.requirements-input input {
-  flex: 1;
-}
-
-.requirements-input button {
-  background-color: #3140c4;
-  color: white;
-  font-weight: 600;
-  padding: 8px 14px;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.requirements-input button:hover {
-  background-color: #2633a5;
-}
-
-.requirements-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.requirements-list li {
-  background: #f7f7fa;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 8px 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
-  font-size: 14px;
-  color: #333;
-}
-
-.remove-btn {
-  background: none;
-  border: none;
-  color: #e34a65;
-  cursor: pointer;
-  font-size: 16px;
-  transition: transform 0.2s ease;
-}
-
-.remove-btn:hover {
-  transform: scale(1.2);
-}
-
-/* ===== أزرار مستوى الصعوبة ===== */
-.difficulty-options {
-  display: flex;
-  gap: 10px;
-  margin-top: 6px;
-}
-
-.difficulty-btn {
-  border: 1.5px solid #ccc;
-  background-color: white;
-  color: #333;
-  padding: 6px 16px;
-  border-radius: 20px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-
-/* ===== تأثير الهوفر العام ===== */
-.difficulty-btn:hover {
-  transform: translateY(-2px);
-}
-
-/* ===== Easy ===== */
-.difficulty-btn.easy:hover,
-.difficulty-btn.easy.active {
-  background-color: #e8ecff;
-  color: #3140c4;
-  border-color: #3140c4;
-}
-
-/* ===== Medium ===== */
-.difficulty-btn.medium:hover,
-.difficulty-btn.medium.active {
-  background-color: #fff7df;
-  color: #d6a400;
-  border-color: #d6a400;
-}
-
-/* ===== Hard ===== */
-.difficulty-btn.hard:hover,
-.difficulty-btn.hard.active {
-  background-color: #ffe7ea;
-  color: #e34a65;
-  border-color: #e34a65;
-}
-
-/* ===== الحركات ===== */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-@keyframes slideUp {
-  from { transform: translateY(30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-/* ===== صف المنشئ + المستوى (جديد) ===== */
 .creator-level-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .creator-level-row .creator {
@@ -721,106 +136,200 @@ textarea {
 .creator-level-row .level-row {
   display: flex;
   align-items: center;
-  gap: 5px;
-}
-
-.creator-level-row .level-row p {
-  font-size: 14px;
-  font-weight: 600;
-  color: #2f3640;
+  gap: 6px;
 }
 
 .creator-level-row .material-icons {
   font-size: 18px;
-  vertical-align: middle;
 }
 
-/* ===== تلوين جميع الأيقونات داخل الكرت حسب مستوى الصعوبة ===== */
-
-/* الكروت السهلة */
-.challenge-card.easy .material-icons {
-  color: #3140c4; /* أزرق فخم يناسب Easy */
+/* =====================================================
+   ICON COLORS — حسب مستوى الصعوبة
+===================================================== */
+.challenges-card.easy .material-icons {
+  color: #3140c4;
 }
-
-/* الكروت المتوسطة */
-.challenge-card.medium .material-icons {
-  color: #f6a623; /* برتقالي دافئ يناسب Medium */
-}
-
-/* الكروت الصعبة */
-.challenge-card.hard .material-icons {
-  color: #e74c3c; /* أحمر قوي يناسب Hard */
-}
-
-/* ===== العنوان في منتصف الكرت ===== */
-.challenge-card h2 {
-  text-align: center;
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 10px;
-  color: #000;
-}
-
-/* ===== رقم النسبة بلون مستوى الصعوبة ===== */
-
-/* سهلة */
-.challenge-card.easy .progress-percent {
-  color: #3140c4; /* نفس لون مستوى الصعوبة */
-}
-
-/* متوسطة */
-.challenge-card.medium .progress-percent {
+.challenges-card.medium .material-icons {
   color: #f6a623;
 }
-
-/* صعبة */
-.challenge-card.hard .progress-percent {
+.challenges-card.hard .material-icons {
   color: #e74c3c;
 }
 
-/* ===== زر Join Challenge بألوان ديناميكية حسب مستوى الصعوبة ===== */
-.join-btn .challenges-leave-btn {
-  width: 100%;
-  margin-top: 10px;
+/* =====================================================
+   DESCRIPTION
+===================================================== */
+.challenges-desc {
+  text-align: center;
   font-size: 14px;
-  border-radius: 12px;
-  font-weight: 700;
-  padding: 12px 0;
-  border: none;
-  color: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  color: #222;
+  margin-bottom: 14px;
+  min-height: 50px;
 }
 
-/* Easy */
-.challenge-card.easy .join-btn {
-  background-color: #3140C4;
+/* =====================================================
+   PARTICIPANTS
+===================================================== */
+.participants-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
 }
-.challenge-card.easy .join-btn:hover {
+
+.participants-text {
+  font-size: 12px;
+  color: #181818;
+  font-weight: 500;
+}
+
+/* =====================================================
+   PROGRESS SECTION
+===================================================== */
+.challenges-progress-section {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.challenges-progress-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.challenges-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.challenges-progress-bar {
+  width: 100%;
+  height: 9px;
+  background: #e0e0e0;
+  border-radius: 50px;
+  overflow: hidden;
+}
+
+.challenges-progress-fill {
+  height: 100%;
+  border-radius: 50px;
+  transition: width 0.4s ease;
+}
+
+/* ألوان التقدم حسب مستوى الصعوبة */
+.easy .challenges-progress-fill.user {
+  background-color: #3140c4;
+}
+.easy .challenges-progress-fill.group {
+  background-color: #7b89f3;
+}
+.medium .challenges-progress-fill.user {
+  background-color: #f9cf62;
+}
+.medium .challenges-progress-fill.group {
+  background-color: #f6dd92;
+}
+.hard .challenges-progress-fill.user {
+  background-color: #f36b80;
+}
+.hard .challenges-progress-fill.group {
+  background-color: #f8a0ae;
+}
+
+/* =====================================================
+   BUTTONS SECTION — زر الانضمام/المغادرة/تعديل/حذف
+===================================================== */
+.challenges-card-actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* شكل الأزرار */
+.challenges-join-btn,
+.challenges-leave-btn,
+.challenges-edit-btn,
+.challenges-delete-btn,
+.challenges-ended-btn,
+.challenges-full-btn {
+  width: 100%;
+  padding: 12px 0;
+  border-radius: 12px;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  color: white;
+}
+
+/* -------- أزرار حسب مستوى الصعوبة -------- */
+
+/* EASY */
+.challenges-card.easy .challenges-join-btn,
+.challenges-card.easy .challenges-leave-btn {
+  background-color: #3140c4;
+}
+.challenges-card.easy .challenges-join-btn:hover,
+.challenges-card.easy .challenges-leave-btn:hover {
   background-color: #2633a5;
 }
 
-/* Medium */
-.challenge-card.medium .join-btn {
-  background-color: #FFC727;
+/* MEDIUM */
+.challenges-card.medium .challenges-join-btn,
+.challenges-card.medium .challenges-leave-btn {
+  background-color: #f9cf62;
+  color: #fff;
 }
-.challenge-card.medium .join-btn:hover {
+.challenges-card.medium .challenges-join-btn:hover,
+.challenges-card.medium .challenges-leave-btn:hover {
   background-color: #e6b941;
 }
 
-/* Hard */
-.challenge-card.hard .join-btn {
-  background-color: #F36B80;
+/* HARD */
+.challenges-card.hard .challenges-join-btn,
+.challenges-card.hard .challenges-leave-btn {
+  background-color: #f36b80;
 }
-.challenge-card.hard .join-btn:hover {
+.challenges-card.hard .challenges-join-btn:hover,
+.challenges-card.hard .challenges-leave-btn:hover {
   background-color: #e34a65;
 }
 
-/* في حال الكرت ممتلئ */
-.join-btn.full {
-  background-color: #ccc;
-  color: #555;
+/* -------- FULL / ENDED -------- */
+
+/* FULL — رمادي غامق */
+.challenges-full-btn {
+  background-color: #a0a0a0;
   cursor: not-allowed;
+  color: white;
 }
 
+/* ENDED — أغمق من FULL */
+.challenges-ended-btn {
+  background-color: #777;
+  cursor: not-allowed;
+  color: white;
+}
+
+/* -------- EDIT -------- */
+.challenges-edit-btn {
+  background-color: #3498db;
+}
+.challenges-edit-btn:hover {
+  background-color: #2980b9;
+}
+
+/* -------- DELETE -------- */
+.challenges-delete-btn {
+  background-color: #e74c3c;
+}
+.challenges-delete-btn:hover {
+  background-color: #c0392b;
+}
 

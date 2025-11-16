@@ -4,12 +4,8 @@ import React from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
-//type Task = { title: string; done?: boolean };
-// type LeaderRow = { user_id: number; user_name: string; progress: number };
-// type CommentRow = { id: number; user_name: string; content: string; timestamp: string };
-
-type Task = string | { id?: number; title?: string; done?: boolean };
-type LeaderRow = { id: number; name: string; progress: number };
+type Task = { id?: number; title?: string; done?: boolean };
+type LeaderRow = { user_id: number; user_name: string; progress: number };
 type CommentRow = {
   id: number;
   user_name: string;
@@ -75,7 +71,9 @@ export default function ChallengeDetails() {
   const [newComment, setNewComment] = React.useState("");
   const [loadingComments, setLoadingComments] = React.useState(false);
 
-  const [editingCommentId, setEditingCommentId] = React.useState<number | null>(null);
+  const [editingCommentId, setEditingCommentId] = React.useState<number | null>(
+    null
+  );
   const [editContent, setEditContent] = React.useState("");
 
   const [toast, setToast] = React.useState("");
@@ -123,80 +121,81 @@ export default function ChallengeDetails() {
   }, [activeTab]);
 
   // ===== Participants =====
-  const participantsArray: any[] = Array.isArray(challenge?.participants)
-    ? challenge.participants
-    : [];
-
-  // @ts-ignore
-  const participantIds = participantsArray
-    .map((p) =>
-      typeof p === "object" && p !== null ? (p as any).id : Number(p)
-    )
-    .filter(Boolean) as number[];
-    
-  // @ts-ignore
-    const participantNames = participantsArray
-    .map((p) => (typeof p === "object" && p !== null ? (p as any).name : p))
-    .filter(Boolean) as string[];
-
+  
   React.useEffect(() => {
     if (!challenge) return;
-     const participantIds = [];
-  const participantNames = [];
 
-  if (Array.isArray(challenge.participants)) {
-    for (const p of challenge.participants) {
-      if (typeof p === "number") participantIds.push(p);
-      else if (p && typeof p === "object") {
-        if (p.id) participantIds.push(Number(p.id));
-        if (p.name) participantNames.push(p.name);
+    const ids: number[] = [];
+    const names: string[] = [];
+
+    if (Array.isArray(challenge.participants)) {
+      for (const p of challenge.participants) {
+        if (typeof p === "number") {
+          ids.push(p);
+        } else if (p && typeof p === "object") {
+          const obj = p as any;
+          if (obj.id != null) ids.push(Number(obj.id));
+          if (obj.name) names.push(String(obj.name));
+        }
       }
     }
-  }
 
-  const joined =
-    participantIds.includes(Number(currentUserId)) ||
-    participantNames.includes(String(currentUserName)) ||
-    challenge.is_joined === true;
+    const joined =
+      ids.includes(Number(currentUserId)) ||
+      names.includes(String(currentUserName)) ||
+      challenge.is_joined === true;
 
-  setIsJoined(joined);
-}, [challenge, currentUserId, currentUserName]);
+    setIsJoined(joined);
+  }, [challenge, currentUserId, currentUserName]);
 
-  // ===== Tasks =====
-  const rawTasks: Task[] = Array.isArray(challenge?.tasks)
-    ? challenge.tasks
-    : [];
-  const tasks = rawTasks.map((t: any) =>
-    typeof t === "string"
-      ? { title: t, done: false }
-      : t || { title: "", done: false }
-  );
+  // ========== PROGRESS & TASKS (يحافظ على التقدم الفردي والمجموعة) ==========
+  // Progress from backend: { "2": [1,0,1], "3": [0,1,0], ... }
+  const rawProgressMap = (challenge?.progress || {}) as Record<string, number[]>;
+  const userArray = rawProgressMap[String(currentUserId)] || [];
 
-  const progressMap =
-    (typeof challenge?.progress === "object" && challenge?.progress) || {};
+  // حساب التقدم الفردي كنسبة مئوية (محفوظ في الباك، والفرونت بس يعرضه)
   const userProgress =
-    progressMap[String(currentUserId)] ??
-    (typeof challenge?.user_progress === "number"
-      ? challenge.user_progress
-      : 0);
-  const groupProgress = Number.isFinite(challenge?.group_progress)
-    ? challenge.group_progress
-    : 0;
+    userArray.length > 0
+      ? Math.round(
+          (userArray.reduce((sum, v) => sum + (v ? 1 : 0), 0) /
+            userArray.length) *
+            100
+        )
+      : 0;
 
-  const currentCount =
-    challenge?.participants_count ?? participantsArray.length ?? 0;
-  const maxCount = challenge?.max_participants ?? 0;
-  const isFull = maxCount > 0 && currentCount >= maxCount;
+  // التقدم الجماعي كما يرجع من الباك
+  const groupProgress: number = challenge?.group_progress ?? 0;
 
-  // ===== Challenge status =====
+  // ربط حالة كل مهمة مع مصفوفة التقدم للمستخدم
+  const tasks: Task[] = Array.isArray(
+    challenge?.tasks
+  )
+    ? challenge.tasks.map((t: any, index: number) => {
+        const doneFlag = userArray[index] === 1;
+        if (typeof t === "string") {
+          return { title: t, done: doneFlag };
+        }
+        return { ...t, done: doneFlag };
+      })
+    : [];
+
+  // هل التحدي ممتلئ؟
+  const isFull =
+    challenge?.max_participants && challenge?.participants_count != null
+      ? challenge.participants_count >= challenge.max_participants
+      : false;
+
+  // Dates & Status
   const today = new Date();
-  const start = challenge?.start_date ? new Date(challenge.start_date) : null;
-  const end = challenge?.end_date ? new Date(challenge.end_date) : null;
+  const start = challenge?.start_date
+    ? new Date(challenge.start_date)
+    : new Date();
+  const end = challenge?.end_date ? new Date(challenge.end_date) : new Date();
 
-  let challengeStatus: "Upcoming" | "Active" | "Ended" = "Upcoming";
-  if (start && today >= start && end && today <= end) challengeStatus = "Active";
-  else if (end && today > end) challengeStatus = "Ended";
-  else if (start && today < start) challengeStatus = "Upcoming";
+  let status: "Upcoming" | "Active" | "Ended" = "Upcoming";
+  if (today < start) status = "Upcoming";
+  else if (today > end) status = "Ended";
+  else status = "Active";
 
   // ===== Leaderboard =====
   function handleFetchLeaderboard() {
@@ -344,59 +343,6 @@ export default function ChallengeDetails() {
       </div>
     );
 
-  // Convert tasks
-  //const tasks: Task[] = Array.isArray(challenge.tasks)
-    //? challenge.tasks.map((t: any) =>
-   //     typeof t === "string" ? { title: t, done: false } : t
-  //    )
-  //  : [];
-
-  // Progress
-  //const progressMap = challenge.progress || {};
-  //const userProgress = progressMap[String(currentUserId)] ?? 0;
-  //const groupProgress = challenge.group_progress ?? 0;
-  
-  // tasks تجي جاهزة من API وتحتوي title + done
-  // Progress from backend: { "2": [1,0,1], "3": [0,1,0], ... }
-  const rawProgressMap = (challenge.progress || {}) as Record<string, number[]>;
-  const userArray = rawProgressMap[String(currentUserId)] || [];
-
-  // حساب التقدم الفردي كنسبة مئوية
-  const userProgress =
-    userArray.length > 0
-      ? Math.round(
-          (userArray.reduce((sum, v) => sum + (v ? 1 : 0), 0) / userArray.length) *
-            100
-        )
-      : 0;
-
-  // التقدم الجماعي كما يرجع من الباك
-  const groupProgress = challenge.group_progress ?? 0;
-
-  // ربط حالة كل مهمة مع مصفوفة التقدم للمستخدم
-  const tasks: Task[] = Array.isArray(challenge.tasks)
-    ? challenge.tasks.map((t: any, index: number) => {
-        const doneFlag = userArray[index] === 1;
-
-        if (typeof t === "string") {
-          return { title: t, done: doneFlag };
-        }
-        return { ...t, done: doneFlag };
-      })
-    : [];
-  const isFull = challenge.max_participants
-    ? challenge.participants_count >= challenge.max_participants
-    : false;
-
-  // Dates & Status
-  const today = new Date();
-  const start = new Date(challenge.start_date);
-  const end = new Date(challenge.end_date);
-
-  let status: "Upcoming" | "Active" | "Ended" = "Upcoming";
-  if (today < start) status = "Upcoming";
-  else if (today > end) status = "Ended";
-  else status = "Active";
 
   return (
     <div className="challenge-container">
@@ -416,7 +362,9 @@ export default function ChallengeDetails() {
         </button>
 
         <button
-          className={`challenge-tab-btn ${activeTab === "leaderboard" ? "active" : ""}`}
+          className={`challenge-tab-btn ${
+            activeTab === "leaderboard" ? "active" : ""
+          }`}
           onClick={() => {
             setActiveTab("leaderboard");
             handleFetchLeaderboard();
@@ -426,7 +374,9 @@ export default function ChallengeDetails() {
         </button>
 
         <button
-          className={`challenge-tab-btn ${activeTab === "comments" ? "active" : ""}`}
+          className={`challenge-tab-btn ${
+            activeTab === "comments" ? "active" : ""
+          }`}
           onClick={() => {
             setActiveTab("comments");
             handleFetchComments();
