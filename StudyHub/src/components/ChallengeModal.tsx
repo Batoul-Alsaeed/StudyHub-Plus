@@ -67,12 +67,14 @@ export default function ChallengeModal({
     const data = {
       title,
       description,
-      requirements,
+      tasks: requirements,
       level,
       start_date: startDate ? startDate.toISOString().split("T")[0] : null,
       end_date: endDate ? endDate.toISOString().split("T")[0] : null,
       max_participants: maxParticipants,
       creator_name: localStorage.getItem("username") || "Guest",
+      creator_id: Number(localStorage.getItem("user_id")),
+      participants: [], 
     };
     onSave(data);
   };
