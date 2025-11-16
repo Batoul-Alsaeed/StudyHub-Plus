@@ -316,6 +316,16 @@
   color: #8a80c9;
   vertical-align: middle;
 }
+/* =====================================================
+   COMMENT META ROW (Date + Time Row)
+===================================================== */
+.comment-meta-row {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 20px;
+  margin-top: 6px;
+}
 
 /* =====================================================
    COMMENT FORM

@@ -463,6 +463,7 @@ export default function ChallengeDetails() {
       )}
 
       {/* COMMENTS */}
+      {/* COMMENTS */}
       {activeTab === "comments" && (
         <div className="challenge-comments">
           <h3>
@@ -475,13 +476,11 @@ export default function ChallengeDetails() {
             <ul className="challenge-comments-list">
               {comments.map((c) => {
                 const dateObj = new Date(c.timestamp);
-                const d = dateObj.toISOString().slice(0, 10);  
-                const t = dateObj.toISOString().slice(11, 16);  
+                const d = dateObj.toISOString().slice(0, 10);
+                const t = dateObj.toISOString().slice(11, 16);
 
                 return (
                   <li key={c.id} className="challenge-comment-item">
-
-                    {/* اسم صاحب التعليق */}
                     <div className="comment-header">
                       <strong>{c.user_name}</strong>
                     </div>
@@ -489,56 +488,58 @@ export default function ChallengeDetails() {
                     {/* نص التعليق */}
                     <p>{c.content}</p>
 
-                    {/* التاريخ والوقت - فوق */}
-                    <div className="comment-meta-wrapper">
-                      <div className="comment-meta">
-                        <span className="material-icons comment-icon purple">calendar_today</span>
-                        <span>{d}</span>
+                    {/* التاريخ + الوقت + أدوات التحكم */}
+                    <div className="comment-footer">
+
+                      {/* الصف الأول (تاريخ + وقت) */}
+                      <div className="comment-meta-row">
+                        <div className="comment-meta">
+                          <span className="material-icons comment-icon purple">calendar_today</span>
+                          <span className="comment-meta-text">{d}</span>
+                        </div>
+
+                        <div className="comment-meta">
+                          <span className="material-icons comment-icon purple">schedule</span>
+                          <span className="comment-meta-text">{t}</span>
+                        </div>
                       </div>
 
-                      <div className="comment-meta">
-                        <span className="material-icons comment-icon purple">schedule</span>
-                        <span>{t}</span>
-                      </div>
+                      {/* الصف الثاني (تعديل + حذف) */}
+                      {!challengeEnded && c.user_name === currentUserName && (
+                        <div className="comment-actions-row">
+                          <button
+                            className="comment-action-btn blue"
+                            onClick={() => {
+                              setEditingCommentId(c.id);
+                              setEditContent(c.content);
+                            }}
+                          >
+                            <span className="material-icons">edit</span>
+                          </button>
+
+                          <button
+                            className="comment-action-btn red"
+                            onClick={() => handleDeleteComment(c.id)}
+                          >
+                            <span className="material-icons">delete</span>
+                          </button>
+                        </div>
+                      )}
                     </div>
 
-                    {/* أزرار التعديل والحذف (تحت) */}
-                    {!challengeEnded && c.user_name === currentUserName && (
-                      <div className="comment-actions-row">
-                        <button
-                          className="comment-action-btn blue"
-                          onClick={() => {
-                            setEditingCommentId(c.id);
-                            setEditContent(c.content);
-                          }}
-                        >
-                          <span className="material-icons">edit</span>
-                        </button>
-
-                        <button
-                          className="comment-action-btn red"
-                          onClick={() => handleDeleteComment(c.id)}
-                        >
-                          <span className="material-icons">delete</span>
-                        </button>
-                      </div>
-                    )}
-
-                    {/* مربع تعديل التعليق */}
+                    {/* محرر التعديل */}
                     {editingCommentId === c.id && !challengeEnded && (
                       <div className="comment-edit-box">
                         <textarea
                           value={editContent}
                           onChange={(e) => setEditContent(e.target.value)}
                         />
-
                         <button
                           className="challenge-save-btn"
                           onClick={() => handleSaveEditedComment(c.id)}
                         >
                           Save
                         </button>
-
                         <button
                           className="challenge-cancel-btn"
                           onClick={() => setEditingCommentId(null)}
@@ -547,7 +548,6 @@ export default function ChallengeDetails() {
                         </button>
                       </div>
                     )}
-
                   </li>
                 );
               })}
@@ -556,7 +556,7 @@ export default function ChallengeDetails() {
             <p>No comments yet.</p>
           )}
 
-          {/* إغلاق التعليقات لو انتهى التحدي */}
+          {/* إدخال تعليق جديد */}
           {challengeEnded ? (
             <p className="comments-closed">Comments closed (challenge ended)</p>
           ) : isJoined ? (
@@ -571,6 +571,6 @@ export default function ChallengeDetails() {
           ) : (
             <p className="comments-closed">Join the challenge to comment</p>
           )}
-
         </div>
-      )}
+      );   
+    }         
