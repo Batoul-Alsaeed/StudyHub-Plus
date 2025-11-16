@@ -167,15 +167,24 @@ export default function ChallengeDetails() {
   const groupProgress: number = challenge?.group_progress ?? 0;
 
   // ربط حالة كل مهمة مع مصفوفة التقدم للمستخدم
-  const tasks: Task[] = Array.isArray(
-    challenge?.tasks
-  )
-    ? challenge.tasks.map((t: any, index: number) => {
-        const doneFlag = userArray[index] === 1;
-        if (typeof t === "string") {
-          return { title: t, done: doneFlag };
-        }
-        return { ...t, done: doneFlag };
+ // const tasks: Task[] = Array.isArray(
+  // challenge?.tasks
+  //)
+    //? challenge.tasks.map((t: any, index: number) => {
+      //  const doneFlag = userArray[index] === 1;
+        //if (typeof t === "string") {
+          //return { title: t, done: doneFlag };
+        //}
+        //return { ...t, done: doneFlag };
+      //})
+    //: [];
+
+  //
+  const tasks: Task[] = Array.isArray(challenge?.tasks)
+    ? challenge.tasks.map((t: any) => {
+        const userArr = rawProgressMap[String(currentUserId)] || [];
+        const doneFlag = userArr[t.id] === 1;
+        return { id: t.id, title: t.title, done: doneFlag };
       })
     : [];
 
@@ -207,7 +216,7 @@ export default function ChallengeDetails() {
     );
   }
 
-  // Comments
+  // ===== Comments =====
   function handleFetchComments() {
     if (!id) return;
     fetchList<CommentRow>(
@@ -303,14 +312,33 @@ export default function ChallengeDetails() {
   }
 
   // Toggle task
-  async function handleToggleTask(index: number) {
+  //async function handleToggleTask(index: number) {
+    //if (!challenge || !isJoined) return;
+
+    //setUpdating(true);
+
+    //try {
+      //await safeFetch(
+        //`${API_BASE}/challenges/${challenge.id}/task-toggle?user_id=${currentUserId}&task_index=${index}`,
+        //{ method: "PATCH" }
+      //);
+
+      //await fetchChallengeSafe();
+    //} catch (e: any) {
+     // showToast(e.message);
+    //} finally {
+      //setUpdating(false);
+    //}
+  //}
+
+  async function handleToggleTask(taskId: number) {
     if (!challenge || !isJoined) return;
 
     setUpdating(true);
 
     try {
       await safeFetch(
-        `${API_BASE}/challenges/${challenge.id}/task-toggle?user_id=${currentUserId}&task_index=${index}`,
+        `${API_BASE}/challenges/${challenge.id}/task-toggle?user_id=${currentUserId}&task_id=${taskId}`,
         { method: "PATCH" }
       );
 
@@ -437,11 +465,11 @@ export default function ChallengeDetails() {
 
             {tasks.length > 0 ? (
               <ul>
-                {tasks.map((t, i) => (
+                {tasks.map((t) => (
                   <li
-                    key={i}
+                    key={t.id}
                     className={`challenge-task-item ${t.done ? "done" : ""}`}
-                    onClick={() => handleToggleTask(i)}
+                    onClick={() => handleToggleTask(t.id!)}
                     style={{ cursor: isJoined ? "pointer" : "default" }}
                   >
                     <span className="material-icons">
