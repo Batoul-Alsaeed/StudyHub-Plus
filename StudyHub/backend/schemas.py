@@ -2,6 +2,8 @@ from pydantic import BaseModel, Field
 from typing import Optional, Literal, List, Dict, Any
 from datetime import datetime, date
 
+
+# ---------------- USERS --------------------
 class UserCreate(BaseModel):
     name: str
     email: str
@@ -18,6 +20,7 @@ class UserResponse(BaseModel):
         orm_mode = True
 
 
+# ---------------- GOALS --------------------
 class GoalBase(BaseModel):
     title: str
     completed: bool = False
@@ -39,6 +42,7 @@ class GoalResponse(GoalBase):
         orm_mode = True
 
 
+# ---------------- FOCUS --------------------
 class FocusCreate(BaseModel):
     title: str
     duration_min: int
@@ -75,9 +79,10 @@ class FocusSummary(BaseModel):
     active_timer: Optional[int] = None       # remaining seconds for the latest running session (if any)
     daily_plant_growth: float                      
 
-# -------------------- CHALLENGES --------------------
-# (Request Body)
 
+# -------------------- CHALLENGES --------------------
+
+# Task output (for frontend)
 class ChallengeTaskOut(BaseModel):
     id: int
     title: str
@@ -86,6 +91,7 @@ class ChallengeTaskOut(BaseModel):
     class Config:
         orm_mode = True
 
+# Create challenge
 class ChallengeCreate(BaseModel):
     title: str
     description: Optional[str] = None
@@ -95,39 +101,45 @@ class ChallengeCreate(BaseModel):
     start_date: date
     end_date: date
     max_participants: int = 10
-    tasks: List[str]
+    tasks: List[str] # frontend sends strings only
     participants: List[int] = Field(default_factory=list)
     #progress: Dict[str, float] = Field(default_factory=dict)
     #group_progress: float = 0.0
 
+# Update specific task
 class ChallengeTaskUpdate(BaseModel):
     title: str
     done: bool = False
 
 
-# (Response Body)
+# Challenge Response
 class ChallengeResponse(BaseModel):
     id: int
     title: str
     description: Optional[str]
     level: Optional[str]
+    creator_id: Optional[int] = None
     creator_name: str
-    #creator_id: int
     start_date: date
     end_date: date
-    #tasks: List[str] = Field(default_factory=list)
-    creator_id: Optional[int] = None
-    #start_date: Optional[str]
-    #end_date: Optional[str]
+
     tasks: List[ChallengeTaskUpdate] = Field(default_factory=list)
     participants: List[int] = Field(default_factory=list)
     participants_count: int = 0
-    progress: Dict[str, List[bool]] = Field(default_factory=dict)
+    
+    progress: Dict[str, List[int]] = Field(default_factory=dict)
     group_progress: int = 0
+    
     max_participants: int
     status: Optional[str] = None
     is_creator: Optional[bool] = False
     is_joined: Optional[bool] = False
+
+    #creator_id: int
+    #tasks: List[str] = Field(default_factory=list)
+    #start_date: Optional[str]
+    #end_date: Optional[str]
+    #progress: Dict[str, List[bool]] = Field(default_factory=dict)
 
     class Config:
         from_attributes = True

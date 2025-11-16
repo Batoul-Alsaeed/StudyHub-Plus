@@ -4,7 +4,7 @@ from datetime import datetime
 from . import models, schemas
 from .database import SessionLocal
 import json
-from typing import List
+from typing import List, Optional
 
 
 router = APIRouter(prefix="/api/challenges", tags=["challenges"])
@@ -22,22 +22,38 @@ def get_db():
 
 
 # ============================================================
+# Helper: Recompute Group Progress
+# ============================================================
+def recompute_group_progress(challenge: models.Challenge) -> None:
+    """
+    يحسب متوسط التقدم لكل المشاركين بناءً على challenge.progress
+    progress = { "user_id": [0/1, 0/1, ...] }
+    """
+    progress = challenge.progress or {}
+    all_pcts: List[float] = []
+
+    for arr in progress.values():
+        if not isinstance(arr, list) or not arr:
+            continue
+        # تأكد أن العناصر 0/1 أو bool
+        vals = [1 if bool(x) else 0 for x in arr]
+        pct = (sum(vals) / len(vals)) * 100
+        all_pcts.append(pct)
+
+    challenge.group_progress = round(sum(all_pcts) / len(all_pcts), 2) if all_pcts else 0.0
+
+
+# ============================================================
 # Helper: Format Final Response
 # ============================================================
-def format_challenge_response(challenge, current_user_id=None):
-    """Prepare ChallengeResponse object with full formatting."""
+def format_challenge_response(challenge: models.Challenge, current_user_id: Optional[int] = None):
+    """يجهّز ChallengeResponse مع المهام + التقدم حسب المستخدم الحالي."""
 
-    participants_count = len(challenge.participants or [])
+    participants = challenge.participants or []
+    participants_count = len(participants)
 
-    is_creator = (
-        current_user_id is not None
-        and challenge.creator_id == current_user_id
-    )
-
-    is_joined = (
-        current_user_id is not None
-        and current_user_id in (challenge.participants or [])
-    )
+    is_creator = current_user_id is not None and challenge.creator_id == current_user_id
+    is_joined = current_user_id is not None and current_user_id in participants
 
     today = datetime.utcnow().date()
     if challenge.start_date and today < challenge.start_date:
@@ -47,8 +63,24 @@ def format_challenge_response(challenge, current_user_id=None):
     else:
         status = "Active"
 
-    tasks = challenge.tasks if isinstance(challenge.tasks, list) else []
-    progress = challenge.progress if isinstance(challenge.progress, dict) else {}
+    # progress per user
+    progress_map = challenge.progress or {}
+    user_key = str(current_user_id) if current_user_id is not None else None
+    user_progress_list = progress_map.get(user_key, []) if user_key else []
+
+    # نحول relationship Challenge.tasks إلى list[{"title": ..., "done": ...}]
+    tasks_out = []
+    for idx, t in enumerate(challenge.tasks or []):
+        if user_key and idx < len(user_progress_list):
+            done = bool(user_progress_list[idx])
+        else:
+            done = False
+        tasks_out.append(
+            {
+                "title": t.title,
+                "done": done,
+            }
+        )
 
     return {
         "id": challenge.id,
@@ -59,10 +91,10 @@ def format_challenge_response(challenge, current_user_id=None):
         "creator_id": challenge.creator_id,
         "start_date": challenge.start_date,
         "end_date": challenge.end_date,
-        "tasks": tasks,
-        "participants": challenge.participants or [],
+        "tasks": tasks_out,
+        "participants": participants,
         "participants_count": participants_count,
-        "progress": progress,
+        "progress": progress_map,
         "group_progress": challenge.group_progress or 0,
         "max_participants": challenge.max_participants,
         "status": status,
@@ -76,6 +108,14 @@ def format_challenge_response(challenge, current_user_id=None):
 # ============================================================
 @router.post("", response_model=schemas.ChallengeResponse)
 def create_challenge(challenge: schemas.ChallengeCreate, db: Session = Depends(get_db)):
+    """
+    - ينشئ Challenge
+    - ينشئ ChallengeTask لكل عنوان في challenge.tasks
+    - يضيف المنشئ كـ participant
+    - يهيئ progress للمشاركين
+    """
+
+    # نبدأ بتحدي بدون tasks (لأن tasks صارت relationship)
     new_challenge = models.Challenge(
         title=challenge.title,
         description=challenge.description,
@@ -86,17 +126,29 @@ def create_challenge(challenge: schemas.ChallengeCreate, db: Session = Depends(g
         end_date=challenge.end_date,
         participants=challenge.participants or [],
         max_participants=challenge.max_participants,
-        tasks=challenge.tasks or [],
         progress={},
         group_progress=0,
     )
 
-    # Creator is auto-joined
+    # Creator auto join
     if challenge.creator_id not in new_challenge.participants:
         new_challenge.participants.append(challenge.creator_id)
 
-    # Initialize progress for creator
-    new_challenge.progress[str(challenge.creator_id)] = [False] * len(new_challenge.tasks)
+    # إنشاء المهام كـ ChallengeTask objects
+    for title in challenge.tasks or []:
+        title = title.strip()
+        if not title:
+            continue
+        new_challenge.tasks.append(models.ChallengeTask(title=title))
+
+    # تهيئة progress لكل مشارك
+    tasks_count = len(new_challenge.tasks or [])
+    progress_map = {}
+    for uid in new_challenge.participants:
+        progress_map[str(uid)] = [0] * tasks_count  # كل المهام غير منجزة
+
+    new_challenge.progress = progress_map
+    recompute_group_progress(new_challenge)
 
     db.add(new_challenge)
     db.commit()
@@ -108,18 +160,14 @@ def create_challenge(challenge: schemas.ChallengeCreate, db: Session = Depends(g
 # ============================================================
 # Get All Challenges
 # ============================================================
-#@router.get("", response_model=list[schemas.ChallengeResponse])
-#def get_challenges(
-#    current_user_id: int = Query(None),
-#    db: Session = Depends(get_db)
-#):
-#    challenges = db.query(models.Challenge).all()
-#    return [format_challenge_response(c, current_user_id) for c in challenges]
-
 @router.get("", response_model=List[schemas.ChallengeResponse])
-def get_challenges(db: Session = Depends(get_db)):
+def get_challenges(
+    current_user_id: int = Query(None),
+    db: Session = Depends(get_db),
+):
     challenges = db.query(models.Challenge).all()
-    return challenges
+    return [format_challenge_response(c, current_user_id) for c in challenges]
+
 
 # ============================================================
 # Get Single Challenge
@@ -128,23 +176,23 @@ def get_challenges(db: Session = Depends(get_db)):
 def get_challenge(
     challenge_id: int,
     current_user_id: int = Query(None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     challenge = db.query(models.Challenge).filter(models.Challenge.id == challenge_id).first()
     if not challenge:
         raise HTTPException(status_code=404, detail="Challenge not found")
-    #return format_challenge_response(challenge, current_user_id)
 
-    return challenge
+    return format_challenge_response(challenge, current_user_id)
+
 
 # ============================================================
 # Join Challenge
 # ============================================================
-@router.post("/{challenge_id}/join")
+@router.post("/{challenge_id}/join", response_model=schemas.ChallengeResponse)
 def join_challenge(
     challenge_id: int,
     user_id: int = Query(...),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     challenge = db.query(models.Challenge).filter(models.Challenge.id == challenge_id).first()
 
@@ -156,22 +204,22 @@ def join_challenge(
         raise HTTPException(status_code=400, detail="Challenge already ended")
 
     # ================================
-    # FIX: normalize participants JSONB
+    # Normalize participants JSONB
     # ================================
     raw_participants = challenge.participants
 
     if isinstance(raw_participants, str):
         try:
             participants = json.loads(raw_participants)
-        except:
+        except Exception:
             participants = []
     elif isinstance(raw_participants, list):
         participants = raw_participants
     else:
         participants = []
 
+    # تأكد أنهم أعداد صحيحة
     participants = [int(p) for p in participants if str(p).isdigit()]
-    # ================================
 
     if user_id in participants:
         raise HTTPException(status_code=400, detail="User already joined")
@@ -182,26 +230,14 @@ def join_challenge(
     participants.append(user_id)
     challenge.participants = participants
 
-    # progress
-    challenge.progress[str(user_id)] = [False] * len(challenge.tasks)
-
-    # group progress
-    #all_p = []
-    #for arr in challenge.progress.values():
-    #    if len(arr) > 0:
-    #        pct = (sum(arr) / len(arr)) * 100
-    #        all_p.append(pct)
-    #challenge.group_progress = round(sum(all_p) / len(all_p), 2) if all_p else 0
-    
+    # progress: نضيف مستخدم جديد بـ list طولها عدد المهام كلها 0
+    tasks_count = len(challenge.tasks or [])
     progress_map = challenge.progress or {}
-    progress_map[str(user_id)] = 0.0
+    progress_map[str(user_id)] = [0] * tasks_count
     challenge.progress = progress_map
 
-    # recompute group progress
-    progresses = list(progress_map.values())
-    challenge.group_progress = (
-        round(sum(progresses) / len(progresses), 2) if progresses else 0.0
-    )
+    # إعادة حساب group_progress
+    recompute_group_progress(challenge)
 
     db.commit()
     db.refresh(challenge)
@@ -210,14 +246,14 @@ def join_challenge(
 
 
 # ============================================================
-# Toggle Task
+# Toggle Task (per-user)
 # ============================================================
-@router.patch("/{challenge_id}/task-toggle")
+@router.patch("/{challenge_id}/task-toggle", response_model=schemas.ChallengeResponse)
 def toggle_task(
     challenge_id: int,
     user_id: int = Query(...),
     task_index: int = Query(...),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     challenge = db.query(models.Challenge).filter(models.Challenge.id == challenge_id).first()
     if not challenge:
@@ -227,32 +263,32 @@ def toggle_task(
     if challenge.end_date and today > challenge.end_date:
         raise HTTPException(status_code=400, detail="Challenge already ended")
 
-    if user_id not in challenge.participants:
+    participants = challenge.participants or []
+    if user_id not in participants:
         raise HTTPException(status_code=403, detail="You must join first")
 
-    user_key = str(user_id)
-
-    if user_key not in challenge.progress:
-        challenge.progress[user_key] = [False] * len(challenge.tasks)
-
-    if task_index < 0 or task_index >= len(challenge.tasks):
+    tasks_count = len(challenge.tasks or [])
+    if task_index < 0 or task_index >= tasks_count:
         raise HTTPException(status_code=400, detail="Invalid task index")
 
-    #challenge.progress[user_key][task_index] = not challenge.progress[user_key][task_index]
-    
-    current = challenge.progress[user_key][task_index]
-    challenge.progress[user_key][task_index] = 0 if current else 1
+    user_key = str(user_id)
+    progress_map = challenge.progress or {}
+
+    # إذا ما كان له progress من قبل نهيئه
+    if user_key not in progress_map or not isinstance(progress_map[user_key], list):
+        progress_map[user_key] = [0] * tasks_count
+
+    # تأكد أن طول الليست يساوي عدد المهام
+    if len(progress_map[user_key]) != tasks_count:
+        progress_map[user_key] = (progress_map[user_key] + [0] * tasks_count)[:tasks_count]
+
+    current = progress_map[user_key][task_index]
+    progress_map[user_key][task_index] = 0 if current else 1  # 0/1
+
+    challenge.progress = progress_map
 
     # recalc group progress
-    all_p = []
-    for arr in challenge.progress.values():
-        if len(arr) > 0:
-            pct = (sum(arr) / len(arr)) * 100
-            all_p.append(pct)
-
-    challenge.group_progress = round(
-        sum(all_p) / len(all_p), 2
-    ) if all_p else 0
+    recompute_group_progress(challenge)
 
     db.commit()
     db.refresh(challenge)
@@ -263,11 +299,11 @@ def toggle_task(
 # ============================================================
 # Leave Challenge
 # ============================================================
-@router.delete("/{challenge_id}/leave")
+@router.delete("/{challenge_id}/leave", response_model=schemas.ChallengeResponse)
 def leave_challenge(
     challenge_id: int,
     user_id: int = Query(...),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     challenge = db.query(models.Challenge).filter(models.Challenge.id == challenge_id).first()
 
@@ -279,25 +315,11 @@ def leave_challenge(
         raise HTTPException(status_code=400, detail="Challenge already ended")
 
     participants = challenge.participants or []
-
     if user_id not in participants:
         raise HTTPException(status_code=400, detail="User not joined")
 
     participants.remove(user_id)
     challenge.participants = participants
-
-#    challenge.progress.pop(str(user_id), None)
-
-    #all_p = []
-    #for arr in challenge.progress.values():
-    #    if len(arr) > 0:
-    #        pct = (sum(arr) / len(arr)) * 100
-    #        all_p.append(pct)
-
-    #challenge.group_progress = round(
-    #    sum(all_p) / len(all_p), 2
-    #) if all_p else 0
-
 
     # Remove user progress entry
     progress_map = challenge.progress or {}
@@ -305,10 +327,7 @@ def leave_challenge(
     challenge.progress = progress_map
 
     # Update group progress safely
-    progresses = list(progress_map.values())
-    challenge.group_progress = (
-        round(sum(progresses) / len(progresses), 2) if progresses else 0.0
-    )
+    recompute_group_progress(challenge)
 
     db.commit()
     db.refresh(challenge)
@@ -317,14 +336,19 @@ def leave_challenge(
 
 
 # ============================================================
-# Update Challenge
+# Update Challenge (meta + tasks)
 # ============================================================
 @router.put("/{challenge_id}", response_model=schemas.ChallengeResponse)
 def update_challenge(
     challenge_id: int,
     challenge_data: schemas.ChallengeCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
+    """
+    - منشئ التحدي يقدر يعدل العنوان/الوصف/التواريخ/العدد
+    - يقدر يغير قائمة المهام (نمسح القديمة وننشئ الجديدة)
+    - مع تغيير المهام نعيد تهيئة progress لكل المشاركين (تقدم جديد صفر)
+    """
     challenge = db.query(models.Challenge).filter(models.Challenge.id == challenge_id).first()
 
     if not challenge:
@@ -334,7 +358,7 @@ def update_challenge(
     if challenge.end_date and today > challenge.end_date:
         raise HTTPException(status_code=400, detail="Challenge already ended")
 
-    if challenge_data.max_participants < len(challenge.participants):
+    if challenge_data.max_participants < len(challenge.participants or []):
         raise HTTPException(status_code=400, detail="max_participants too small")
 
     challenge.title = challenge_data.title
@@ -344,21 +368,27 @@ def update_challenge(
     challenge.end_date = challenge_data.end_date
     challenge.max_participants = challenge_data.max_participants
 
-   # old_count = len(challenge.tasks)
-   # new_count = len(challenge_data.tasks)
-
-    #if challenge_data.tasks:
-    
-    # ✅ Safely update tasks
+    # تحديث المهام:
     if challenge_data.tasks is not None:
-        challenge.tasks = challenge_data.tasks
+        # نحذف المهام القديمة (cascade يحذف ChallengeTask)
+        challenge.tasks.clear()
 
-    if new_count != old_count:
+        # ننشئ مهام جديدة
+        for title in challenge_data.tasks:
+            title = title.strip()
+            if not title:
+                continue
+            challenge.tasks.append(models.ChallengeTask(title=title))
+
+        # عدد المهام الجديد
+        new_count = len(challenge.tasks or [])
+        # نعيد تهيئة progress لكل المشاركين
         new_progress = {}
-        for uid in challenge.participants:
-            new_progress[str(uid)] = [False] * new_count
+        for uid in (challenge.participants or []):
+            new_progress[str(uid)] = [0] * new_count
+
         challenge.progress = new_progress
-        challenge.group_progress = 0
+        recompute_group_progress(challenge)
 
     db.commit()
     db.refresh(challenge)
@@ -373,7 +403,7 @@ def update_challenge(
 def delete_challenge(
     challenge_id: int,
     user_id: int = Query(...),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     challenge = db.query(models.Challenge).filter(models.Challenge.id == challenge_id).first()
 
@@ -399,7 +429,7 @@ def delete_challenge(
 @router.get("/{challenge_id}/leaderboard")
 def get_leaderboard(
     challenge_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     challenge = (
         db.query(models.Challenge)
@@ -419,8 +449,9 @@ def get_leaderboard(
         uid_str = str(uid)
         user_prog_arr = progress.get(uid_str, [])
 
-        if len(user_prog_arr) > 0:
-            pct = round((sum(user_prog_arr) / len(user_prog_arr)) * 100, 2)
+        if isinstance(user_prog_arr, list) and len(user_prog_arr) > 0:
+            vals = [1 if bool(x) else 0 for x in user_prog_arr]
+            pct = round((sum(vals) / len(vals)) * 100, 2)
         else:
             pct = 0.0
 
@@ -442,7 +473,7 @@ def get_leaderboard(
 # ============================================================
 # Comments System (Database Based)
 # ============================================================
-@router.get("/{challenge_id}/comments", response_model=list[schemas.CommentResponse])
+@router.get("/{challenge_id}/comments", response_model=List[schemas.CommentResponse])
 def get_comments(challenge_id: int, db: Session = Depends(get_db)):
     comments = (
         db.query(models.Comment)
@@ -458,7 +489,7 @@ def add_comment(
     challenge_id: int,
     user_id: int = Query(...),
     content: str = Query(...),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     if not content.strip():
         raise HTTPException(status_code=400, detail="Empty comment")
@@ -471,7 +502,7 @@ def add_comment(
     if challenge.end_date and today > challenge.end_date:
         raise HTTPException(status_code=400, detail="Challenge ended")
 
-    if user_id not in challenge.participants:
+    if user_id not in (challenge.participants or []):
         raise HTTPException(status_code=403, detail="Join challenge first")
 
     user = db.query(models.User).filter(models.User.id == user_id).first()
@@ -497,7 +528,7 @@ def update_comment(
     comment_id: int,
     user_id: int = Query(...),
     content: str = Query(...),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     if not content.strip():
         raise HTTPException(status_code=400, detail="Empty comment")
@@ -520,68 +551,18 @@ def update_comment(
 def delete_comment(
     comment_id: int,
     user_id: int = Query(...),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     comment = db.query(models.Comment).filter(models.Comment.id == comment_id).first()
     if not comment:
         raise HTTPException(status_code=404, detail="Comment not found")
 
-   # challenge = db.query(models.Challenge).filter(models.Challenge.id == comment.challenge_id).first()
+    # هنا تقدر تضيف شرط إذا حبيتي: صاحب الكومنت أو صاحب التحدي
+    # challenge = db.query(models.Challenge).filter(models.Challenge.id == comment.challenge_id).first()
+    # if user_id != comment.user_id and user_id != challenge.creator_id:
+    #     raise HTTPException(status_code=403, detail="Not allowed")
 
-   # if user_id != comment.user_id and user_id != challenge.creator_id:
-    #    raise HTTPException(status_code=403, detail="Not allowed")
-
-    #db.delete(comment)
-    #db.commit()
-
-    #return {"message": "Comment deleted"}
-
-
-# ============================================================
-# ✅ Tasks + Progress update
-# ============================================================
-@router.patch(
-    "/{challenge_id}/tasks",
-    response_model=schemas.ChallengeResponse,
-)
-def update_tasks(
-    challenge_id: int,
-    updated_tasks: List[schemas.ChallengeTaskUpdate],
-    user_id: int = Query(...),
-    db: Session = Depends(get_db),
-):
-    challenge = (
-        db.query(models.Challenge)
-        .filter(models.Challenge.id == challenge_id)
-        .first()
-    )
-    if not challenge:
-        raise HTTPException(status_code=404, detail="Challenge not found")
-
-    # convert Pydantic models to plain dicts for storage
-    tasks_payload = [t.model_dump() for t in updated_tasks]
-    challenge.tasks = tasks_payload
-
-    # only valid tasks with non-empty title
-    valid_tasks = [t for t in tasks_payload if t.get("title")]
-
-    total = len(valid_tasks)
-    if total == 0:
-        user_progress = 0.0
-    else:
-        completed = len([t for t in valid_tasks if bool(t.get("done"))])
-        user_progress = round((completed / total) * 100.0, 2)
-
-    progress_map = challenge.progress or {}
-    progress_map[str(user_id)] = user_progress
-    challenge.progress = progress_map
-
-    # recompute group progress (average of all users)
-    progresses = list(progress_map.values())
-    challenge.group_progress = (
-        round(sum(progresses) / len(progresses), 2) if progresses else 0.0
-    )
-
+    db.delete(comment)
     db.commit()
-    db.refresh(challenge)
-    return challenge
+
+    return {"message": "Comment deleted", "comment_id": comment_id}
