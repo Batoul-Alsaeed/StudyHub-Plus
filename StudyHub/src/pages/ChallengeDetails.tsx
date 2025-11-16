@@ -469,31 +469,44 @@ export default function ChallengeDetails() {
             <span className="material-icons">chat</span> Comments
           </h3>
 
-          {comments.length > 0 ? (
+          {loadingComments ? (
+            <p>Loading comments...</p>
+          ) : comments.length > 0 ? (
             <ul className="challenge-comments-list">
-              {comments.map((c) => (
-                <li key={c.id} className="challenge-comment-item">
-                  <div className="comment-header">
-                    <strong>{c.user_name}</strong>
+              {comments.map((c) => {
+                const dateObj = new Date(c.timestamp);
+                const d = dateObj.toISOString().slice(0, 10);  
+                const t = dateObj.toISOString().slice(11, 16);  
 
-                    {/* Date + Time Icons */}
-                    <div className="comment-meta">
-                      <span className="material-icons comment-icon">calendar_today</span>
-                      <span className="comment-date">
-                        {new Date(c.timestamp).toISOString().slice(0, 10)}
-                      </span>
+                return (
+                  <li key={c.id} className="challenge-comment-item">
 
-                      <span className="material-icons comment-icon">schedule</span>
-                      <span className="comment-time">
-                        {new Date(c.timestamp).toISOString().slice(11, 16)}
-                      </span>
+                    {/* اسم صاحب التعليق */}
+                    <div className="comment-header">
+                      <strong>{c.user_name}</strong>
                     </div>
 
-                    {/* Comment actions */}
+                    {/* نص التعليق */}
+                    <p>{c.content}</p>
+
+                    {/* التاريخ والوقت - فوق */}
+                    <div className="comment-meta-wrapper">
+                      <div className="comment-meta">
+                        <span className="material-icons comment-icon purple">calendar_today</span>
+                        <span>{d}</span>
+                      </div>
+
+                      <div className="comment-meta">
+                        <span className="material-icons comment-icon purple">schedule</span>
+                        <span>{t}</span>
+                      </div>
+                    </div>
+
+                    {/* أزرار التعديل والحذف (تحت) */}
                     {!challengeEnded && c.user_name === currentUserName && (
-                      <div className="comment-actions">
+                      <div className="comment-actions-row">
                         <button
-                          className="comment-icon-btn"
+                          className="comment-action-btn blue"
                           onClick={() => {
                             setEditingCommentId(c.id);
                             setEditContent(c.content);
@@ -503,47 +516,49 @@ export default function ChallengeDetails() {
                         </button>
 
                         <button
-                          className="comment-icon-btn"
+                          className="comment-action-btn red"
                           onClick={() => handleDeleteComment(c.id)}
                         >
                           <span className="material-icons">delete</span>
                         </button>
                       </div>
                     )}
-                  </div>
 
-                  {editingCommentId === c.id ? (
-                    <div className="edit-comment-section">
-                      <textarea
-                        value={editContent}
-                        onChange={(e) => setEditContent(e.target.value)}
-                      />
-                      <button
-                        className="challenge-save-btn"
-                        onClick={() => handleSaveEditedComment(c.id)}
-                      >
-                        Save
-                      </button>
-                      <button
-                        className="challenge-cancel-btn"
-                        onClick={() => setEditingCommentId(null)}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  ) : (
-                    <p className="comment-content">{c.content}</p>
-                  )}
-                </li>
-              ))}
+                    {/* مربع تعديل التعليق */}
+                    {editingCommentId === c.id && !challengeEnded && (
+                      <div className="comment-edit-box">
+                        <textarea
+                          value={editContent}
+                          onChange={(e) => setEditContent(e.target.value)}
+                        />
+
+                        <button
+                          className="challenge-save-btn"
+                          onClick={() => handleSaveEditedComment(c.id)}
+                        >
+                          Save
+                        </button>
+
+                        <button
+                          className="challenge-cancel-btn"
+                          onClick={() => setEditingCommentId(null)}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    )}
+
+                  </li>
+                );
+              })}
             </ul>
           ) : (
             <p>No comments yet.</p>
           )}
 
-          {/* Comment form */}
+          {/* إغلاق التعليقات لو انتهى التحدي */}
           {challengeEnded ? (
-            <p className="comments-closed">Comments are closed.</p>
+            <p className="comments-closed">Comments closed (challenge ended)</p>
           ) : isJoined ? (
             <div className="challenge-comment-form">
               <textarea
@@ -554,12 +569,8 @@ export default function ChallengeDetails() {
               <button onClick={handleAddComment}>Send</button>
             </div>
           ) : (
-            <p className="comments-closed">Join the challenge to comment.</p>
+            <p className="comments-closed">Join the challenge to comment</p>
           )}
+
         </div>
       )}
-
-      {toast && <div className="challenge-toast">{toast}</div>}
-    </div>
-  );
-}
