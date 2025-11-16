@@ -7,7 +7,7 @@ from sqlalchemy.types import JSON
 from sqlalchemy.dialects.postgresql import JSONB
 
 
-
+# ---------------- USERS -----------------
 class User(Base):
     __tablename__ = "users"
 
@@ -20,8 +20,10 @@ class User(Base):
 
     # Link to goals
     goals = relationship("Goal", back_populates="user")
+    comments = relationship("Comment", back_populates="user", cascade="all, delete-orphan")
 
 
+# ---------------- GOALS -----------------
 class Goal(Base):
     __tablename__ = "goals"
 
@@ -36,6 +38,7 @@ class Goal(Base):
     user = relationship("User", back_populates="goals")
 
 
+# ---------------- FOCUS SESSION -----------------
 class SessionStatus(str, enum.Enum):
     created = "created"  # saved but not started
     running = "running"
@@ -67,7 +70,7 @@ class FocusSession(Base):
     plant_growth = Column(Float, default=0.0)
 
 
-# (Challenge Table)
+# ---------------- CHALLENGES -----------------
 class Challenge(Base):
     __tablename__ = "challenges"
 
@@ -76,37 +79,21 @@ class Challenge(Base):
     description = Column(Text, nullable=True)
     level = Column(String, nullable=True)
     creator_name = Column(String, nullable=False)
+    
     start_date = Column(Date, nullable=True)
     end_date = Column(Date, nullable=True)
 
     participants = Column(JSONB, default=list)
-    tasks = Column(JSONB, default=list)
+    #tasks = Column(JSONB, default=list)
     progress = Column(JSONB, default=dict)
 
     max_participants = Column(Integer, nullable=False, default=10)
-    tasks = Column(JSON, default=[])
-    progress = Column(JSON, default=dict)
+    #tasks = Column(JSON, default=[])
+    #progress = Column(JSON, default=dict)
     group_progress = Column(Integer, default=0)
 
     creator_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     creator = relationship("User", back_populates="challenges_created")
-    #comments = relationship("Comment", back_populates="challenge", cascade="all, delete")
-
-
-#class Comment(Base):
-    #__tablename__ = "comments"
-
-  #  id = Column(Integer, primary_key=True, index=True)
-   # challenge_id = Column(Integer, ForeignKey("challenges.id"), nullable=False)
-
-   # user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-   # user_name = Column(String, nullable=False)
-
-   # content = Column(Text, nullable=False)
-    #timestamp = Column(DateTime, default=datetime.utcnow)
-
-    #challenge = relationship("Challenge", back_populates="comments")
-    #user = relationship("User")
 
     tasks = relationship(
         "ChallengeTask",
@@ -114,6 +101,8 @@ class Challenge(Base):
         cascade="all, delete-orphan",
         lazy="joined",    
     )
+
+    comments = relationship("Comment", back_populates="challenge", cascade="all, delete-orphan")
 
 
 class ChallengeTask(Base):
@@ -126,4 +115,19 @@ class ChallengeTask(Base):
 
     challenge = relationship("Challenge", back_populates="tasks")
 
-   
+
+# ---------------- COMMENT -----------------
+class Comment(Base):
+    __tablename__ = "comments"
+
+    id = Column(Integer, primary_key=True, index=True)
+    challenge_id = Column(Integer, ForeignKey("challenges.id", ondelete="CASCADE"), nullable=False)
+
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_name = Column(String, nullable=False)
+
+    content = Column(Text, nullable=False)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User", back_populates="comments")
+    challenge = relationship("Challenge", back_populates="comments")

@@ -1,10 +1,6 @@
 from pydantic import BaseModel, Field
-from typing import Optional, Literal, List, Dict
+from typing import Optional, Literal, List, Dict, Any
 from datetime import datetime, date
-from typing import Optional, Literal
-from datetime import datetime
-from typing import Optional, List, Dict, Any
-
 
 class UserCreate(BaseModel):
     name: str
@@ -117,12 +113,12 @@ class ChallengeResponse(BaseModel):
     level: Optional[str]
     creator_name: str
     #creator_id: int
-    #start_date: date
-    #end_date: date
+    start_date: date
+    end_date: date
     #tasks: List[str] = Field(default_factory=list)
     creator_id: Optional[int] = None
-    start_date: Optional[str]
-    end_date: Optional[str]
+    #start_date: Optional[str]
+    #end_date: Optional[str]
     tasks: List[ChallengeTaskUpdate] = Field(default_factory=list)
     participants: List[int] = Field(default_factory=list)
     participants_count: int = 0
