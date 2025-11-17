@@ -15,6 +15,8 @@ type CommentRow = {
 
 const API_BASE = "https://studyhub-backend-81w7.onrender.com/api";
 
+// Safe fetch wrapper
+
 async function safeFetch<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, options);
   let data: any = {};
@@ -84,7 +86,7 @@ export default function ChallengeDetails() {
     setTimeout(() => setToast(""), 2500);
   };
 
-  // Fetch challenge
+  // ===== Fetch challenge =====
   async function fetchChallengeSafe() {
     if (!id || challengeFromState) return;
 
@@ -92,8 +94,8 @@ export default function ChallengeDetails() {
     setError("");
 
     try {
-      let url = `${API_BASE}/challenges/${id}`;
-      let data = await safeFetch<any>(url);
+      const url = `${API_BASE}/challenges/${id}`;
+      const data = await safeFetch<any>(url);
 
       setChallenge(data);
       setIsJoined(data.is_joined === true);
@@ -134,14 +136,20 @@ export default function ChallengeDetails() {
 
   const groupProgress: number = challenge?.group_progress ?? 0;
 
-  // TASKS
+  // ===== TASKS =====
   const tasks: Task[] = Array.isArray(challenge?.tasks)
-    ? challenge.tasks.map((t: any) => {
-        const doneFlag =
-          (rawProgressMap[String(currentUserId)] || [])[t.id] === 1;
-        return { id: t.id, title: t.title, done: doneFlag };
-      })
+    ? challenge.tasks.map((t: any) => ({
+        id: t.id,
+        title: t.title,
+        done: !!t.done,
+      }))
     : [];
+
+        //const doneFlag =
+          //(rawProgressMap[String(currentUserId)] || [])[t.id] === 1;
+        //return { id: t.id, title: t.title, done: doneFlag };
+      //})
+    //: [];
 
   // ====== JOIN / LEAVE ======
   async function updateJoinState(action: "join" | "leave") {
@@ -190,14 +198,17 @@ export default function ChallengeDetails() {
   }
 
   // ===== COMMENTS =====
-  function handleFetchComments() {
-    if (!id) return;
+   function handleFetchComments() {
+  if (!id) return;
 
-    fetch(`${API_BASE}/challenges/${id}/comments`)
-      .then((res) => res.json())
-      .then((data) => {
-        setComments(Array.isArray(data) ? data : []);
-      });
+  setLoadingComments(true);
+
+  fetch(`${API_BASE}/challenges/${id}/comments`)
+    .then((res) => res.json())
+    .then((data) => {
+      setComments(Array.isArray(data) ? data : []);
+    })
+    .finally(() => setLoadingComments(false));
   }
 
   async function handleAddComment() {
@@ -221,10 +232,10 @@ export default function ChallengeDetails() {
   }
 
   async function handleDeleteComment(commentId: number) {
-    if (challengeEnded) return;
+  if (challengeEnded) return;
     try {
       await safeFetch(
-      `${API_BASE}/challenges/comments/${commentId}?user_id=${currentUserId}`,
+        `${API_BASE}/challenges/comments/${commentId}?user_id=${currentUserId}`,
         { method: "DELETE" }
       );
 
@@ -236,8 +247,8 @@ export default function ChallengeDetails() {
   }
 
   async function handleSaveEditedComment(commentId: number) {
-    if (challengeEnded) return;
-    if (!editContent.trim()) return;
+  if (challengeEnded) return;
+  if (!editContent.trim()) return;
 
     try {
       await safeFetch(
@@ -299,9 +310,11 @@ export default function ChallengeDetails() {
           }`}
           onClick={() => {
             setActiveTab("leaderboard");
+            setLoadingLeaderboard(true);
             fetch(`${API_BASE}/challenges/${id}/leaderboard`)
               .then((res) => res.json())
-              .then((data) => setLeaderboard(data));
+              .then((data) => setLeaderboard(data))
+              .finally(() => setLoadingLeaderboard(false));
           }}
         >
           Leaderboard
@@ -377,9 +390,9 @@ export default function ChallengeDetails() {
 
           {/* TASKS */}
           <div className="challenge-requirements">
-            <h3>
+            <h4>
               <span className="material-icons">list_alt</span> Requirements
-            </h3>
+            </h4>
 
             {tasks.length > 0 ? (
               <ul>
@@ -417,7 +430,7 @@ export default function ChallengeDetails() {
                 onClick={handleJoin}
                 disabled={updating || challenge.participants_count >= challenge.max_participants}
               >
-                Join Challenge
+                Join
               </button>
             ) : (
               <button
@@ -425,7 +438,7 @@ export default function ChallengeDetails() {
                 onClick={handleLeave}
                 disabled={updating}
               >
-                Leave Challenge
+                Leave
               </button>
             )}
           </div>
@@ -439,7 +452,9 @@ export default function ChallengeDetails() {
             <span className="material-icons">emoji_events</span> Leaderboard
           </h3>
 
-          {leaderboard.length > 0 ? (
+          {loadingLeaderboard ? (
+            <p>Loading leaderboard...</p>
+          ) : leaderboard.length > 0 ? (
             <ul>
               {leaderboard.map((row, index) => (
                 <li key={row.user_id} className="challenge-leaderboard-item">
@@ -465,113 +480,110 @@ export default function ChallengeDetails() {
       )}
 
       {/* COMMENTS */}
-      {/* COMMENTS */}
-{/* COMMENTS */}
-{activeTab === "comments" && (
-  <div className="challenge-comments">
-    <h3 className="comments-title">
-      <span className="material-icons">chat</span> Comments
-    </h3>
+      {activeTab === "comments" && (
+        <div className="challenge-comments">
+          <h3 className="comments-title">
+            <span className="material-icons">chat</span> Comments
+          </h3>
 
-    {loadingComments ? (
-      <p>Loading comments...</p>
-    ) : comments.length > 0 ? (
-      <ul className="comments-list">
-        {comments.map((c) => {
-          const dateObj = new Date(c.timestamp);
-          const d = dateObj.toISOString().slice(0, 10);
-          const t = dateObj.toISOString().slice(11, 16);
+          {loadingComments ? (
+            <p>Loading comments...</p>
+          ) : comments.length > 0 ? (
+            <ul className="comments-list">
+              {comments.map((c) => {
+                const dateObj = new Date(c.timestamp);
+                const d = dateObj.toISOString().slice(0, 10);
+                const t = dateObj.toISOString().slice(11, 16);
 
-          return (
-            <li key={c.id} className="comment-card">
-              <div className="comment-header-line">
-                <strong className="comment-username">{c.user_name}</strong>
+                return (
+                  <li key={c.id} className="comment-card">
+                    <div className="comment-header-line">
+                      <strong className="comment-username">{c.user_name}</strong>
 
-                <div className="comment-meta-right">
-                  <span className="material-icons meta-icon">calendar_month</span>
-                  <span className="comment-meta-text">{d}</span>
+                      <div className="comment-meta-right">
+                        <span className="material-icons meta-icon">calendar_month</span>
+                        <span className="comment-meta-text">{d}</span>
 
-                  <span className="material-icons meta-icon">schedule</span>
-                  <span className="comment-meta-text">{t}</span>
+                        <span className="material-icons meta-icon">schedule</span>
+                        <span className="comment-meta-text">{t}</span>
 
-                  {/* أدوات التحكم */}
-                  {!challengeEnded && c.user_name === currentUserName && (
-                    <div className="comment-actions">
-                      <button
-                        className="action-btn blue"
-                        onClick={() => {
-                          setEditingCommentId(c.id);
-                          setEditContent(c.content);
-                        }}
-                      >
-                        <span className="material-icons">edit_note</span>
-                      </button>
+                        {/* أدوات التحكم */}
+                        {!challengeEnded && c.user_name === currentUserName && (
+                          <div className="comment-actions">
+                            <button
+                              className="action-btn blue"
+                              onClick={() => {
+                                setEditingCommentId(c.id);
+                                setEditContent(c.content);
+                              }}
+                            >
+                              <span className="material-icons">edit_note</span>
+                            </button>
 
-                      <button
-                        className="action-btn red"
-                        onClick={() => handleDeleteComment(c.id)}
-                      >
-                        <span className="material-icons">delete_outline</span>
-                      </button>
+                            <button
+                              className="action-btn red"
+                              onClick={() => handleDeleteComment(c.id)}
+                            >
+                              <span className="material-icons">delete_outline</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  )}
-                </div>
-              </div>
 
-              {/* نص التعليق */}
-              <p className="comment-text">{c.content}</p>
+                    {/* نص التعليق */}
+                    <p className="comment-text">{c.content}</p>
 
-              {editingCommentId === c.id && !challengeEnded && (
-                <div className="edit-box">
-                  <textarea
-                    value={editContent}
-                    onChange={(e) => setEditContent(e.target.value)}
-                  />
-                  <div className="edit-actions">
-                    <button
-                      className="challenge-save-btn"
-                      onClick={() => handleSaveEditedComment(c.id)}
-                    >
-                      Save
-                    </button>
-                    <button
-                      className="challenge-cancel-btn"
-                      onClick={() => setEditingCommentId(null)}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              )}
-            </li>
-          );
-        })}
-      </ul>
-    ) : (
-      <p>No comments yet.</p>
-    )}
+                    {editingCommentId === c.id && !challengeEnded && (
+                      <div className="edit-box">
+                        <textarea
+                          value={editContent}
+                          onChange={(e) => setEditContent(e.target.value)}
+                        />
+                        <div className="edit-actions">
+                          <button
+                            className="challenge-save-btn"
+                            onClick={() => handleSaveEditedComment(c.id)}
+                          >
+                            Save
+                          </button>
+                          
+                          <button
+                            className="challenge-cancel-btn"
+                            onClick={() => setEditingCommentId(null)}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <p>No comments yet.</p>
+          )}
 
-    {/* إضافة تعليق */}
-    {challengeEnded ? (
-      <p className="comments-closed">Comments closed (challenge ended)</p>
-    ) : isJoined ? (
-      <div className="comment-input-box">
-        <textarea
-          placeholder="Write your comment..."
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-        />
-        <button className="send-btn" onClick={handleAddComment}>Send</button>
-      </div>
-    ) : (
-      <p className="comments-closed">Join the challenge to comment</p>
-    )}
-  </div>
-)}
+          {/* إضافة تعليق */}
+          {challengeEnded ? (
+            <p className="comments-closed">Comments closed (challenge ended)</p>
+          ) : isJoined ? (
+            <div className="comment-input-box">
+              <textarea
+                placeholder="Write your comment..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+              />
+              <button className="send-btn" onClick={handleAddComment}>Send</button>
+            </div>
+          ) : (
+            <p className="comments-closed">Join the challenge to comment</p>
+          )}
+        </div>
+      )}
 
-
-{toast && <div className="toast-box">{toast}</div>}
-
-</div>
-);
+      {toast && <div className="toast-box">{toast}</div>}
+    </div>
+  );
 }
