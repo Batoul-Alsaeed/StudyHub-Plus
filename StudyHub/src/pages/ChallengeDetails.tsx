@@ -529,23 +529,20 @@ export default function ChallengeDetails() {
                 return (
                   <li key={c.id} className="comment-card">
 
-                    {/* Avatar + Name + Date/Time */}
+                    {/* ======= ROW: Avatar + Right Side ======= */}
                     <div style={{ display: "flex", gap: "14px" }}>
-                      
-                      {/* Avatar */}
+
+                      {/* AVATAR */}
                       <Avatar name={c.user_name} />
 
-                      {/* RIGHT SIDE */}
+                      {/* ===== RIGHT SIDE ===== */}
                       <div style={{ flex: 1 }}>
-                        
-                        {/* ===== HEADER LINE ===== */}
+
+                        {/* ===== HEADER (Name + Date) ===== */}
                         <div className="comment-header-line">
-                          
-                          {/* Avatar + Name */}
-                          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                            <Avatar name={c.user_name} />
-                            <strong className="comment-username">{c.user_name}</strong>
-                          </div>
+
+                          {/* Name */}
+                          <strong className="comment-username">{c.user_name}</strong>
 
                           {/* Date + Time */}
                           <div className="comment-meta-right">
@@ -560,9 +557,9 @@ export default function ChallengeDetails() {
                         {/* ===== COMMENT TEXT ===== */}
                         <p className="comment-text">{c.content}</p>
 
-                        {/* ===== ACTION BUTTONS — GO BELOW ===== */}
+                        {/* ===== ACTION BUTTONS — BELOW TEXT ===== */}
                         {!challengeEnded && c.user_name === currentUserName && (
-                          <div className="comment-actions">
+                          <div className="comment-actions-row">
                             <button
                               className="action-btn blue"
                               onClick={() => {
@@ -611,6 +608,7 @@ export default function ChallengeDetails() {
                     </div>
 
                   </li>
+
                 );
               })}
             </ul>
