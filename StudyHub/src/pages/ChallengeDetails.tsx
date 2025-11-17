@@ -511,6 +511,7 @@ export default function ChallengeDetails() {
       )}
 
       {/* COMMENTS */}
+      {/* COMMENTS */}
       {activeTab === "comments" && (
         <div className="challenge-comments">
           <h3 className="comments-title">
@@ -529,22 +530,18 @@ export default function ChallengeDetails() {
                 return (
                   <li key={c.id} className="comment-card">
 
-                    {/* ======= ROW: Avatar + Right Side ======= */}
                     <div style={{ display: "flex", gap: "14px" }}>
-
+                      
                       {/* AVATAR */}
                       <Avatar name={c.user_name} />
 
-                      {/* ===== RIGHT SIDE ===== */}
+                      {/* RIGHT SIDE */}
                       <div style={{ flex: 1 }}>
 
-                        {/* ===== HEADER (Name + Date) ===== */}
+                        {/* HEADER */}
                         <div className="comment-header-line">
-
-                          {/* Name */}
                           <strong className="comment-username">{c.user_name}</strong>
 
-                          {/* Date + Time */}
                           <div className="comment-meta-right">
                             <span className="material-icons meta-icon">calendar_month</span>
                             <span className="comment-meta-text">{d}</span>
@@ -554,10 +551,10 @@ export default function ChallengeDetails() {
                           </div>
                         </div>
 
-                        {/* ===== COMMENT TEXT ===== */}
+                        {/* COMMENT TEXT */}
                         <p className="comment-text">{c.content}</p>
 
-                        {/* ===== ACTION BUTTONS — BELOW TEXT ===== */}
+                        {/* ACTION BUTTONS — BELOW */}
                         {!challengeEnded && c.user_name === currentUserName && (
                           <div className="comment-actions-row">
                             <button
@@ -579,13 +576,14 @@ export default function ChallengeDetails() {
                           </div>
                         )}
 
-                        {/* ===== EDIT MODE ===== */}
+                        {/* EDIT BOX */}
                         {editingCommentId === c.id && !challengeEnded && (
                           <div className="edit-box">
                             <textarea
                               value={editContent}
                               onChange={(e) => setEditContent(e.target.value)}
                             />
+
                             <div className="edit-actions">
                               <button
                                 className="challenge-save-btn"
@@ -608,7 +606,6 @@ export default function ChallengeDetails() {
                     </div>
 
                   </li>
-
                 );
               })}
             </ul>
@@ -616,7 +613,7 @@ export default function ChallengeDetails() {
             <p>No comments yet.</p>
           )}
 
-          {/* إضافة تعليق */}
+          {/* INPUT */}
           {challengeEnded ? (
             <p className="comments-closed">Comments closed (challenge ended)</p>
           ) : isJoined ? (
@@ -633,6 +630,7 @@ export default function ChallengeDetails() {
           )}
         </div>
       )}
+
       {toast && <div className="toast-box">{toast}</div>}
     </div>
   );
