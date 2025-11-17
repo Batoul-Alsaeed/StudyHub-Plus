@@ -3,6 +3,8 @@ import "../css/ChallengeDetails.css";
 import React from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import MainLayout from "../layout/MainLayout";
+
 
 type Task = { id?: number; title?: string; done?: boolean };
 type LeaderRow = { user_id: number; user_name: string; progress: number };
@@ -290,376 +292,377 @@ export default function ChallengeDetails() {
   // ===== Loading UI =====
   if (loading)
     return (
-    //  <div className="challenge-container">
-    <div className={`challenge-container ${challenge.level?.toLowerCase()}`}>
-
-        <button className="challenge-back-btn" onClick={() => navigate(-1)}>
-          ← Back
-        </button>
-        <div className="challenge-spinner"></div>
-      </div>
+      <MainLayout>
+        <div className={`challenge-container ${challenge?.level?.toLowerCase() || ""}`}>
+          <button className="challenge-back-btn" onClick={() => navigate(-1)}>
+            ← Back
+          </button>
+          <div className="challenge-spinner"></div>
+        </div>
+      </MainLayout>
     );
 
   if (error || !challenge)
     return (
-      <div className="challenge-container">
-        <button className="challenge-back-btn" onClick={() => navigate(-1)}>
-          ← Back
-        </button>
-        <p style={{ color: "#c0392b" }}>{error}</p>
-      </div>
+      <MainLayout>
+        <div className="challenge-container">
+          <button className="challenge-back-btn" onClick={() => navigate(-1)}>
+            ← Back
+          </button>
+          <p style={{ color: "#c0392b" }}>{error}</p>
+        </div>
+      </MainLayout>
     );
 
-  return (
-    <div className="challenge-container">
-      <button className="challenge-back-btn" onClick={() => navigate(-1)}>
-        ← Back
-      </button>
+        return (
+          <MainLayout>
+              <div className={`challenge-container ${challenge.level?.toLowerCase()}`}>
+              <button className="challenge-back-btn" onClick={() => navigate(-1)}>
+                ← Back
+              </button>
 
-      <h1 className="challenge-title">{challenge.title}</h1>
+            <h1 className="challenge-title">{challenge.title}</h1>
 
-      {/* TABS */}
-      <div className="challenge-tabs">
-        <button
-          className={`challenge-tab-btn ${activeTab === "details" ? "active" : ""}`}
-          onClick={() => setActiveTab("details")}
-        >
-          Details
-        </button>
-
-        <button
-          className={`challenge-tab-btn ${
-            activeTab === "leaderboard" ? "active" : ""
-          }`}
-          onClick={() => {
-            setActiveTab("leaderboard");
-            setLoadingLeaderboard(true);
-            fetch(`${API_BASE}/challenges/${id}/leaderboard`)
-              .then((res) => res.json())
-              .then((data) => setLeaderboard(data))
-              .finally(() => setLoadingLeaderboard(false));
-          }}
-        >
-          Leaderboard
-        </button>
-
-        <button
-          className={`challenge-tab-btn ${
-            activeTab === "comments" ? "active" : ""
-          }`}
-          onClick={() => {
-            setActiveTab("comments");
-            handleFetchComments();
-          }}
-        >
-          Comments ({loadingComments ? "..." : comments.length})
-        </button>
-      </div>
-
-      {/* DETAILS */}
-      {activeTab === "details" && (
-        <>
-          <div className="challenge-info">
-            {/* Creator + Difficulty + Status */}
-            <div className="top-info-row">
-              
-              {/* Creator */}
-              <div className="creator-box">
-                <span className="material-icons">person</span>
-                <span className="creator-name">{challenge.creator_name}</span>
-              </div>
-
-              {/* Difficulty */}
-              <div className={`level-box level-${challenge.level.toLowerCase()}`}>
-                <span className="material-icons">bar_chart</span>
-                <span>{challenge.level} Level</span>
-              </div>
-            </div>
-
-            {/* STATUS BADGE HERE */}
-            <span
-              className={`challenge-status-badge ${
-                status === "Upcoming"
-                  ? "status-upcoming"
-                  : status === "Active"
-                  ? "status-active"
-                  : "status-ended"
-              }`}
+            {/* TABS */}
+            <div className="challenge-tabs-premium">
+              <button
+              className={`premium-tab ${activeTab === "details" ? "active" : ""}`}
+              onClick={() => setActiveTab("details")}
             >
-              {status}
-            </span>
+              Overview
+            </button>
 
-            {/* Participants count */}
-            <div className="participants-row">
-              <span className="material-icons">groups</span>
-              <span>{challenge.participants_count} participants</span>
+            <button
+              className={`premium-tab ${activeTab === "leaderboard" ? "active" : ""}`}
+              onClick={() => {
+                setActiveTab("leaderboard");
+                setLoadingLeaderboard(true);
+                fetch(`${API_BASE}/challenges/${id}/leaderboard`)
+                  .then((res) => res.json())
+                  .then((data) => setLeaderboard(data))
+                  .finally(() => setLoadingLeaderboard(false));
+              }}
+            >
+              Leaderboard
+            </button>
+
+            <button
+              className={`premium-tab ${activeTab === "comments" ? "active" : ""}`}
+              onClick={() => {
+                setActiveTab("comments");
+                handleFetchComments();
+              }}
+            >
+              Comments ({loadingComments ? "..." : comments.length})
+              </button>
             </div>
 
-            {/* Description */}
-            {challenge.description && (
-              <p className="challenge-description">{challenge.description}</p>
-            )}
-
-            {/* Dates */}
-            <p className="challenge-dates">
-              <span className="material-icons">calendar_month</span>
-              {challenge.start_date}
-
-              <span style={{ margin: "0 8px" }}>→</span>
-
-              <span className="material-icons">event</span>
-              {challenge.end_date}
-            </p>
-          </div>
-
-          {/* PROGRESS */}
-          <div className="challenge-progress-section">
-            {isJoined && !challengeEnded && (
+            {/* DETAILS */}
+            {activeTab === "details" && (
               <>
-                <div className="challenge-progress-label">
-                  <span>Your Progress</span>
-                  <span>{userProgress}%</span>
+                <div className="challenge-info">
+                  {/* Creator + Difficulty + Status */}
+                  <div className="top-info-row">
+                    
+                    {/* Creator */}
+                    <div className="creator-box">
+                      <span className="material-icons">person</span>
+                      <span className="creator-name">{challenge.creator_name}</span>
+                    </div>
+
+                    {/* Difficulty */}
+                    <div className={`level-box level-${challenge.level.toLowerCase()}`}>
+                      <span className="material-icons">bar_chart</span>
+                      <span>{challenge.level} Level</span>
+                    </div>
+                  </div>
+
+                  {/* STATUS BADGE HERE */}
+                  <span
+                    className={`challenge-status-badge ${
+                      status === "Upcoming"
+                        ? "status-upcoming"
+                        : status === "Active"
+                        ? "status-active"
+                        : "status-ended"
+                    }`}
+                  >
+                    {status}
+                  </span>
+
+                  {/* Participants count */}
+                  <div className="participants-row">
+                    <span className="material-icons">groups</span>
+                    <span>{challenge.participants_count} participants</span>
+                  </div>
+
+                  {/* Description */}
+                  {challenge.description && (
+                    <p className="challenge-description">{challenge.description}</p>
+                  )}
+
+                  {/* Dates */}
+                  <p className="challenge-dates">
+                    <span className="material-icons">calendar_month</span>
+                    {challenge.start_date}
+
+                    <span style={{ margin: "0 8px" }}>→</span>
+
+                    <span className="material-icons">event</span>
+                    {challenge.end_date}
+                  </p>
                 </div>
-                <div className="challenge-progress-bar">
-                  <div
-                    className="challenge-progress-fill user"
-                    style={{ width: `${userProgress}%` }}
-                  ></div>
+
+                {/* PROGRESS */}
+                <div className="challenge-progress-section">
+                  {isJoined && !challengeEnded && (
+                    <>
+                      <div className="challenge-progress-label">
+                        <span>Your Progress</span>
+                        <span>{userProgress}%</span>
+                      </div>
+                      <div className="challenge-progress-bar">
+                        <div
+                          className="challenge-progress-fill user"
+                          style={{ width: `${userProgress}%` }}
+                        ></div>
+                      </div>
+                    </>
+                  )}
+
+                  <div className="challenge-progress-label">
+                    <span>Group Progress</span>
+                    <span>{groupProgress}%</span>
+                  </div>
+
+                  <div className="challenge-progress-bar">
+                    <div
+                      className="challenge-progress-fill group"
+                      style={{ width: `${groupProgress}%` }}
+                    ></div>
+                  </div>
+                </div>
+
+                {/* TASKS */}
+                <div className="challenge-requirements">
+                  <h4>
+                    <span className="material-icons">list_alt</span> Requirements
+                  </h4>
+
+                  {tasks.length > 0 ? (
+                    <ul>
+                      {tasks.map((t) => (
+                        <li
+                          key={t.id}
+                          className={`challenge-task-item ${t.done ? "done" : ""}`}
+                          onClick={() => handleToggleTask(t.id!)}
+                          style={{
+                            cursor: challengeEnded ? "not-allowed" : "pointer",
+                            opacity: challengeEnded ? 0.5 : 1,
+                          }}
+                        >
+                          <span className="material-icons">
+                            {t.done ? "check_circle" : "radio_button_unchecked"}
+                          </span>
+                          <span>{t.title}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>No tasks defined.</p>
+                  )}
+                </div>
+
+                {/* JOIN / LEAVE */}
+                <div style={{ marginTop: 24 }}>
+                  {challengeEnded ? (
+                    <button className="challenge-cancel-btn" disabled>
+                      Challenge Ended
+                    </button>
+                  ) : !isJoined ? (
+                    <button
+                      className="challenge-save-btn"
+                      onClick={handleJoin}
+                      disabled={updating || challenge.participants_count >= challenge.max_participants}
+                    >
+                      Join
+                    </button>
+                  ) : (
+                    <button
+                      className="challenge-cancel-btn"
+                      onClick={handleLeave}
+                      disabled={updating}
+                    >
+                      Leave
+                    </button>
+                  )}
                 </div>
               </>
             )}
 
-            <div className="challenge-progress-label">
-              <span>Group Progress</span>
-              <span>{groupProgress}%</span>
-            </div>
+            {/* LEADERBOARD */}
+            {activeTab === "leaderboard" && (
+              <div className="challenge-leaderboard">
+                <h3>
+                  <span className="material-icons">emoji_events</span> Leaderboard
+                </h3>
 
-            <div className="challenge-progress-bar">
-              <div
-                className="challenge-progress-fill group"
-                style={{ width: `${groupProgress}%` }}
-              ></div>
-            </div>
-          </div>
+                {loadingLeaderboard ? (
+                  <p>Loading leaderboard...</p>
+                ) : leaderboard.length > 0 ? (
+                  <ul>
+                    {leaderboard.map((row, index) => (
+                      <li key={row.user_id} className="challenge-leaderboard-item">
+                        <span className="material-icons">
+                          {index === 0
+                            ? "emoji_events"
+                            : index === 1
+                            ? "military_tech"
+                            : index === 2
+                            ? "workspace_premium"
+                            : "person"}
+                        </span>
 
-          {/* TASKS */}
-          <div className="challenge-requirements">
-            <h4>
-              <span className="material-icons">list_alt</span> Requirements
-            </h4>
-
-            {tasks.length > 0 ? (
-              <ul>
-                {tasks.map((t) => (
-                  <li
-                    key={t.id}
-                    className={`challenge-task-item ${t.done ? "done" : ""}`}
-                    onClick={() => handleToggleTask(t.id!)}
-                    style={{
-                      cursor: challengeEnded ? "not-allowed" : "pointer",
-                      opacity: challengeEnded ? 0.5 : 1,
-                    }}
-                  >
-                    <span className="material-icons">
-                      {t.done ? "check_circle" : "radio_button_unchecked"}
-                    </span>
-                    <span>{t.title}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No tasks defined.</p>
+                        <span>{row.user_name}</span>
+                        <span>{row.progress}%</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>No participants yet.</p>
+                )}
+              </div>
             )}
-          </div>
 
-          {/* JOIN / LEAVE */}
-          <div style={{ marginTop: 24 }}>
-            {challengeEnded ? (
-              <button className="challenge-cancel-btn" disabled>
-                Challenge Ended
-              </button>
-            ) : !isJoined ? (
-              <button
-                className="challenge-save-btn"
-                onClick={handleJoin}
-                disabled={updating || challenge.participants_count >= challenge.max_participants}
-              >
-                Join
-              </button>
-            ) : (
-              <button
-                className="challenge-cancel-btn"
-                onClick={handleLeave}
-                disabled={updating}
-              >
-                Leave
-              </button>
-            )}
-          </div>
-        </>
-      )}
+            {/* COMMENTS */}
+            {activeTab === "comments" && (
+              <div className="challenge-comments">
+                <h3 className="comments-title">
+                  <span className="material-icons">chat</span> Comments
+                </h3>
 
-      {/* LEADERBOARD */}
-      {activeTab === "leaderboard" && (
-        <div className="challenge-leaderboard">
-          <h3>
-            <span className="material-icons">emoji_events</span> Leaderboard
-          </h3>
+                {loadingComments ? (
+                  <p>Loading comments...</p>
+                ) : comments.length > 0 ? (
+                  <ul className="comments-list">
+                    {comments.map((c) => {
+                      const dateObj = new Date(c.timestamp);
+                      const d = dateObj.toISOString().slice(0, 10);
+                      const t = dateObj.toISOString().slice(11, 16);
 
-          {loadingLeaderboard ? (
-            <p>Loading leaderboard...</p>
-          ) : leaderboard.length > 0 ? (
-            <ul>
-              {leaderboard.map((row, index) => (
-                <li key={row.user_id} className="challenge-leaderboard-item">
-                  <span className="material-icons">
-                    {index === 0
-                      ? "emoji_events"
-                      : index === 1
-                      ? "military_tech"
-                      : index === 2
-                      ? "workspace_premium"
-                      : "person"}
-                  </span>
-
-                  <span>{row.user_name}</span>
-                  <span>{row.progress}%</span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>No participants yet.</p>
-          )}
-        </div>
-      )}
-
-      {/* COMMENTS */}
-      {activeTab === "comments" && (
-        <div className="challenge-comments">
-          <h3 className="comments-title">
-            <span className="material-icons">chat</span> Comments
-          </h3>
-
-          {loadingComments ? (
-            <p>Loading comments...</p>
-          ) : comments.length > 0 ? (
-            <ul className="comments-list">
-              {comments.map((c) => {
-                const dateObj = new Date(c.timestamp);
-                const d = dateObj.toISOString().slice(0, 10);
-                const t = dateObj.toISOString().slice(11, 16);
-
-                return (
-                  <li key={c.id} className="comment-card">
-                      
-                      {/* AVATAR
-                      <Avatar name={c.user_name} />
-
-                      <div style={{ flex: 1 }}>*/}
-
-
-                        {/* HEADER */}
-                        <div className="comment-header-line">
-                          {/* LEFT: Avatar + Name */}
-                          <div className="comment-left">
+                      return (
+                        <li key={c.id} className="comment-card">
+                            
+                            {/* AVATAR
                             <Avatar name={c.user_name} />
-                            <strong className="comment-username">{c.user_name}</strong>
-                          </div>
 
-                          <div className="comment-meta-right">
-                            <div className="date-line">
-                              <span className="material-icons meta-icon">calendar_month</span>
-                              <span className="comment-meta-text">{d}</span>
-                            </div>
+                            <div style={{ flex: 1 }}>*/}
 
-                            <div className="time-line">
-                              <span className="material-icons meta-icon">schedule</span>
-                              <span className="comment-meta-text">{t}</span>
-                            </div>
 
-                          </div>
-                        </div>
+                              {/* HEADER */}
+                              <div className="comment-header-line">
+                                {/* LEFT: Avatar + Name */}
+                                <div className="comment-left">
+                                  <Avatar name={c.user_name} />
+                                  <strong className="comment-username">{c.user_name}</strong>
+                                </div>
 
-                        {/* COMMENT TEXT */}
-                        <p className="comment-text">{c.content}</p>
+                                <div className="comment-meta-right">
+                                  <div className="date-line">
+                                    <span className="material-icons meta-icon">calendar_month</span>
+                                    <span className="comment-meta-text">{d}</span>
+                                  </div>
 
-                        {/* FOOTER - ACTION BUTTONS — BELOW */}
-                        <div className="comment-footer-line">
-                          {!challengeEnded && c.user_name === currentUserName && (
-                            <div className="comment-actions-row">
-                              <button
-                                className="action-btn blue"
-                                onClick={() => {
-                                  setEditingCommentId(c.id);
-                                  setEditContent(c.content);
-                                }}
-                              >
-                                <span className="material-icons">edit</span>
-                              </button>
+                                  <div className="time-line">
+                                    <span className="material-icons meta-icon">schedule</span>
+                                    <span className="comment-meta-text">{t}</span>
+                                  </div>
 
-                              <button
-                                className="action-btn red"
-                                onClick={() => handleDeleteComment(c.id)}
-                              >
-                                <span className="material-icons delete-icon">delete</span>
-                              </button>
-                            </div>
-                           )}
-                        </div>
+                                </div>
+                              </div>
 
-                        {/* EDIT BOX */}
-                        {editingCommentId === c.id && !challengeEnded && (
-                          <div className="edit-box">
-                            <textarea
-                              value={editContent}
-                              onChange={(e) => setEditContent(e.target.value)}
-                            />
+                              {/* COMMENT TEXT */}
+                              <p className="comment-text">{c.content}</p>
 
-                            <div className="edit-actions">
-                              <button
-                                className="challenge-save-btn"
-                                onClick={() => handleSaveEditedComment(c.id)}
-                              >
-                                Save
-                              </button>
+                              {/* FOOTER - ACTION BUTTONS — BELOW */}
+                              <div className="comment-footer-line">
+                                {!challengeEnded && c.user_name === currentUserName && (
+                                  <div className="comment-actions-row">
+                                    <button
+                                      className="action-btn blue"
+                                      onClick={() => {
+                                        setEditingCommentId(c.id);
+                                        setEditContent(c.content);
+                                      }}
+                                    >
+                                      <span className="material-icons">edit</span>
+                                    </button>
 
-                              <button
-                                className="challenge-cancel-btn"
-                                onClick={() => setEditingCommentId(null)}
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          </div>
-                        )}
+                                    <button
+                                      className="action-btn red"
+                                      onClick={() => handleDeleteComment(c.id)}
+                                    >
+                                      <span className="material-icons delete-icon">delete</span>
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
 
-                  </li>
-                );
-              })}
-            </ul>
-          ) : (
-            <p>No comments yet.</p>
-          )}
+                              {/* EDIT BOX */}
+                              {editingCommentId === c.id && !challengeEnded && (
+                                <div className="edit-box">
+                                  <textarea
+                                    value={editContent}
+                                    onChange={(e) => setEditContent(e.target.value)}
+                                  />
 
-          {/* INPUT */}
-          {challengeEnded ? (
-            <p className="comments-closed">Comments closed (challenge ended)</p>
-          ) : isJoined ? (
-            <div className="comment-input-box">
-              <textarea
-                placeholder="Write your comment..."
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-              />
-              <button className="send-btn" onClick={handleAddComment}>Send</button>
-            </div>
-          ) : (
-            <p className="comments-closed">Join the challenge to comment</p>
-          )}
-        </div>
-      )}
+                                  <div className="edit-actions">
+                                    <button
+                                      className="challenge-save-btn"
+                                      onClick={() => handleSaveEditedComment(c.id)}
+                                    >
+                                      Save
+                                    </button>
 
-      {toast && <div className="toast-box">{toast}</div>}
-    </div>
-  );
-}
+                                    <button
+                                      className="challenge-cancel-btn"
+                                      onClick={() => setEditingCommentId(null)}
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <p>No comments yet.</p>
+                )}
+
+                {/* INPUT */}
+                {challengeEnded ? (
+                  <p className="comments-closed">Comments closed (challenge ended)</p>
+                ) : isJoined ? (
+                  <div className="comment-input-box">
+                    <textarea
+                      placeholder="Write your comment..."
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                    />
+                    <button className="send-btn" onClick={handleAddComment}>Send</button>
+                  </div>
+                ) : (
+                  <p className="comments-closed">Join the challenge to comment</p>
+                )}
+              </div>
+            )}
+
+            {toast && <div className="toast-box">{toast}</div>}
+          </div>
+        </MainLayout>
+
+    );
+  }
