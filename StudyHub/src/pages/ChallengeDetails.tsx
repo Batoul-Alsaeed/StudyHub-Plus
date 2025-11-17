@@ -266,16 +266,6 @@ export default function ChallengeDetails() {
     }
   }
 
-  function getAvatarColor(name: string) {
-    const colors = [
-      "#8b7cd3", "#4a90e2", "#50c878", "#f5a623",
-      "#d0021b", "#7b8d93", "#bd10e0"
-    ];
-    let sum = 0;
-    for (let i = 0; i < name.length; i++) sum += name.charCodeAt(i);
-    return colors[sum % colors.length];
-  }
-
   function Avatar({ name }: { name: string }) {
     const letter = name ? name.trim().charAt(0).toUpperCase() : "?";
 
@@ -532,8 +522,8 @@ export default function ChallengeDetails() {
 
                     <div style={{ display: "flex", gap: "14px" }}>
                       
-                      {/* AVATAR */}
-                      <Avatar name={c.user_name} />
+                      {/* AVATAR 
+                      <Avatar name={c.user_name} />*/}
 
                       {/* RIGHT SIDE */}
                       <div style={{ flex: 1 }}>
@@ -558,27 +548,29 @@ export default function ChallengeDetails() {
                         {/* COMMENT TEXT */}
                         <p className="comment-text">{c.content}</p>
 
-                        {/* ACTION BUTTONS — BELOW */}
-                        {!challengeEnded && c.user_name === currentUserName && (
-                          <div className="comment-actions-row">
-                            <button
-                              className="action-btn blue"
-                              onClick={() => {
-                                setEditingCommentId(c.id);
-                                setEditContent(c.content);
-                              }}
-                            >
-                              <span className="material-icons">edit</span>
-                            </button>
+                        {/* FOOTER - ACTION BUTTONS — BELOW */}
+                        <div className="comment-footer-line">
+                          {!challengeEnded && c.user_name === currentUserName && (
+                            <div className="comment-actions-row">
+                              <button
+                                className="action-btn blue"
+                                onClick={() => {
+                                  setEditingCommentId(c.id);
+                                  setEditContent(c.content);
+                                }}
+                              >
+                                <span className="material-icons">edit</span>
+                              </button>
 
-                            <button
-                              className="action-btn red"
-                              onClick={() => handleDeleteComment(c.id)}
-                            >
-                              <span className="material-icons delete-icon">delete</span>
-                            </button>
-                          </div>
-                        )}
+                              <button
+                                className="action-btn red"
+                                onClick={() => handleDeleteComment(c.id)}
+                              >
+                                <span className="material-icons delete-icon">delete</span>
+                              </button>
+                            </div>
+                           )}
+                        </div>
 
                         {/* EDIT BOX */}
                         {editingCommentId === c.id && !challengeEnded && (
