@@ -266,6 +266,28 @@ export default function ChallengeDetails() {
     }
   }
 
+  function getAvatarColor(name: string) {
+    const colors = [
+      "#8b7cd3", "#4a90e2", "#50c878", "#f5a623",
+      "#d0021b", "#7b8d93", "#bd10e0"
+    ];
+    let sum = 0;
+    for (let i = 0; i < name.length; i++) sum += name.charCodeAt(i);
+    return colors[sum % colors.length];
+  }
+
+  function Avatar({ name }: { name: string }) {
+    const letter = name.trim().charAt(0).toUpperCase();
+    return (
+      <div
+        className="comment-avatar"
+        style={{ backgroundColor: getAvatarColor(name) }}
+      >
+        {letter}
+      </div>
+    );
+  }
+
   // ===== Loading UI =====
   if (loading)
     return (
@@ -498,8 +520,13 @@ export default function ChallengeDetails() {
                 return (
                   <li key={c.id} className="comment-card">
                     <div className="comment-header-line">
-                      <strong className="comment-username">{c.user_name}</strong>
+                      {/* Avatar + Name */}
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <Avatar name={c.user_name} />
+                        <strong className="comment-username">{c.user_name}</strong>
+                      </div>
 
+                      {/* Date + Time */}
                       <div className="comment-meta-right">
                         <span className="material-icons meta-icon">calendar_month</span>
                         <span className="comment-meta-text">{d}</span>
@@ -509,7 +536,7 @@ export default function ChallengeDetails() {
 
                         {/* أدوات التحكم */}
                         {!challengeEnded && c.user_name === currentUserName && (
-                          <div className="comment-actions">
+                          <div className="comment-actions-row">
                             <button
                               className="action-btn blue"
                               onClick={() => {

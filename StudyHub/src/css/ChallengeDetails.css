@@ -335,7 +335,7 @@
 
 .meta-icon {
   font-size: 18px;
-  color: #888;
+  color:  #8b7cd3 !important;
 }
 
 .comment-meta-text {
@@ -467,6 +467,51 @@
   text-align: center;
   font-size: 14px;
 }
+
+/* ===== COMMENT AVATAR =====*/
+.comment-avatar {
+  width: 34px;
+  height: 34px;
+
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 700;
+  color: #fff;
+  font-size: 16px;
+
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+/* ===== ACTION BUTTONS ROW (Moved to bottom) =====*/
+.comment-actions-row {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* لون أيقونة التعديل */
+.action-btn.blue span {
+  color: #4a90e2;
+}
+
+/* لون أيقونة الحذف */
+.action-btn.red span {
+  color: #d0021b;
+}
+
+.action-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+}
+
 /* =====================================================
    RESPONSIVE
 ===================================================== */
@@ -478,4 +523,3 @@
     font-size: 24px;
   }
 }
-
