@@ -44,29 +44,65 @@
 /* =====================================================
    TABS (Details / Leaderboard / Comments)
 ===================================================== */
+/* ================================
+   FULL-WIDTH TABS BAR
+================================ */
+.tabs-wrapper {
+  width: 100%;
+  background: #ffffff; /* تقدرين تغيرينه #f3f3f3 */
+  padding: 16px 0;
+  margin: 30px 0;
+  display: flex;
+  justify-content: center; /* التابات بالنص */
+  border-bottom: 1px solid #e5e5e5;
+}
+
+/* ================================
+   TABS CONTAINER
+================================ */
 .challenge-tabs {
   display: flex;
-  justify-content: center;
-  gap: 14px;
-  margin-bottom: 25px;
+  gap: 28px;
 }
-.challenge-tab-btn {
-  background-color: #e8e6ea;
-  border: none;
-  padding: 8px 18px;
-  border-radius: 25px;
-  font-weight: 600;
-  color: #001b44;
+
+/* ================================
+   SINGLE TAB
+================================ */
+.challenge-tab {
+  padding: 10px 20px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  font-weight: 600;
+  color: #3a3a3a;
+  background: none;
+  border: none;
+  position: relative;
+  transition: 0.25s ease;
+  font-size: 15px;
+  border-radius: 8px;
 }
-.challenge-tab-btn.active {
-  background-color: #8c7ae6;
-  color: #fff;
+
+/* Hover */
+.challenge-tab:hover {
+  background: rgba(139, 124, 211, 0.12);
 }
-.challenge-tab-btn:hover {
-  background-color: #d8d5dd;
+
+/* Active text color */
+.challenge-tab.active {
+  color: #8b7cd3;
 }
+
+/* Active underline */
+.challenge-tab.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -8px;
+  width: 100%;
+  height: 3px;
+  background: #8c7ae6;
+  border-radius: 20px;
+}
+
 
 /* -------------------------------
    TOP ROW (Creator + Difficulty + Status)
@@ -611,84 +647,4 @@
   gap: 20px;
   margin-bottom: 25px;
   text-align: left;
-}
-
-/* TABS */
-.challenge-tabs-premium {
-  display: flex;
-  gap: 14px;
-  margin: 20px 0;
-}
-
-.premium-tab {
-  background: #f4f4f7;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  color: #333;
-  transition: 0.2s ease;
-}
-
-.premium-tab.active {
-  background: #5865f2;
-  color: white;
-}
-
-/* CREATOR + LEVEL + STATUS */
-.top-info-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.creator-box {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: 600;
-}
-
-.level-box {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border-radius: 20px;
-  border: 2px solid currentColor;
-  font-weight: 600;
-}
-
-/* Difficulty Colors */
-.level-easy {
-  color: #304ffe;
-}
-.level-medium {
-  color: #ffb300;
-}
-.level-hard {
-  color: #d32f2f;
-}
-
-/* STATUS BADGE */
-.challenge-status-badge {
-  padding: 6px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 700;
-  display: inline-block;
-}
-
-.status-upcoming { background:#dcdcdc; color:#555; }
-.status-active { background:#c8e6c9; color:#1b5e20; }
-.status-ended { background:#ffcdd2; color:#c62828; }
-
-/* PARTICIPANTS */
-.participants-row {
-  margin-top: -6px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: 600;
 }

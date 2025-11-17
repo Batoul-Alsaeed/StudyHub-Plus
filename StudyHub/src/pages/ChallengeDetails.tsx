@@ -66,8 +66,8 @@ export default function ChallengeDetails() {
   const [updating, setUpdating] = React.useState(false);
 
   const [activeTab, setActiveTab] = React.useState<
-    "details" | "leaderboard" | "comments"
-  >("details");
+    "overview" | "leaderboard" | "comments"
+  >("overview");
 
   const [leaderboard, setLeaderboard] = React.useState<LeaderRow[]>([]);
   const [loadingLeaderboard, setLoadingLeaderboard] = React.useState(false);
@@ -323,42 +323,46 @@ export default function ChallengeDetails() {
 
             <h1 className="challenge-title">{challenge.title}</h1>
 
-            {/* TABS */}
-            <div className="challenge-tabs-premium">
-              <button
-                className={`premium-tab ${activeTab === "details" ? "active" : ""}`}
-                onClick={() => setActiveTab("details")}
-              >
-                Overview
-              </button>
+            {/* TABS BAR */}
+            <div className="tabs-wrapper">
+              <div className="challenge-tabs">
 
-              <button
-                className={`premium-tab ${activeTab === "leaderboard" ? "active" : ""}`}
-                onClick={() => {
-                  setActiveTab("leaderboard");
-                  setLoadingLeaderboard(true);
-                  fetch(`${API_BASE}/challenges/${id}/leaderboard`)
-                    .then((res) => res.json())
-                    .then((data) => setLeaderboard(data))
-                    .finally(() => setLoadingLeaderboard(false));
-                }}
-              >
-                Leaderboard
-              </button>
-
-              <button
-                className={`premium-tab ${activeTab === "comments" ? "active" : ""}`}
-                onClick={() => {
-                  setActiveTab("comments");
-                  handleFetchComments();
-                }}
-              >
-                Comments ({loadingComments ? "..." : comments.length})
+                <button
+                  className={`challenge-tab ${activeTab === "overview" ? "active" : ""}`}
+                  onClick={() => setActiveTab("overview")}
+                >
+                  Overview
                 </button>
+
+                <button
+                  className={`challenge-tab ${activeTab === "leaderboard" ? "active" : ""}`}
+                  onClick={() => {
+                    setActiveTab("leaderboard");
+                    setLoadingLeaderboard(true);
+                    fetch(`${API_BASE}/challenges/${id}/leaderboard`)
+                      .then((res) => res.json())
+                      .then((data) => setLeaderboard(data))
+                      .finally(() => setLoadingLeaderboard(false));
+                  }}
+                >
+                  Leaderboard
+                </button>
+
+                <button
+                  className={`challenge-tab ${activeTab === "comments" ? "active" : ""}`}
+                  onClick={() => {
+                    setActiveTab("comments");
+                    handleFetchComments();
+                  }}
+                >
+                  Comments ({loadingComments ? "..." : comments.length})
+                </button>
+
+              </div>
             </div>
-              
+
             {/* DETAILS */}
-            {activeTab === "details" && (
+            {activeTab === "overview" && (
               <>
                 <div className="challenge-info">
                   {/* Creator + Difficulty + Status */}

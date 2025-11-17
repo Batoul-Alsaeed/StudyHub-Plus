@@ -83,17 +83,16 @@ class Challenge(Base):
     start_date = Column(Date, nullable=True)
     end_date = Column(Date, nullable=True)
 
-    #participants = Column(JSONB, default=list)
-    #tasks = Column(JSONB, default=list)
-    #progress = Column(JSONB, default=dict)
+    group_progress = Column(Integer, default=0)
     participants = Column(JSONB, nullable=False, server_default='[]')
     progress = Column(JSONB, nullable=False, server_default='{}')
-
 
     max_participants = Column(Integer, nullable=False, default=10)
     #tasks = Column(JSON, default=[])
     #progress = Column(JSON, default=dict)
-    group_progress = Column(Integer, default=0)
+    #participants = Column(JSONB, default=list)
+    #tasks = Column(JSONB, default=list)
+    #progress = Column(JSONB, default=dict)
 
     creator_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     creator = relationship("User", back_populates="challenges_created")
