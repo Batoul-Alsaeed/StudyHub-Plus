@@ -326,37 +326,37 @@ export default function ChallengeDetails() {
             {/* TABS */}
             <div className="challenge-tabs-premium">
               <button
-              className={`premium-tab ${activeTab === "details" ? "active" : ""}`}
-              onClick={() => setActiveTab("details")}
-            >
-              Overview
-            </button>
-
-            <button
-              className={`premium-tab ${activeTab === "leaderboard" ? "active" : ""}`}
-              onClick={() => {
-                setActiveTab("leaderboard");
-                setLoadingLeaderboard(true);
-                fetch(`${API_BASE}/challenges/${id}/leaderboard`)
-                  .then((res) => res.json())
-                  .then((data) => setLeaderboard(data))
-                  .finally(() => setLoadingLeaderboard(false));
-              }}
-            >
-              Leaderboard
-            </button>
-
-            <button
-              className={`premium-tab ${activeTab === "comments" ? "active" : ""}`}
-              onClick={() => {
-                setActiveTab("comments");
-                handleFetchComments();
-              }}
-            >
-              Comments ({loadingComments ? "..." : comments.length})
+                className={`premium-tab ${activeTab === "details" ? "active" : ""}`}
+                onClick={() => setActiveTab("details")}
+              >
+                Overview
               </button>
-            </div>
 
+              <button
+                className={`premium-tab ${activeTab === "leaderboard" ? "active" : ""}`}
+                onClick={() => {
+                  setActiveTab("leaderboard");
+                  setLoadingLeaderboard(true);
+                  fetch(`${API_BASE}/challenges/${id}/leaderboard`)
+                    .then((res) => res.json())
+                    .then((data) => setLeaderboard(data))
+                    .finally(() => setLoadingLeaderboard(false));
+                }}
+              >
+                Leaderboard
+              </button>
+
+              <button
+                className={`premium-tab ${activeTab === "comments" ? "active" : ""}`}
+                onClick={() => {
+                  setActiveTab("comments");
+                  handleFetchComments();
+                }}
+              >
+                Comments ({loadingComments ? "..." : comments.length})
+                </button>
+            </div>
+              
             {/* DETAILS */}
             {activeTab === "details" && (
               <>
@@ -661,8 +661,8 @@ export default function ChallengeDetails() {
             )}
 
             {toast && <div className="toast-box">{toast}</div>}
-          </div>
-        </MainLayout>
+            </div>
+          </MainLayout>
 
-    );
+        );
   }
