@@ -522,8 +522,8 @@ export default function ChallengeDetails() {
 
                     <div style={{ display: "flex", gap: "14px" }}>
                       
-                      {/* AVATAR 
-                      <Avatar name={c.user_name} />*/}
+                      {/* AVATAR */}
+                      <Avatar name={c.user_name} />
 
                       {/* RIGHT SIDE */}
                       <div style={{ flex: 1 }}>
@@ -532,7 +532,6 @@ export default function ChallengeDetails() {
                         <div className="comment-header-line">
                           {/* LEFT: Avatar + Name */}
                           <div className="comment-left">
-                            <Avatar name={c.user_name} />
                             <strong className="comment-username">{c.user_name}</strong>
                           </div>
 

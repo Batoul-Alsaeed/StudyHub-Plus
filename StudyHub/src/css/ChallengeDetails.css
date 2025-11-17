@@ -388,8 +388,12 @@
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 6px;
+  padding: 4px;
   border-radius: 6px;
+}
+
+.action-btn span {
+  font-size: 16px;
 }
 
 /* Edit icon */
@@ -409,11 +413,6 @@
 .action-btn.red:hover {
   background: rgba(255, 99, 99, 0.2);
 }
-
-/*.action-btn span {
-  font-size: 20px;
-  color: #444;
-}*/
 
 /* ===== EDITING BOX =====*/
 .edit-box {
