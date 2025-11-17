@@ -83,9 +83,12 @@ class Challenge(Base):
     start_date = Column(Date, nullable=True)
     end_date = Column(Date, nullable=True)
 
-    participants = Column(JSONB, default=list)
+    #participants = Column(JSONB, default=list)
     #tasks = Column(JSONB, default=list)
-    progress = Column(JSONB, default=dict)
+    #progress = Column(JSONB, default=dict)
+    participants = Column(JSONB, nullable=False, server_default='[]')
+    progress = Column(JSONB, nullable=False, server_default='{}')
+
 
     max_participants = Column(Integer, nullable=False, default=10)
     #tasks = Column(JSON, default=[])
