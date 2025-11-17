@@ -88,7 +88,7 @@ export default function ChallengeDetails() {
 
   // ===== Fetch challenge =====
   async function fetchChallengeSafe() {
-    if (!id || challengeFromState) return;
+    if (!id) return;
 
     setLoading(true);
     setError("");
