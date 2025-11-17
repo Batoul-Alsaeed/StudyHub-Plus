@@ -360,18 +360,47 @@ export default function ChallengeDetails() {
       {activeTab === "details" && (
         <>
           <div className="challenge-info">
-            <div className="creator-level-row">
+            {/* Creator + Difficulty + Status */}
+            <div className="top-info-row">
+              
+              {/* Creator */}
               <div className="creator-box">
                 <span className="material-icons">person</span>
                 <span className="creator-name">{challenge.creator_name}</span>
               </div>
 
+              {/* Difficulty */}
               <div className={`level-box level-${challenge.level.toLowerCase()}`}>
                 <span className="material-icons">bar_chart</span>
                 <span>{challenge.level} Level</span>
               </div>
             </div>
 
+            {/* STATUS BADGE HERE */}
+            <span
+              className={`challenge-status-badge ${
+                status === "Upcoming"
+                  ? "status-upcoming"
+                  : status === "Active"
+                  ? "status-active"
+                  : "status-ended"
+              }`}
+            >
+              {status}
+            </span>
+
+            {/* Participants count */}
+            <div className="participants-row">
+              <span className="material-icons">groups</span>
+              <span>{challenge.participants_count} participants</span>
+            </div>
+
+            {/* Description */}
+            {challenge.description && (
+              <p className="challenge-description">{challenge.description}</p>
+            )}
+
+            {/* Dates */}
             <p className="challenge-dates">
               <span className="material-icons">calendar_month</span>
               {challenge.start_date}

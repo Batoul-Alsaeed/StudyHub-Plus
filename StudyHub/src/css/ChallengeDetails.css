@@ -68,90 +68,114 @@
   background-color: #d8d5dd;
 }
 
-/* =====================================================
-   INFO SECTION (Creator, Level, Dates)
-===================================================== */
-/* ===========================================
-   INFO SECTION (Creator + Level + Status + Dates)
-=========================================== */
-
-/* الصف الرئيسي */
-.challenge-info {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  align-items: center;
-  margin-bottom: 28px;
-}
-
-/* السطر الأول: الاسم + المستوى */
-.creator-level-row {
+/* -------------------------------
+   TOP ROW (Creator + Difficulty + Status)
+--------------------------------*/
+.top-info-row {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 22px;
+  gap: 16px;
+  margin-bottom: 14px;
 }
 
-/* صندوق المنشئ */
+/* Creator */
 .creator-box {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 16px;
+  color: #444;
+  font-weight: 600;
+  font-size: 15px;
+}
+.creator-box .material-icons {
+  font-size: 18px;
+  color: #666;
+}
+
+/* Difficulty Capsule */
+.level-box {
+  padding: 6px 14px;
+  border-radius: 24px;
+  font-weight: 700;
+  font-size: 14px;
+  border: 3px solid;
+}
+.level-easy {
+  color: #3140c4;
+  border-color: #3140c4;
+  background: rgba(49, 64, 196, 0.08);
+}
+.level-medium {
+  color: #dfa600;
+  border-color: #dfa600;
+  background: rgba(223, 166, 0, 0.12);
+}
+.level-hard {
+  color: #d64058;
+  border-color: #d64058;
+  background: rgba(214, 64, 88, 0.12);
+}
+
+/* Status Badge */
+.status-badge {
+  padding: 6px 14px;
+  border-radius: 24px;
+  font-weight: 700;
+  font-size: 14px;
+  color: white;
+}
+.status-upcoming {
+  background: #777;
+}
+.status-active {
+  background: #2ecc71;
+}
+.status-ended {
+  background: #e74c3c;
+}
+
+/* Participants */
+.participants-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 8px;
   color: #444;
   font-weight: 600;
 }
-
-.creator-box .material-icons {
-  font-size: 19px;
-  color: #777;
-}
-
-/* صندوق المستوى */
-.level-box {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-/* Level Colors */
-.level-easy {
-  background: rgba(81, 201, 104, 0.16);
-  color: #51c968;
-}
-.level-medium {
-  background: rgba(255, 189, 67, 0.18);
-  color: #ffb32b;
-}
-.level-hard {
-  background: rgba(255, 83, 83, 0.14);
-  color: #ff3b3b;
-}
-
-/* السطر الثاني: التواريخ */
-.challenge-dates {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 600;
-  color: #555;
-  font-size: 15px;
-}
-.challenge-dates .material-icons {
+.participants-row .material-icons {
   font-size: 18px;
-  color: #8b7cd3;
+  color: #666;
 }
 
+/* Dates */
+.dates-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-weight: 600;
+  color: #444;
+  margin-top: 10px;
+}
+.dates-row .material-icons {
+  font-size: 18px;
+  color: #666;
+}
+.dates-row .arrow {
+  margin: 0 6px;
+  color: #666;
+}
+
+/* Description */
 .challenge-description {
   text-align: center;
   color: #222;
   font-size: 15px;
   line-height: 1.6;
-  margin-bottom: 24px;
+  margin: 8px 0 16px;
 }
 
 /* =====================================================
