@@ -223,9 +223,11 @@ export default function ChallengeDetails() {
   async function handleDeleteComment(commentId: number) {
     if (challengeEnded) return;
     try {
-      await safeFetch(`${API_BASE}/comments/${commentId}?user_id=${currentUserId}`, {
-        method: "DELETE",
-      });
+      await safeFetch(
+      `${API_BASE}/challenges/comments/${commentId}?user_id=${currentUserId}`,
+        { method: "DELETE" }
+      );
+
       handleFetchComments();
       showToast("Comment deleted");
     } catch (e: any) {
@@ -239,7 +241,7 @@ export default function ChallengeDetails() {
 
     try {
       await safeFetch(
-        `${API_BASE}/comments/${commentId}?user_id=${currentUserId}&content=${encodeURIComponent(
+        `${API_BASE}/challenges/comments/${commentId}?user_id=${currentUserId}&content=${encodeURIComponent(
           editContent.trim()
         )}`,
         { method: "PATCH" }
