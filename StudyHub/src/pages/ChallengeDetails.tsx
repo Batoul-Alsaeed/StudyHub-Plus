@@ -540,8 +540,14 @@ export default function ChallengeDetails() {
                         
                         {/* ===== HEADER LINE ===== */}
                         <div className="comment-header-line">
-                          <span className="comment-username">{c.user_name}</span>
+                          
+                          {/* Avatar + Name */}
+                          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                            <Avatar name={c.user_name} />
+                            <strong className="comment-username">{c.user_name}</strong>
+                          </div>
 
+                          {/* Date + Time */}
                           <div className="comment-meta-right">
                             <span className="material-icons meta-icon">calendar_month</span>
                             <span className="comment-meta-text">{d}</span>

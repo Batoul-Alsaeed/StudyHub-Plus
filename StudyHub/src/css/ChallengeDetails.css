@@ -312,12 +312,30 @@
   box-shadow: 0 2px 12px rgba(0,0,0,0.08);
 }
 
-/* ===== HEADER: Name + Date + Time + Actions =====*/
+/* ===== HEADER (Avatar + name / date+time) =====*/
 .comment-header-line {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 6px;
+}
+
+/* Avatar */
+.comment-avatar {
+  width: 34px;
+  height: 34px;
+
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 700;
+  color: #fff;
+  font-size: 16px;
+
+  text-transform: uppercase;
+  flex-shrink: 0;
 }
 
 .comment-username {
@@ -326,7 +344,14 @@
   color: #3e3e3e;
 }
 
-/* RIGHT SIDE (date + time + icons) */
+/* LEFT PART (Avatar + Name) */
+.comment-head-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* RIGHT PART: date + time */
 .comment-meta-right {
   display: flex;
   align-items: center;
@@ -343,20 +368,38 @@
   color: #666;
 }
 
-/* ===== ACTION ICONS (EDIT + DELETE) =====*/
-.comment-actions {
+/* ===== COMMENT TEXT =====*/
+.comment-text {
+  font-size: 15px;
+  color: #444;
+  line-height: 1.5;
+  margin: 8px 0;
+}
+
+/* ===== EDIT / DELETE — MOVED DOWN =====*/
+.comment-actions-row {
+  margin-top: 10px;
   display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-left: 8px;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 .action-btn {
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 4px;
+  padding: 6px;
   border-radius: 6px;
+}
+
+/* Edit icon */
+.action-btn.blue span {
+  color: #4a90e2;
+}
+
+/* Delete icon */
+.action-btn.red span {
+  color: #d0021b;
 }
 
 .action-btn.blue:hover {
@@ -367,19 +410,10 @@
   background: rgba(255, 99, 99, 0.2);
 }
 
-.action-btn span {
+/*.action-btn span {
   font-size: 20px;
   color: #444;
-}
-
-/* ===== COMMENT TEXT =====*/
-
-.comment-text {
-  font-size: 15px;
-  color: #444;
-  line-height: 1.5;
-  margin: 8px 0;
-}
+}*/
 
 /* ===== EDITING BOX =====*/
 .edit-box {
@@ -448,8 +482,8 @@
   border-radius: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease;
   white-space: nowrap;
+  transition: background 0.2s ease;
 }
 
 .send-btn:hover {
@@ -463,53 +497,9 @@
 /* ===== CLOSED MESSAGE =====*/
 .comments-closed {
   margin-top: 14px;
-  color: #777;
+  color: #b0b0b0;
   text-align: center;
   font-size: 14px;
-}
-
-/* ===== COMMENT AVATAR =====*/
-.comment-avatar {
-  width: 34px;
-  height: 34px;
-
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-weight: 700;
-  color: #fff;
-  font-size: 16px;
-
-  text-transform: uppercase;
-  flex-shrink: 0;
-}
-
-/* ===== ACTION BUTTONS ROW (Moved to bottom) =====*/
-.comment-actions-row {
-  margin-top: 10px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-/* لون أيقونة التعديل */
-.action-btn.blue span {
-  color: #4a90e2;
-}
-
-/* لون أيقونة الحذف */
-.action-btn.red span {
-  color: #d0021b;
-}
-
-.action-btn {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 6px;
-  border-radius: 6px;
 }
 
 /* =====================================================
