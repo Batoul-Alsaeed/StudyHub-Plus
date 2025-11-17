@@ -501,7 +501,6 @@ export default function ChallengeDetails() {
       )}
 
       {/* COMMENTS */}
-      {/* COMMENTS */}
       {activeTab === "comments" && (
         <div className="challenge-comments">
           <h3 className="comments-title">
@@ -519,28 +518,32 @@ export default function ChallengeDetails() {
 
                 return (
                   <li key={c.id} className="comment-card">
-
-                    <div style={{ display: "flex", gap: "14px" }}>
                       
-                      {/* AVATAR */}
+                      {/* AVATAR
                       <Avatar name={c.user_name} />
 
-                      {/* RIGHT SIDE */}
-                      <div style={{ flex: 1 }}>
+                      <div style={{ flex: 1 }}>*/}
+
 
                         {/* HEADER */}
                         <div className="comment-header-line">
                           {/* LEFT: Avatar + Name */}
                           <div className="comment-left">
+                            <Avatar name={c.user_name} />
                             <strong className="comment-username">{c.user_name}</strong>
                           </div>
 
                           <div className="comment-meta-right">
-                            <span className="material-icons meta-icon">calendar_month</span>
-                            <span className="comment-meta-text">{d}</span>
+                            <div className="date-line">
+                              <span className="material-icons meta-icon">calendar_month</span>
+                              <span className="comment-meta-text">{d}</span>
+                            </div>
 
-                            <span className="material-icons meta-icon">schedule</span>
-                            <span className="comment-meta-text">{t}</span>
+                            <div className="time-line">
+                              <span className="material-icons meta-icon">schedule</span>
+                              <span className="comment-meta-text">{t}</span>
+                            </div>
+
                           </div>
                         </div>
 
@@ -596,9 +599,6 @@ export default function ChallengeDetails() {
                             </div>
                           </div>
                         )}
-
-                      </div>
-                    </div>
 
                   </li>
                 );
