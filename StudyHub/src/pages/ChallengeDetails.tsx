@@ -556,21 +556,24 @@ export default function ChallengeDetails() {
             <p>No comments yet.</p>
           )}
 
-          {/* إدخال تعليق جديد */}
-          {challengeEnded ? (
-            <p className="comments-closed">Comments closed (challenge ended)</p>
-          ) : isJoined ? (
-            <div className="challenge-comment-form">
-              <textarea
-                placeholder="Write your comment..."
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-              />
-              <button onClick={handleAddComment}>Send</button>
-            </div>
-          ) : (
-            <p className="comments-closed">Join the challenge to comment</p>
-          )}
-        </div>
-      );   
-    }         
+                    {/* إدخال تعليق جديد */}
+            {challengeEnded ? (
+              <p className="comments-closed">Comments closed (challenge ended)</p>
+            ) : isJoined ? (
+              <div className="challenge-comment-form">
+                <textarea
+                  placeholder="Write your comment..."
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                />
+                <button onClick={handleAddComment}>Send</button>
+              </div>
+            ) : (
+              <p className="comments-closed">Join the challenge to comment</p>
+            )}
+          </div> 
+        )} 
+
+      </div> 
+    ); 
+  } 
