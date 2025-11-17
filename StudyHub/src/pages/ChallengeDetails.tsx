@@ -94,7 +94,7 @@ export default function ChallengeDetails() {
     setError("");
 
     try {
-      const url = `${API_BASE}/challenges/${id}`;
+      const url = `${API_BASE}/challenges/${id}?current_user_id=${currentUserId}`;
       const data = await safeFetch<any>(url);
 
       setChallenge(data);
@@ -329,7 +329,7 @@ export default function ChallengeDetails() {
             handleFetchComments();
           }}
         >
-          Comments ({comments.length})
+          Comments ({loadingComments ? "..." : comments.length})
         </button>
       </div>
 

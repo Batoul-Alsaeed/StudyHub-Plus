@@ -372,6 +372,7 @@
   transform: translateY(-1px);
 }
 
+
 /* =====================================================
    COMMENT EDIT FORM
 ===================================================== */
@@ -444,6 +445,25 @@
   list-style: none;
 }
 
+.comment-header-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.comment-username {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.comment-meta-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #666;
+  font-size: 13px;
+}
 
 /* =====================================================
    RESPONSIVE
