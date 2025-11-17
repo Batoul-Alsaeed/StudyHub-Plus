@@ -290,7 +290,9 @@ export default function ChallengeDetails() {
   // ===== Loading UI =====
   if (loading)
     return (
-      <div className="challenge-container">
+    //  <div className="challenge-container">
+    <div className={`challenge-container ${challenge.level?.toLowerCase()}`}>
+
         <button className="challenge-back-btn" onClick={() => navigate(-1)}>
           ← Back
         </button>
@@ -358,14 +360,16 @@ export default function ChallengeDetails() {
       {activeTab === "details" && (
         <>
           <div className="challenge-info">
-            <p className="challenge-creator">
-              <span className="material-icons">person</span>
-              {challenge.creator_name}
-            </p>
+            <div className="creator-level-row">
+              <div className="creator-box">
+                <span className="material-icons">person</span>
+                <span className="creator-name">{challenge.creator_name}</span>
+              </div>
 
-            <div className="challenge-level">
-              <span className="material-icons">bar_chart</span>
-              {challenge.level} Level
+              <div className={`level-box level-${challenge.level.toLowerCase()}`}>
+                <span className="material-icons">bar_chart</span>
+                <span>{challenge.level} Level</span>
+              </div>
             </div>
 
             <p className="challenge-dates">

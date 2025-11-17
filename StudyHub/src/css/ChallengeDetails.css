@@ -71,29 +71,81 @@
 /* =====================================================
    INFO SECTION (Creator, Level, Dates)
 ===================================================== */
+/* ===========================================
+   INFO SECTION (Creator + Level + Status + Dates)
+=========================================== */
+
+/* الصف الرئيسي */
 .challenge-info {
   display: flex;
   flex-direction: column;
+  gap: 14px;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 20px;
+  margin-bottom: 28px;
 }
-.challenge-creator {
-  color: #777;
-  font-size: 15px;
-  font-weight: 600;
+
+/* السطر الأول: الاسم + المستوى */
+.creator-level-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
 }
-.challenge-level {
+
+/* صندوق المنشئ */
+.creator-box {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-weight: 700;
-  color: #000;
+  font-size: 16px;
+  color: #444;
+  font-weight: 600;
 }
+
+.creator-box .material-icons {
+  font-size: 19px;
+  color: #777;
+}
+
+/* صندوق المستوى */
+.level-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* Level Colors */
+.level-easy {
+  background: rgba(81, 201, 104, 0.16);
+  color: #51c968;
+}
+.level-medium {
+  background: rgba(255, 189, 67, 0.18);
+  color: #ffb32b;
+}
+.level-hard {
+  background: rgba(255, 83, 83, 0.14);
+  color: #ff3b3b;
+}
+
+/* السطر الثاني: التواريخ */
 .challenge-dates {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-weight: 600;
   color: #555;
+  font-size: 15px;
 }
+.challenge-dates .material-icons {
+  font-size: 18px;
+  color: #8b7cd3;
+}
+
 .challenge-description {
   text-align: center;
   color: #222;
