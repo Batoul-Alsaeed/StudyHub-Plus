@@ -277,11 +277,20 @@ export default function ChallengeDetails() {
   }
 
   function Avatar({ name }: { name: string }) {
-    const letter = name.trim().charAt(0).toUpperCase();
+    const letter = name ? name.trim().charAt(0).toUpperCase() : "?";
+
+    const colors = [
+      "#8b7cd3", "#f36b80", "#4aa3df",
+      "#f9cf62", "#7b89f3", "#56c596"
+    ];
+
+    const index = letter.charCodeAt(0) % colors.length;
+    const bg = colors[index];
+
     return (
       <div
         className="comment-avatar"
-        style={{ backgroundColor: getAvatarColor(name) }}
+        style={{ backgroundColor: bg }}
       >
         {letter}
       </div>
@@ -519,24 +528,35 @@ export default function ChallengeDetails() {
 
                 return (
                   <li key={c.id} className="comment-card">
-                    <div className="comment-header-line">
-                      {/* Avatar + Name */}
-                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                        <Avatar name={c.user_name} />
-                        <strong className="comment-username">{c.user_name}</strong>
-                      </div>
 
-                      {/* Date + Time */}
-                      <div className="comment-meta-right">
-                        <span className="material-icons meta-icon">calendar_month</span>
-                        <span className="comment-meta-text">{d}</span>
+                    {/* Avatar + Name + Date/Time */}
+                    <div style={{ display: "flex", gap: "14px" }}>
+                      
+                      {/* Avatar */}
+                      <Avatar name={c.user_name} />
 
-                        <span className="material-icons meta-icon">schedule</span>
-                        <span className="comment-meta-text">{t}</span>
+                      {/* RIGHT SIDE */}
+                      <div style={{ flex: 1 }}>
+                        
+                        {/* ===== HEADER LINE ===== */}
+                        <div className="comment-header-line">
+                          <span className="comment-username">{c.user_name}</span>
 
-                        {/* أدوات التحكم */}
+                          <div className="comment-meta-right">
+                            <span className="material-icons meta-icon">calendar_month</span>
+                            <span className="comment-meta-text">{d}</span>
+
+                            <span className="material-icons meta-icon">schedule</span>
+                            <span className="comment-meta-text">{t}</span>
+                          </div>
+                        </div>
+
+                        {/* ===== COMMENT TEXT ===== */}
+                        <p className="comment-text">{c.content}</p>
+
+                        {/* ===== ACTION BUTTONS — GO BELOW ===== */}
                         {!challengeEnded && c.user_name === currentUserName && (
-                          <div className="comment-actions-row">
+                          <div className="comment-actions">
                             <button
                               className="action-btn blue"
                               onClick={() => {
@@ -544,46 +564,46 @@ export default function ChallengeDetails() {
                                 setEditContent(c.content);
                               }}
                             >
-                              <span className="material-icons">edit_note</span>
+                              <span className="material-icons">edit</span>
                             </button>
 
                             <button
                               className="action-btn red"
                               onClick={() => handleDeleteComment(c.id)}
                             >
-                              <span className="material-icons">delete_outline</span>
+                              <span className="material-icons delete-icon">delete</span>
                             </button>
                           </div>
                         )}
+
+                        {/* ===== EDIT MODE ===== */}
+                        {editingCommentId === c.id && !challengeEnded && (
+                          <div className="edit-box">
+                            <textarea
+                              value={editContent}
+                              onChange={(e) => setEditContent(e.target.value)}
+                            />
+                            <div className="edit-actions">
+                              <button
+                                className="challenge-save-btn"
+                                onClick={() => handleSaveEditedComment(c.id)}
+                              >
+                                Save
+                              </button>
+
+                              <button
+                                className="challenge-cancel-btn"
+                                onClick={() => setEditingCommentId(null)}
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
                       </div>
                     </div>
 
-                    {/* نص التعليق */}
-                    <p className="comment-text">{c.content}</p>
-
-                    {editingCommentId === c.id && !challengeEnded && (
-                      <div className="edit-box">
-                        <textarea
-                          value={editContent}
-                          onChange={(e) => setEditContent(e.target.value)}
-                        />
-                        <div className="edit-actions">
-                          <button
-                            className="challenge-save-btn"
-                            onClick={() => handleSaveEditedComment(c.id)}
-                          >
-                            Save
-                          </button>
-                          
-                          <button
-                            className="challenge-cancel-btn"
-                            onClick={() => setEditingCommentId(null)}
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    )}
                   </li>
                 );
               })}
@@ -609,7 +629,6 @@ export default function ChallengeDetails() {
           )}
         </div>
       )}
-
       {toast && <div className="toast-box">{toast}</div>}
     </div>
   );
