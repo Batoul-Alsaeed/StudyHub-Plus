@@ -12,6 +12,21 @@
   transition: all 0.3s ease;
 }
 
+/* =============================
+   COLOR VARIABLES BY DIFFICULTY
+============================= */
+.challenge-container.easy {
+  --icon-color: #3140c4;
+}
+
+.challenge-container.medium {
+  --icon-color: #dfa600;
+}
+
+.challenge-container.hard {
+  --icon-color: #d64058;
+}
+
 /* =====================================================
    BACK BUTTON
 ===================================================== */
@@ -49,12 +64,14 @@
 ================================ */
 .tabs-wrapper {
   width: 100%;
-  background: #ffffff; /* تقدرين تغيرينه #f3f3f3 */
-  padding: 16px 0;
+  background: #ffffff;
+  padding: 10px 0;
   margin: 30px 0;
   display: flex;
-  justify-content: center; /* التابات بالنص */
-  border-bottom: 1px solid #e5e5e5;
+  justify-content: center;
+  border-radius: 100px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+
 }
 
 /* ================================
@@ -89,12 +106,12 @@
   border-radius: 20px; /* يخلي الهوفر مستدير */
 }
 
-/* Active */
+/* Active 
 .challenge-tab.active {
   color: #8b7cd3;
   background: rgba(139, 124, 211, 0.15);
   border-radius: 20px; /* مستدير */
-}
+
 
 /* الخط اللي تحت التاب */
 .challenge-tab.active::after {
@@ -113,6 +130,14 @@
 /* -------------------------------
    TOP ROW (Creator + Difficulty + Status)
 --------------------------------*/
+/* ICONS THAT FOLLOW DIFFICULTY */
+.creator-box .material-icons,
+.participants-row .material-icons,
+.challenge-task-item .material-icons,
+.level-box .material-icons {
+  color: var(--icon-color) !important;
+}
+
 .top-info-row {
   display: flex;
   align-items: center;
@@ -625,6 +650,39 @@
   color: #b0b0b0;
   text-align: center;
   font-size: 14px;
+}
+
+/* =============================
+   ICONS THAT SHOULD NOT CHANGE
+============================= */
+
+/* Tab icons */
+.challenge-tabs .material-icons,
+.challenge-tab .material-icons {
+  color: inherit !important;
+}
+
+/* Date icons */
+.dates-row .material-icons {
+  color: #666 !important;
+}
+
+/* Comment date/time */
+.comment-meta-right .material-icons {
+  color: #8b7cd3 !important;
+}
+
+/* Edit/Delete buttons */
+.action-btn.blue .material-icons {
+  color: #4a90e2 !important;
+}
+.action-btn.red .material-icons {
+  color: #d0021b !important;
+}
+
+/* Send button icon */
+.send-btn .material-icons {
+  color: white !important;
 }
 
 /* =====================================================
