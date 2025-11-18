@@ -462,17 +462,18 @@ export default function ChallengeDetails() {
                       {tasks.map((t) => (
                         <li
                           key={t.id}
-                          className={`challenge-task-item ${t.done ? "done" : ""}`}
+                          className={`task-item ${t.done ? "done" : ""}`}
                           onClick={() => handleToggleTask(t.id!)}
                           style={{
                             cursor: challengeEnded ? "not-allowed" : "pointer",
                             opacity: challengeEnded ? 0.5 : 1,
                           }}
                         >
-                          <span className="material-icons">
+                          <span className="material-icons check-icon">
                             {t.done ? "check_circle" : "radio_button_unchecked"}
                           </span>
-                          <span>{t.title}</span>
+
+                          <span className="task-title">{t.title}</span>
                         </li>
                       ))}
                     </ul>

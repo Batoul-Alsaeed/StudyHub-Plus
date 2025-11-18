@@ -245,6 +245,63 @@
 .level-medium .progress-fill { background: #f9cf62; }
 .level-hard .progress-fill { background: #f36b80; }
 
+/* Tasks (Requirements) Section */
+.tasks-preview {
+  margin-top: 18px;
+}
+
+.tasks-title {
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 10px;
+  display: block;
+}
+
+/* Task Item */
+.task-preview-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Icon shape */
+.task-check-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+/* COLORS by difficulty */
+.level-easy .task-check-icon {
+  background: #3140c4;
+  color: white;
+}
+
+.level-medium .task-check-icon {
+  background: #f9cf62;
+  color: #000;
+}
+
+.level-hard .task-check-icon {
+  background: #f36b80;
+  color: #fff;
+}
+
+/* "+ more" text */
+.task-preview-more {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  margin-top: 4px;
+}
+
 /* =====================================================
    BUTTONS
 ===================================================== */

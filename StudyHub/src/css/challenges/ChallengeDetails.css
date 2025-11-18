@@ -199,11 +199,13 @@
   background-color: #f8a0ae;
 }
 
-/* === REQUIREMENTS - TASKS SECTIO === */
+/* === REQUIREMENTS - TASKS SECTION === */
 .challenge-requirements {
   margin-top: 20px;
 }
-.challenge-requirements h3 {
+
+/* Title */
+.challenge-requirements h4 {
   font-size: 15px;
   font-weight: 700;
   margin-bottom: 10px;
@@ -211,12 +213,16 @@
   align-items: center;
   gap: 6px;
 }
+
+/* List Reset */
 .challenge-requirements ul {
   list-style: none !important;
   padding: 0;
   margin: 0;
 }
-.challenge-task-item {
+
+/* Task Row */
+.task-item {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -224,13 +230,35 @@
   margin-bottom: 4px;
   cursor: pointer;
 }
-.challenge-task-item.done {
-  opacity: 0.7;
-  text-decoration: line-through;
+
+/* Task Title */
+.task-title {
+  font-size: 14px;
+  font-weight: 600;
 }
-.challenge-task-item .material-icons {
-  font-size: 18px;
-  color: var(--icon-color);
+
+/* Done = شطب */
+.task-item.done .task-title {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+/* Check Icon */
+.check-icon {
+  font-size: 20px;
+}
+
+/* Colors by level */
+.level-easy .check-icon {
+  color: #3140c4;
+}
+
+.level-medium .check-icon {
+  color: #f9cf62;
+}
+
+.level-hard .check-icon {
+  color: #f36b80;
 }
 
 /* === BUTTONS === */

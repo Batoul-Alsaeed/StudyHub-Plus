@@ -445,6 +445,25 @@ export default function Challenges() {
 
                 </div>
 
+                {/* Tasks Preview */}
+                <div className="tasks-preview">
+                  <label className="tasks-title">Requirements</label>
+
+                  {/* Show max 3 tasks */}
+                  {c.tasks.slice(0, 3).map((t: any) => (
+                  <div key={t.id} className="task-preview-item">
+                    <span className="task-check-icon">✔</span>
+                    <span>{t.title}</span>
+                  </div>
+                  ))}
+                  
+                  {/* If more tasks exist */}
+                  {c.tasks.length > 3 && (
+                    <div className="task-preview-more">
+                      +{c.tasks.length - 3} more...
+                    </div>
+                  )}
+                </div>
 
                 {/* ACTION BUTTONS */}
                 <div
