@@ -383,7 +383,7 @@ export default function ChallengeDetails() {
 
                   {/* STATUS BADGE HERE */}
                   <span
-                    className={`challenge-status-badge ${
+                    className={`status-badge ${
                       status === "Upcoming"
                         ? "status-upcoming"
                         : status === "Active"
