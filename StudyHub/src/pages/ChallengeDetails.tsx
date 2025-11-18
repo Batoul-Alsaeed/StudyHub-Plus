@@ -3,7 +3,6 @@ import "../css/challenges/ChallengeDetails.css";
 import "../css/challenges/Tabs.css";
 import "../css/challenges/Leaderboard.css";
 import "../css/challenges/Comments.css";
-import "../css/challenges/Challenges.css";
 
 import React from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
