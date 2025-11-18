@@ -27,10 +27,7 @@
   --icon-color: #d64058;
 }
 
-.dates-row .material-icons {
-  color: #666 !important;   /* يرجع اللون الطبيعي */
-  font-size: 18px !important;
-}
+
 /* =====================================================
    BACK BUTTON
 ===================================================== */
@@ -140,6 +137,10 @@
 .challenge-task-item .material-icons,
 .level-box .material-icons {
   color: var(--icon-color) !important;
+}
+/* Date icons */
+.dates-row .material-icons {
+  color: #666 !important;
 }
 
 .top-info-row {
