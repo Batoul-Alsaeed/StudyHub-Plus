@@ -1,6 +1,6 @@
 // src/pages/Challenges.tsx
 import { useEffect, useMemo, useState } from "react";
-import "../css/Challenges.css";
+import "../css/challenges/Challenges.css";
 import { useAuth } from "../contexts/AuthContext";
 import ChallengeModal from "../components/ChallengeModal";
 import { useNavigate } from "react-router-dom";

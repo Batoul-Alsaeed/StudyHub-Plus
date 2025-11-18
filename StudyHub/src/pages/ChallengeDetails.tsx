@@ -1,5 +1,9 @@
 // src/pages/ChallengeDetails.tsx
-import "../css/ChallengeDetails.css";
+import "../css/challenges/ChallengeDetails.css";
+import "../css/challenges/Tabs.css";
+import "../css/challenges/Comments.css";
+import "../css/challenges/Leaderboard.css";
+
 import React from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
