@@ -1,0 +1,87 @@
+
+/* =====================================================
+   TABS (Details / Leaderboard / Comments)
+===================================================== */
+/* ================================
+   FULL-WIDTH TABS BAR
+================================ */
+.tabs-wrapper {
+  width: 100%;
+  background: #ffffff;
+  padding: 10px 0;
+  margin: 30px 0;
+  display: flex;
+  justify-content: center;
+  border-radius: 100px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+
+}
+
+/* ================================
+   TABS CONTAINER
+================================ */
+.challenge-tabs {
+  display: flex;
+  gap: 28px;
+}
+
+/* ================================
+   SINGLE TAB
+================================ */
+.challenge-tab {
+  padding: 10px 22px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #3a3a3a;
+  background: transparent;
+  border: none;
+  position: relative;
+  transition: 0.25s ease;
+  font-size: 15px;
+
+  /* أهم شيء */
+  border-radius: 20px;
+}
+
+/* Hover - مستدير */
+.challenge-tab:hover {
+  background: rgba(139, 124, 211, 0.14);
+  border-radius: 20px; /* يخلي الهوفر مستدير */
+}
+
+/* Active 
+.challenge-tab.active {
+  color: #8b7cd3;
+  background: rgba(139, 124, 211, 0.15);
+  border-radius: 20px; /* مستدير */
+
+
+/* الخط اللي تحت التاب */
+.challenge-tab.active::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  transform: translateX(-50%);
+  width: 45%;
+  height: 3px;
+  background: #8b7cd3;
+  border-radius: 50px;
+}
+
+
+/* -------------------------------
+   TOP ROW (Creator + Difficulty + Status)
+--------------------------------*/
+/* ICONS THAT FOLLOW DIFFICULTY */
+.creator-box .material-icons,
+.participants-row .material-icons,
+.challenge-task-item .material-icons,
+.level-box .material-icons {
+  color: var(--icon-color) !important;
+}
+/* Date icons */
+.dates-row .material-icons {
+  color: #8b7cd3 !important;   /* بنفسجي */
+  font-size: 20px;
+}
