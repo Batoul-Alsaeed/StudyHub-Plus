@@ -410,7 +410,8 @@ export default function Challenges() {
                 {/* Participants */}
                 <div className="challenge-part-row">
                   <span className="material-icons">groups</span>
-                  <span>Total {c._participantsCount} Participants</span>
+                  <span className="participants-text"> 
+                  <strong>{c._participantsCount}</strong> / {c.max_participants} Members</span>
                 </div>
 
                 {/* Progress */}
