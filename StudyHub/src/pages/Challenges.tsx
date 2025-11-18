@@ -393,13 +393,15 @@ export default function Challenges() {
                     <span>{c.level} Level</span>
                   </div>
 
+                  <div className="challenge-status-row">
                   <span
-                    className={`challenge-status-badge ${
+                  className={`challenge-status-badge ${
                       isEnded ? "ended" : c._status.toLowerCase()
                     }`}
                   >
                     {isEnded ? "Ended" : c._status}
                   </span>
+                  </div>
                 </div>
 
                 {/* Description */}
@@ -409,12 +411,6 @@ export default function Challenges() {
                 <div className="challenge-part-row">
                   <span className="material-icons">groups</span>
                   <span>Total {c._participantsCount} Participants</span>
-                </div>
-
-                {/* Reward */}
-                <div className="challenge-reward-row">
-                  <span className="material-icons">emoji_events</span>
-                  <span>There are awards when you are done</span>
                 </div>
 
                 {/* Progress */}
@@ -474,7 +470,7 @@ export default function Challenges() {
                       className="challenge-btn leave"
                       onClick={() => handleLeave(c.id)}
                     >
-                      Leave Challenge
+                      Leave
                     </button>
                   ) : full ? (
                     <button className="challenge-btn full" disabled>
@@ -485,7 +481,7 @@ export default function Challenges() {
                       className="challenge-btn join"
                       onClick={() => handleJoin(c.id)}
                     >
-                      Join Challenge
+                      Join
                     </button>
                   )}
                 </div>
