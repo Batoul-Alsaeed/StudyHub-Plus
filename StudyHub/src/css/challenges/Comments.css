@@ -1,11 +1,12 @@
-@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
+/* ===== COMMENTS =====*/
+
 
 /* Wrapper */
 .challenge-comments {
   margin-top: 30px;
 }
 
-/* ===== TITLE =====*/
+/* TITLE */
 .comments-title {
   display: flex;
   align-items: center;
@@ -16,7 +17,7 @@
   margin-bottom: 18px;
 }
 
-/* ===== COMMENT CARD =====*/
+/* COMMENT CARD */
 .comments-list {
   list-style: none;
   padding: 0;
@@ -80,7 +81,7 @@
 
 .meta-icon {
   font-size: 16px;
-  color:  #8b7cd3;
+  color:  #8b7cd3 !important;
 }
 
 .comment-meta-text {
@@ -103,7 +104,7 @@
   margin: 8px 0;
 }
 
-/* ===== EDIT / DELETE — MOVED DOWN =====*/
+/* ===== EDIT / DELETE =====*/
 .comment-actions-row {
   margin-top: 10px;
   display: flex;
@@ -125,12 +126,12 @@
 
 /* Edit icon */
 .action-btn.blue span {
-  color: #4a90e2;
+  color: #4a90e2 !important;
 }
 
 /* Delete icon */
 .action-btn.red span {
-  color: #d0021b;
+  color: #d0021b !important;
 }
 
 .action-btn.blue:hover {

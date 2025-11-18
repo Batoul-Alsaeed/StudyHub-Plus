@@ -148,8 +148,8 @@
 /* =====================================================
    ICON COLORS — حسب مستوى الصعوبة
 ===================================================== */
-.challenges-card.medium .material-icons,
-.challenges-card.medium .level-row {
+.challenges-card.easy .material-icons,
+.challenges-card.easy .level-row {
   color: #3140c4;
 }
 .challenges-card.medium .material-icons,

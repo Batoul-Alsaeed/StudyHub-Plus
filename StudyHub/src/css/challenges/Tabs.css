@@ -1,10 +1,7 @@
 
-/* =====================================================
-   TABS (Details / Leaderboard / Comments)
-===================================================== */
-/* ================================
-   FULL-WIDTH TABS BAR
-================================ */
+/* === TABS (Overview / Leaderboard / Comments) === */
+
+/* FULL-WIDTH TABS BAR */
 .tabs-wrapper {
   width: 100%;
   background: #ffffff;
@@ -14,20 +11,16 @@
   justify-content: center;
   border-radius: 100px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-
 }
 
-/* ================================
-   TABS CONTAINER
-================================ */
+/* TABS CONTAINER */
+
 .challenge-tabs {
   display: flex;
   gap: 28px;
 }
 
-/* ================================
-   SINGLE TAB
-================================ */
+/* SINGLE TAB */
 .challenge-tab {
   padding: 10px 22px;
   cursor: pointer;
@@ -38,25 +31,23 @@
   position: relative;
   transition: 0.25s ease;
   font-size: 15px;
-
-  /* أهم شيء */
   border-radius: 20px;
 }
 
-/* Hover - مستدير */
+/* Hover (rounded) */
 .challenge-tab:hover {
   background: rgba(139, 124, 211, 0.14);
-  border-radius: 20px; /* يخلي الهوفر مستدير */
+  border-radius: 20px;
 }
 
-/* Active 
+/* ACTIVE TAB
 .challenge-tab.active {
   color: #8b7cd3;
   background: rgba(139, 124, 211, 0.15);
-  border-radius: 20px; /* مستدير */
+  border-radius: 20px;
+}*/
 
-
-/* الخط اللي تحت التاب */
+/* underline */
 .challenge-tab.active::after {
   content: "";
   position: absolute;
@@ -67,21 +58,4 @@
   height: 3px;
   background: #8b7cd3;
   border-radius: 50px;
-}
-
-
-/* -------------------------------
-   TOP ROW (Creator + Difficulty + Status)
---------------------------------*/
-/* ICONS THAT FOLLOW DIFFICULTY */
-.creator-box .material-icons,
-.participants-row .material-icons,
-.challenge-task-item .material-icons,
-.level-box .material-icons {
-  color: var(--icon-color) !important;
-}
-/* Date icons */
-.dates-row .material-icons {
-  color: #8b7cd3 !important;   /* بنفسجي */
-  font-size: 20px;
 }
