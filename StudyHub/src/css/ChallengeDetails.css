@@ -69,38 +69,44 @@
    SINGLE TAB
 ================================ */
 .challenge-tab {
-  padding: 10px 20px;
+  padding: 10px 22px;
   cursor: pointer;
   font-weight: 600;
   color: #3a3a3a;
-  background: none;
+  background: transparent;
   border: none;
   position: relative;
   transition: 0.25s ease;
   font-size: 15px;
-  border-radius: 8px;
+
+  /* أهم شيء */
+  border-radius: 20px;
 }
 
-/* Hover */
+/* Hover - مستدير */
 .challenge-tab:hover {
-  background: rgba(139, 124, 211, 0.12);
+  background: rgba(139, 124, 211, 0.14);
+  border-radius: 20px; /* يخلي الهوفر مستدير */
 }
 
-/* Active text color */
+/* Active */
 .challenge-tab.active {
   color: #8b7cd3;
+  background: rgba(139, 124, 211, 0.15);
+  border-radius: 20px; /* مستدير */
 }
 
-/* Active underline */
+/* الخط اللي تحت التاب */
 .challenge-tab.active::after {
   content: "";
   position: absolute;
-  left: 0;
-  bottom: -8px;
-  width: 100%;
+  left: 50%;
+  bottom: -6px;
+  transform: translateX(-50%);
+  width: 45%;
   height: 3px;
-  background: #8c7ae6;
-  border-radius: 20px;
+  background: #8b7cd3;
+  border-radius: 50px;
 }
 
 
