@@ -120,7 +120,7 @@ export default function ChallengeModal({
           />
         </div>
 
-        {/* ✅ Requirements section */}
+        {/* Requirements section */}
         <div className="form-group">
           <label>Requirements / Tasks</label>
           <div className="requirements-input">
@@ -149,7 +149,7 @@ export default function ChallengeModal({
           </ul>
         </div>
 
-        {/* ✅ Difficulty buttons */}
+        {/* Difficulty buttons */}
         <div className="form-group">
           <label>Difficulty Level</label>
           <div className="difficulty-options">

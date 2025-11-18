@@ -331,6 +331,7 @@ export default function Challenges() {
     <MainLayout>
       <div className="challenges-container">
 
+        {/* HEADER */}
         <div className="challenges-header">
           <h1>Challenges</h1>
           <button className="challenges-create-btn" onClick={openModal}>
@@ -338,6 +339,7 @@ export default function Challenges() {
           </button>
         </div>
 
+        {/* TABS */}
         <div className="challenges-tabs">
           <button
             className={
@@ -366,14 +368,12 @@ export default function Challenges() {
             const owner = isOwner(c);
             const member = isMember(c);
             const full = isFull(c);
-
-            // 🔥 حساب انتهاء التحدي مباشرة بدون الاعتماد على _status
             const isEnded = new Date(c.end_date) < new Date();
 
             return (
               <div
                 key={c.id}
-                className={`challenges-card ${c.level?.toLowerCase?.() || ""}`}
+                className={`challenge-card-wrapper level-${c.level?.toLowerCase?.()}`}
                 onClick={() =>
                   !loading &&
                   navigate(`/challenges/${c.id}`, {
@@ -381,44 +381,89 @@ export default function Challenges() {
                   })
                 }
               >
-                <h2>{c.title}</h2>
+                {/* Title */}
+                <h2 className="challenge-title">{c.title}</h2>
 
-                <div className="challenges-creator-level-row">
-                  <p className="challenges-creator">By {c.creator_name}</p>
-                  <div className="challenges-level-row">
+                {/* Creator + Level + Status */}
+                <div className="challenge-info-row">
+                  <p className="challenge-by">By {c.creator_name}</p>
+
+                  <div className="challenge-level">
                     <span className="material-icons">bar_chart</span>
-                    <p>{c.level} Level</p>
+                    <span>{c.level} Level</span>
                   </div>
-                </div>
 
-                <p className="challenges-desc">{c.description}</p>
-
-                <div className="challenges-participants-row">
-                  <span className="material-icons">group</span>
-                  <span className="challenges-participants-text">
-                    {c._participantsCount}/{c.max_participants} Participants
+                  <span
+                    className={`challenge-status-badge ${
+                      isEnded ? "ended" : c._status.toLowerCase()
+                    }`}
+                  >
+                    {isEnded ? "Ended" : c._status}
                   </span>
                 </div>
 
-                {/* ACTIONS */}
+                {/* Description */}
+                <p className="challenge-desc">{c.description}</p>
+
+                {/* Participants */}
+                <div className="challenge-part-row">
+                  <span className="material-icons">groups</span>
+                  <span>Total {c._participantsCount} Participants</span>
+                </div>
+
+                {/* Reward */}
+                <div className="challenge-reward-row">
+                  <span className="material-icons">emoji_events</span>
+                  <span>There are awards when you are done</span>
+                </div>
+
+                {/* Progress */}
+                <div className="progress-section">
+
+                  {/* User Progress */}
+                  <label className="progress-label">Your Progress</label>
+                  <div className="progress-bar">
+                    <div
+                      className="progress-fill"
+                      style={{ width: `${c.user_progress || 0}%` }}
+                    ></div>
+                  </div>
+                  <span className="progress-value">
+                    {c.user_progress || 0}%
+                  </span>
+
+                  {/* Group Progress */}
+                  <label className="progress-label">Group Progress</label>
+                  <div className="progress-bar">
+                    <div
+                      className="progress-fill"
+                      style={{ width: `${c.group_progress || 0}%` }}
+                    ></div>
+                  </div>
+                  <span className="progress-value">
+                    {c.group_progress || 0}%
+                  </span>
+                </div>
+
+                {/* ACTION BUTTONS */}
                 <div
-                  className="challenges-card-actions"
+                  className="challenge-card-actions"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {isEnded ? (
-                    <button className="challenges-ended-btn" disabled>
+                    <button className="challenge-btn ended" disabled>
                       Ended
                     </button>
                   ) : owner ? (
                     <>
                       <button
-                        className="challenges-edit-btn"
+                        className="challenge-btn edit"
                         onClick={() => handleEdit(c)}
                       >
                         Edit
                       </button>
                       <button
-                        className="challenges-delete-btn"
+                        className="challenge-btn delete"
                         onClick={() => handleDelete(c.id)}
                       >
                         Delete
@@ -426,30 +471,30 @@ export default function Challenges() {
                     </>
                   ) : member ? (
                     <button
-                      className="challenges-leave-btn"
+                      className="challenge-btn leave"
                       onClick={() => handleLeave(c.id)}
                     >
-                      Leave
+                      Leave Challenge
                     </button>
                   ) : full ? (
-                    <button className="challenges-full-btn" disabled>
+                    <button className="challenge-btn full" disabled>
                       Full
                     </button>
                   ) : (
                     <button
-                      className="challenges-join-btn"
+                      className="challenge-btn join"
                       onClick={() => handleJoin(c.id)}
                     >
-                      Join
+                      Join Challenge
                     </button>
                   )}
                 </div>
               </div>
             );
           })}
-        </div>
+        </div> {/* ← إغلاق GRID */}
 
-        {/* ==== مودال التحدي (مكانه الصحيح) ==== */}
+        {/* ==== Modal ==== */}
         <ChallengeModal
           isOpen={isModalOpen}
           onClose={closeModal}
@@ -459,6 +504,7 @@ export default function Challenges() {
 
         {/* ==== Toast ==== */}
         {toast && <div className="toast">{toast}</div>}
+
       </div>
     </MainLayout>
   );
