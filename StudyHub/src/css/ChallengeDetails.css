@@ -140,7 +140,8 @@
 }
 /* Date icons */
 .dates-row .material-icons {
-  color: #d72929 !important;
+  color: #8b7cd3 !important;   /* بنفسجي */
+  font-size: 20px;
 }
 
 .top-info-row {
@@ -240,11 +241,12 @@
 }
 .dates-row .material-icons {
   font-size: 18px;
-  color: #666;
+  color: #8b7cd3 !important;  /* بنفسجي */
+  vertical-align: middle;
 }
 .dates-row .arrow {
   margin: 0 6px;
-  color: #666;
+  color: #8b7cd3;
 }
 
 /* Description */
