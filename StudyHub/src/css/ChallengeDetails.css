@@ -665,38 +665,6 @@
   font-size: 14px;
 }
 
-/* =============================
-   ICONS THAT SHOULD NOT CHANGE
-============================= */
-
-/* Tab icons */
-.challenge-tabs .material-icons,
-.challenge-tab .material-icons {
-  color: inherit !important;
-}
-
-/* Date icons */
-.dates-row .material-icons {
-  color: #666 !important;
-}
-
-/* Comment date/time */
-.comment-meta-right .material-icons {
-  color: #8b7cd3 !important;
-}
-
-/* Edit/Delete buttons */
-.action-btn.blue .material-icons {
-  color: #4a90e2 !important;
-}
-.action-btn.red .material-icons {
-  color: #d0021b !important;
-}
-
-/* Send button icon */
-.send-btn .material-icons {
-  color: white !important;
-}
 
 /* =====================================================
    RESPONSIVE
