@@ -418,29 +418,33 @@ export default function Challenges() {
                 <div className="progress-section">
 
                   {/* User Progress */}
-                  <label className="progress-label">Your Progress</label>
+                  <div className="progress-header-row">
+                    <span className="progress-label">Your Progress</span>
+                    <span className="progress-value">{c.user_progress || 0}%</span>
+                  </div>
+
                   <div className="progress-bar">
                     <div
                       className="progress-fill"
                       style={{ width: `${c.user_progress || 0}%` }}
                     ></div>
                   </div>
-                  <span className="progress-value">
-                    {c.user_progress || 0}%
-                  </span>
 
                   {/* Group Progress */}
-                  <label className="progress-label">Group Progress</label>
+                  <div className="progress-header-row">
+                    <span className="progress-label">Group Progress</span>
+                    <span className="progress-value">{c.group_progress || 0}%</span>
+                  </div>
+
                   <div className="progress-bar">
                     <div
                       className="progress-fill"
                       style={{ width: `${c.group_progress || 0}%` }}
                     ></div>
                   </div>
-                  <span className="progress-value">
-                    {c.group_progress || 0}%
-                  </span>
+
                 </div>
+
 
                 {/* ACTION BUTTONS */}
                 <div
@@ -489,7 +493,7 @@ export default function Challenges() {
               </div>
             );
           })}
-        </div> {/* ← إغلاق GRID */}
+        </div>
 
         {/* ==== Modal ==== */}
         <ChallengeModal

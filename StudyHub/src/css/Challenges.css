@@ -210,9 +210,19 @@
   gap: 18px;
   margin: 10px 0 20px;
 }
+.progress-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
 
 .progress-label {
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.progress-value {
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -234,11 +244,6 @@
 .level-easy .progress-fill { background: #3140c4; }
 .level-medium .progress-fill { background: #f9cf62; }
 .level-hard .progress-fill { background: #f36b80; }
-
-.progress-value {
-  font-size: 12px;
-  font-weight: 700;
-}
 
 /* =====================================================
    BUTTONS
