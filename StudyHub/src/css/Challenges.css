@@ -352,3 +352,214 @@
   background-color: #c0392b;
 }
 
+/* =====================================================
+   NEW CHALLENGE CARD (Modern UI)
+   — Compatible with challenge-card-wrapper
+===================================================== */
+
+.challenge-card-wrapper {
+  background: #fff;
+  padding: 22px;
+  border-radius: 18px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  min-height: 430px;
+}
+
+.challenge-card-wrapper:hover {
+  transform: translateY(-4px);
+}
+
+/* ========== Title ========== */
+.challenge-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #000;
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+/* ========== Creator + Level + Status Row ========== */
+.challenge-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* Creator */
+.challenge-by {
+  font-size: 14px;
+  font-weight: 600;
+  color: #888;
+}
+
+/* Level Box */
+.challenge-level {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* Status Badge */
+.challenge-status-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.challenge-status-badge.active {
+  background-color: #4CAF50;
+}
+
+.challenge-status-badge.upcoming {
+  background-color: #3498db;
+}
+
+.challenge-status-badge.ended {
+  background-color: #888;
+}
+
+/* ========== Description ========== */
+.challenge-desc {
+  font-size: 14px;
+  text-align: center;
+  color: #222;
+  margin-bottom: 18px;
+}
+
+/* ========== Participants Row ========== */
+.challenge-part-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+/* ========== Rewards Row (Optional) ========== */
+.challenge-reward-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #444;
+  font-size: 13px;
+  margin-bottom: 18px;
+}
+
+/* ========== Progress Section ========== */
+.progress-section {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.progress-label {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 9px;
+  background: #e0e0e0;
+  border-radius: 50px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 50px;
+  transition: width 0.35s ease;
+}
+
+/* Colors based on Level */
+.level-easy .progress-fill {
+  background-color: #3140c4;
+}
+.level-medium .progress-fill {
+  background-color: #f9cf62;
+}
+.level-hard .progress-fill {
+  background-color: #f36b80;
+}
+
+.progress-value {
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: -4px;
+}
+
+/* ========== Buttons ========== */
+.challenge-card-actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.challenge-btn {
+  width: 100%;
+  padding: 12px 0;
+  border-radius: 12px;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  color: white;
+}
+
+/* Join / Leave Colors */
+.level-easy .challenge-btn.join,
+.level-easy .challenge-btn.leave {
+  background-color: #3140c4;
+}
+.level-medium .challenge-btn.join,
+.level-medium .challenge-btn.leave {
+  background-color: #f9cf62;
+}
+.level-hard .challenge-btn.join,
+.level-hard .challenge-btn.leave {
+  background-color: #f36b80;
+}
+
+/* Hover */
+.level-easy .challenge-btn:hover {
+  background-color: #2633a6;
+}
+.level-medium .challenge-btn:hover {
+  background-color: #e6b941;
+}
+.level-hard .challenge-btn:hover {
+  background-color: #e34a65;
+}
+
+/* Full */
+.challenge-btn.full {
+  background-color: #777;
+  cursor: not-allowed;
+}
+
+/* Ended */
+.challenge-btn.ended {
+  background-color: #555;
+  cursor: not-allowed;
+}
+
+/* Edit & Delete */
+.challenge-btn.edit {
+  background-color: #3498db;
+}
+.challenge-btn.delete {
+  background-color: #e74c3c;
+}
