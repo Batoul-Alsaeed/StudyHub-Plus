@@ -190,11 +190,12 @@
 
 /* Status Badge */
 .status-badge {
-  padding: 6px 14px;
-  border-radius: 24px;
-  font-weight: 700;
-  font-size: 14px;
-  color: white;
+  padding: 4px 10px;
+  border-radius: 10px;  /* مستدير أكثر */
+  font-weight: 600;
+  font-size: 13px;
+  display: inline-block;
+  margin-left: 4px;
 }
 .status-upcoming {
   background: #777;
