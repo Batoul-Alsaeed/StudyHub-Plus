@@ -196,6 +196,7 @@
   font-size: 13px;
   display: inline-block;
   margin-left: 4px;
+  color: white;
 }
 .status-upcoming {
   background: #777;
