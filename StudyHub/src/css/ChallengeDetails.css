@@ -167,11 +167,25 @@
   font-weight: 700;
   font-size: 14px;
   border: none;               /* إزالة الإطار */
-  background: var(--icon-color, #ccc0); /* خلفية بلون الصعوبة */
-  color: var(--icon-color);  /* لون النص */
+
   display: inline-flex;
   align-items: center;
   gap: 6px;
+}
+.level-easy {
+  color: #3140c4;
+  border-color: #3140c4;
+  background: rgba(49, 64, 196, 0.08);
+}
+.level-medium {
+  color: #dfa600;
+  border-color: #dfa600;
+  background: rgba(223, 166, 0, 0.12);
+}
+.level-hard {
+  color: #d64058;
+  border-color: #d64058;
+  background: rgba(214, 64, 88, 0.12);
 }
 
 /* Status Badge */
