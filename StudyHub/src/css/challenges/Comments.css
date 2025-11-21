@@ -104,6 +104,13 @@
   margin: 8px 0;
 }
 
+/* FORCE COMMENT TEXT TO ALIGN UNDER USERNAME, NOT UNDER AVATAR */
+.comment-body {
+  display: flex;
+  flex-direction: column;
+  margin-left: 44px;
+}
+
 /* ===== EDIT / DELETE =====*/
 .comment-actions-row {
   margin-top: 10px;

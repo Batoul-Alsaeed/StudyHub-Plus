@@ -586,12 +586,14 @@ export default function ChallengeDetails() {
                                     <span className="material-icons meta-icon">schedule</span>
                                     <span className="comment-meta-text">{t}</span>
                                   </div>
-
                                 </div>
                               </div>
+                              
 
                               {/* COMMENT TEXT */}
-                              <p className="comment-text">{c.content}</p>
+                              <div className="comment-body">
+                                <p className="comment-text">{c.content}</p>
+                              </div>
 
                               {/* FOOTER - ACTION BUTTONS — BELOW */}
                               <div className="comment-footer-line">
