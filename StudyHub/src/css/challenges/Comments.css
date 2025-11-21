@@ -94,6 +94,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
+  flex-direction: row-reverse;
 }
 
 /* ===== COMMENT TEXT =====*/
