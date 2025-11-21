@@ -383,8 +383,16 @@ export default function Challenges() {
               >
                 {/* Title */}
                 <h2 className="challenge-title">{c.title}</h2>
-
-                {/* Creator + Level + Status */}
+                  {/* Status UNDER the title */}
+                  <span
+                  className={`challenge-status-badge ${
+                      isEnded ? "ended" : c._status.toLowerCase()
+                    }`}
+                  >
+                    {isEnded ? "Ended" : c._status}
+                  </span>
+            
+                {/* Creator + Level*/}
                 <div className="challenge-info-row">
                   <p className="challenge-by">By {c.creator_name}</p>
 
