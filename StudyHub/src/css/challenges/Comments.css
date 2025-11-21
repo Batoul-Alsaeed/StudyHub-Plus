@@ -65,7 +65,7 @@
 }
 
 /* LEFT PART (Avatar + Name) */
-.comment-head-left {
+.comment-left {
   display: flex;
   align-items: center;
   gap: 10px;

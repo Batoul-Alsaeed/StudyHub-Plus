@@ -203,6 +203,9 @@
 .challenge-requirements {
   margin-top: 20px;
 }
+.task-preview-more {
+  margin-bottom: 16px;
+}
 
 /* Title */
 .challenge-requirements h4 {
