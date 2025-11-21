@@ -89,8 +89,8 @@
   color: #666;
 }
 
-.date-line,
-.time-line {
+.challenge-comments .date-line,
+.challenge-comments .time-line {
   display: flex;
   align-items: center;
   gap: 4px;
