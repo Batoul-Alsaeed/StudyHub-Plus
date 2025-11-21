@@ -167,6 +167,15 @@
   max-height: 38px;
 }
 
+.desc-more-btn {
+  background: none;
+  border: none;
+  color: #3140c4;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 0;
+}
+
 /* Participants */
 .challenge-part-row {
   display: flex;
@@ -214,7 +223,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .progress-label {
@@ -232,6 +241,7 @@
   background: #eee;
   border-radius: 50px;
   overflow: hidden;
+  margin-top: 0px;
 }
 
 .progress-fill {
@@ -299,7 +309,9 @@
   font-size: 12px;
   font-weight: 600;
   color: #666;
-  margin-top: 4px;
+  margin-top: 10px;
+  margin-bottom: 12px;
+  display: inline-block;
 }
 
 /* =====================================================
