@@ -73,8 +73,9 @@
 .form-group input,
 .form-group textarea,
 .form-group select {
+  width: 95%;
   border: 1px solid #ddd;
-  border-radius: 18px;
+  border-radius: 30px;
   padding: 12px 14px;
   font-size: 14px;
   background-color: #fafafa;
@@ -85,15 +86,27 @@
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
-  border-color: #3140c4;
+  border-color: #FFC727;
   background-color: #fff;
-  box-shadow: 0 0 0 2px rgba(49, 64, 196, 0.15);
+  box-shadow: 0 0 0 1px rgba(255, 199, 39, 0.18);
 }
 
 textarea {
   resize: vertical;
-  min-height: 70px;
+  min-height: 40px;
   max-height: 120px;
+  border-radius: 16px;
+}
+
+.row-two {
+  display: flex;
+  gap: 30px;          /* المسافة بينهم */
+  align-items: flex-start;
+  width: 80%;
+}
+
+.row-two .half {
+  flex: 1;
 }
 
 /* =====================================================
@@ -151,15 +164,32 @@ textarea {
   align-items: center;
   gap: 8px;
   margin-bottom: 10px;
+  flex-wrap: nowrap;
 }
 
 .requirements-input input {
   flex: 1;
+  height: 10px;
+  width: 50%;
+}
+
+.task-input {
+  height: 40px !important;
+  padding: 0 14px !important;
+  border-radius: 30px !important;
+  margin: 0 !important;
+  line-height: 40px;
+  display: flex;
+  align-items: center;
 }
 
 .requirements-input button {
-  background-color: #8a80c9;
-  padding: 8px 14px;
+  background-color: #8b7cd3;
+  height: 40px;
+  padding: 0 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 10px;
   color: white;
   font-weight: 600;
@@ -169,7 +199,7 @@ textarea {
 }
 
 .requirements-input button:hover {
-  background-color: #2633a5;
+  background-color: #7263b9;
 }
 
 /* List */
@@ -202,6 +232,33 @@ textarea {
 }
 .remove-btn:hover {
   transform: scale(1.2);
+}
+
+.date-row {
+  display: flex;
+  gap: 30px;          /* المسافة بينهم */
+  align-items: flex-start;
+  width: 100%;
+}
+.date-row .half {
+  flex: 1;
+}
+
+.date-input {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 30px;
+  padding: 12px 14px;
+  font-size: 14px;
+  background-color: #fafafa;
+  outline: none;
+  transition: 0.3s;
+}
+
+.date-input:focus {
+  border-color: #FFC727;
+  background-color: #fff;
+  box-shadow: 0 0 0 1px rgba(255, 199, 39, 0.18);
 }
 
 /* =====================================================

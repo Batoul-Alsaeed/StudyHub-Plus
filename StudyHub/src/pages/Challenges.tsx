@@ -383,14 +383,7 @@ export default function Challenges() {
               >
                 {/* Title */}
                 <h2 className="challenge-title">{c.title}</h2>
-                  {/* Status UNDER the title */}
-                  <span
-                  className={`challenge-status-badge ${
-                      isEnded ? "ended" : c._status.toLowerCase()
-                    }`}
-                  >
-                    {isEnded ? "Ended" : c._status}
-                  </span>
+
             
                 {/* Creator + Level*/}
                 <div className="challenge-info-row">
@@ -400,16 +393,17 @@ export default function Challenges() {
                     <span className="material-icons">bar_chart</span>
                     <span>{c.level} Level</span>
                   </div>
+                </div>
 
-                  <div className="challenge-status-row">
+                {/* Status */}
+                <div className="challenge-status-row-top">
                   <span
-                  className={`challenge-status-badge ${
+                    className={`challenge-status-badge ${
                       isEnded ? "ended" : c._status.toLowerCase()
                     }`}
                   >
                     {isEnded ? "Ended" : c._status}
                   </span>
-                  </div>
                 </div>
 
                 {/* Description */}

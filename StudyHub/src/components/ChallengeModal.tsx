@@ -3,6 +3,7 @@ import Modal from "react-modal";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../css/ChallengeModal.css";
+import "../css/calendar.css";
 
 Modal.setAppElement("#root");
 
@@ -125,6 +126,7 @@ export default function ChallengeModal({
           <label>Requirements / Tasks</label>
           <div className="requirements-input">
             <input
+              className="task-input"
               value={newRequirement}
               onChange={(e) => setNewRequirement(e.target.value)}
               placeholder="Add a task..."
@@ -149,53 +151,59 @@ export default function ChallengeModal({
           </ul>
         </div>
 
-        {/* Difficulty buttons */}
-        <div className="form-group">
-          <label>Difficulty Level</label>
-          <div className="difficulty-options">
-            {["Easy", "Medium", "Hard"].map((option) => (
-              <button
-                key={option}
-                type="button"
-                className={`difficulty-btn ${option.toLowerCase()} ${
-                  level === option ? "active" : ""
-                }`}
-                onClick={() => setLevel(option)}
-              >
-                {option}
-              </button>
-            ))}
+        <div className="row-two">
+          {/* Difficulty buttons */}
+          <div className="form-group half">
+            <label>Difficulty Level</label>
+            <div className="difficulty-options">
+              {["Easy", "Medium", "Hard"].map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  className={`difficulty-btn ${option.toLowerCase()} ${
+                    level === option ? "active" : ""
+                  }`}
+                  onClick={() => setLevel(option)}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="form-group half">
+            <label>Max Participants</label>
+            <input
+              type="number"
+              min={1}
+              value={maxParticipants}
+              onChange={(e) => setMaxParticipants(Number(e.target.value))}
+            />
           </div>
         </div>
 
-        <div className="form-group">
-          <label>Max Participants</label>
-          <input
-            type="number"
-            min={1}
-            value={maxParticipants}
-            onChange={(e) => setMaxParticipants(Number(e.target.value))}
-          />
-        </div>
+        <div className="row-two">
+          <div className="form-group half">
+            <label>Start Date</label>
+            <DatePicker
+              selected={startDate}
+              onChange={(d) => setStartDate(d)}
+              className="date-input"
+              calendarClassName={`date-${level.toLowerCase()}`}
+              dateFormat="yyyy-MM-dd"
+            />
+          </div>
 
-        <div className="form-group">
-          <label>Start Date</label>
-          <DatePicker
-            selected={startDate}
-            onChange={(d) => setStartDate(d)}
-            className="date-input"
-            dateFormat="yyyy-MM-dd"
-          />
-        </div>
-
-        <div className="form-group">
-          <label>End Date</label>
-          <DatePicker
-            selected={endDate}
-            onChange={(d) => setEndDate(d)}
-            className="date-input"
-            dateFormat="yyyy-MM-dd"
-          />
+          <div className="form-group half">
+            <label>End Date</label>
+            <DatePicker
+              selected={endDate}
+              onChange={(d) => setEndDate(d)}
+              className="date-input"
+              calendarClassName={`date-${level.toLowerCase()}`}
+              dateFormat="yyyy-MM-dd"
+            />
+          </div>
         </div>
 
         <div className="modal-actions">
