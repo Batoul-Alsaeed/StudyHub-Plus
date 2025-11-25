@@ -357,8 +357,6 @@
 }
 
 /* Edit / Delete */
-.challenge-btn.edit { background: #3498db; }
-.challenge-btn.delete { background: #e74c3c; }
 .card-actions-top {
   position: absolute;
   top: 12px;
