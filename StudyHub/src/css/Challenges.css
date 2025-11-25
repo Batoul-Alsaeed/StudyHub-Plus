@@ -1,8 +1,6 @@
 @import url("https://fonts.googleapis.com/icon?family=Material+Icons");
 
-/* =====================================================
-   ROOT CONTAINER
-===================================================== */
+/* ========== ROOT CONTAINER ========== */
 .challenges-container {
   min-height: 100vh;
   padding: 40px 60px;
@@ -12,11 +10,7 @@
   font-family: "DM Sans", sans-serif;
 }
 
-
-
-/* =====================================================
-   HEADER
-===================================================== */
+/* ========== HEADER ========== */
 .challenges-header {
   width: 100%;
   max-width: 1100px;
@@ -46,9 +40,7 @@
   background-color: #7b6bd9;
 }
 
-/* =====================================================
-   TABS
-===================================================== */
+/* ========== TABS ========== */
 .challenges-tabs {
   display: flex;
   gap: 14px;
@@ -71,9 +63,7 @@
   color: white;
 }
 
-/* =====================================================
-   GRID
-===================================================== */
+/* ========== GRID ========== */
 .challenges-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -82,9 +72,7 @@
   max-width: 1200px;
 }
 
-/* =====================================================
-   CARD (FINAL VERSION)
-===================================================== */
+/* ========== CARD ========== */
 .challenge-card-wrapper {
   background: #fff;
   padding: 22px;
@@ -101,7 +89,7 @@
   transform: translateY(-4px);
 }
 
-/* === Dynamic Colors for Cards === */
+/* Dynamic Colors for Cards */
 .challenge-card-wrapper.level-easy {
   background-color: #3140C417 !important;
 }
@@ -113,7 +101,6 @@
 .challenge-card-wrapper.level-hard {
   background-color: #F36B8017 !important;
 }
-
 
 /* Title */
 .challenge-title {
@@ -144,8 +131,10 @@
 .challenge-level {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 2px;
   font-weight: 700;
+  font-size: 16px;
+
 }
 
 /* Status */
@@ -198,15 +187,6 @@
   max-height: 38px;
 }
 
-.desc-more-btn {
-  background: none;
-  border: none;
-  color: #3140c4;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 2px 0;
-}
-
 /* Participants */
 .challenge-part-row {
   display: flex;
@@ -241,20 +221,19 @@
   margin-bottom: 16px;
 }
 
-/* =====================================================
-   PROGRESS
-===================================================== */
+/* Progress */
 .progress-section {
   display: flex;
   flex-direction: column;
   gap: 18px;
-  margin: 10px 0 20px;
+  margin: 10px 0 10px;
 }
+
 .progress-header-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: 0px;
 }
 
 .progress-label {
@@ -270,7 +249,7 @@
 .progress-bar {
   height: 8px;
   width: 100%;
-  background: #eee;
+  background: #bebebe;
   border-radius: 50px;
   overflow: hidden;
   margin-top: 0px;
@@ -310,7 +289,6 @@
   color: #353535;
 }
 
-/* Icon shape */
 .task-check-icon {
   width: 18px;
   height: 18px;
@@ -322,17 +300,10 @@
 }
 
 /* COLORS by difficulty */
-.level-easy .task-check-icon {
-  color: #3140C4;
-}
+.level-easy .task-check-icon { color: #3140C4; }
+.level-medium .task-check-icon { color: #f5b301; }
+.level-hard .task-check-icon { color: #f36b80; }
 
-.level-medium .task-check-icon {
-  color: #f5b301;
-}
-
-.level-hard .task-check-icon {
-  color: #f36b80;
-}
 
 /* "+ more" text */
 .task-preview-more {
@@ -344,14 +315,13 @@
   display: inline-block;
 }
 
-/* =====================================================
-   BUTTONS
-===================================================== */
+/* ========== BUTTONS ========== */
 .challenge-card-actions {
   margin-top: auto;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  padding-top: 15px;
 }
 
 .challenge-btn {
@@ -366,10 +336,10 @@
   transition: 0.25s;
 }
 
-/* Join/Leave */
-.level-easy .challenge-btn.join, .level-easy .challenge-btn.leave { background: #3140c4; }
-.level-medium .challenge-btn.join, .level-medium .challenge-btn.leave { background: #f9cf62; color: #000; }
-.level-hard .challenge-btn.join, .level-hard .challenge-btn.leave { background: #f36b80; }
+/* Join/Leave/Full */
+.level-easy .challenge-btn.join, .level-easy .challenge-btn.leave, .level-hard .challenge-btn.full { background: #3140C4; }
+.level-medium .challenge-btn.join, .level-medium .challenge-btn.leave, .level-hard .challenge-btn.full { background: #f9cf62; }
+.level-hard .challenge-btn.join, .level-hard .challenge-btn.leave, .level-hard .challenge-btn.full { background: #f36b80; }
 
 /* Hover */
 .level-easy .challenge-btn:hover { background: #2633a5; }
@@ -378,12 +348,11 @@
 
 /* Disabled Buttons */
 .challenge-btn.full {
-  background: #999;
   cursor: not-allowed;
 }
 
 .challenge-btn.ended {
-  background: #7f7f7f;
+  background: #57575799;
   cursor: not-allowed;
 }
 
