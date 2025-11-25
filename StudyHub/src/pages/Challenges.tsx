@@ -381,6 +381,26 @@ export default function Challenges() {
                   })
                 }
               >
+                <div className="card-actions-top" onClick={(e) => e.stopPropagation()}>
+                  {owner && !isEnded && (
+                    <>
+                      <span
+                        className="material-icons edit-icon"
+                        onClick={() => handleEdit(c)}
+                      >
+                        edit
+                      </span>
+
+                      <span
+                        className="material-icons delete-icon"
+                        onClick={() => handleDelete(c.id)}
+                      >
+                        delete
+                      </span>
+                    </>
+                  )}
+                </div>
+
                 {/* Title */}
                 <h2 className="challenge-title">{c.title}</h2>
 

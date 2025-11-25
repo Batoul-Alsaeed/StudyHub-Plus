@@ -359,3 +359,30 @@
 /* Edit / Delete */
 .challenge-btn.edit { background: #3498db; }
 .challenge-btn.delete { background: #e74c3c; }
+.card-actions-top {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 10px;
+  z-index: 5;
+}
+
+.card-actions-top .material-icons {
+  font-size: 20px;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: 0.2s;
+}
+
+.card-actions-top .material-icons:hover {
+  opacity: 1;
+}
+
+.edit-icon {
+  color: #3498db;
+}
+
+.delete-icon {
+  color: #e74c3c;
+}
