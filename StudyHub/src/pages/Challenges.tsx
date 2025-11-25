@@ -404,7 +404,6 @@ export default function Challenges() {
                 {/* Title */}
                 <h2 className="challenge-title">{c.title}</h2>
 
-            
                 {/* Creator + Level*/}
                 <div className="challenge-info-row">
                   <p className="challenge-by">By {c.creator_name}</p>
@@ -496,21 +495,6 @@ export default function Challenges() {
                     <button className="challenge-btn ended" disabled>
                       Ended
                     </button>
-                  ) : owner ? (
-                    <>
-                      <button
-                        className="challenge-btn edit"
-                        onClick={() => handleEdit(c)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="challenge-btn delete"
-                        onClick={() => handleDelete(c.id)}
-                      >
-                        Delete
-                      </button>
-                    </>
                   ) : member ? (
                     <button
                       className="challenge-btn leave"
