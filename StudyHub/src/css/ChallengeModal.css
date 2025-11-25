@@ -1,6 +1,5 @@
 /* =====================================================
-   CHALLENGE MODAL — CLEAN VERSION
-   File: ChallengeModal.css
+   CHALLENGE MODAL
 ===================================================== */
 
 /* ===== Overlay ===== */
@@ -100,7 +99,7 @@ textarea {
 
 .row-two {
   display: flex;
-  gap: 30px;          /* المسافة بينهم */
+  gap: 30px;
   align-items: flex-start;
   width: 80%;
 }
@@ -236,7 +235,7 @@ textarea {
 
 .date-row {
   display: flex;
-  gap: 30px;          /* المسافة بينهم */
+  gap: 30px;
   align-items: flex-start;
   width: 100%;
 }

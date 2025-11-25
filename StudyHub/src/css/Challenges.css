@@ -111,7 +111,7 @@
 
 }
 
-/* Creator + Level + Status */
+/* Creator + Level */
 .challenge-info-row {
   display: flex;
   justify-content: space-between;
@@ -132,6 +132,7 @@
   font-weight: 700;
 }
 
+/* Status */
 .challenge-status-row {
   margin-top: 0px;
   display: flex;
@@ -148,8 +149,6 @@
   background: rgba(255, 255, 255, 0.25);
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-  display: inline-block;
 }
 
 .challenge-status-badge.active {

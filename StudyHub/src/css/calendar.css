@@ -12,7 +12,7 @@
   font-family: "DM Sans", sans-serif;
 }
 
-/* ====== FIX HEADER LAYOUT ====== */
+/* HEADER LAYOUT */
 .react-datepicker__header {
   background: #ffffff !important;
   border-bottom: 1px solid #eee !important;
@@ -20,10 +20,10 @@
 
   display: flex !important;
   align-items: center !important;
-  justify-content: space-between !important; /* الأسهم + العنوان بنفس السطر */
+  justify-content: space-between !important;
 }
 
-/* ====== NAV BUTTONS (previous/next arrows) ====== */
+/* NAV BUTTONS (previous/next arrows) */
 .react-datepicker__navigation {
   top: 12px !important;
 }
@@ -33,12 +33,12 @@
   border-width: 2px 2px 0 0 !important;
 }
 
-/* ====== MONTH TITLE ====== */
+/* MONTH TITLE */
 .react-datepicker__current-month {
-  font-size: 16px !important;        /* قللناه */
+  font-size: 16px !important;
   font-weight: 600 !important;
-  color: #8b7cd3 !important;          /* بنفسجي */
-  margin: 0 auto !important;          /* يتوسط بين السهمين */
+  color: #8b7cd3 !important;
+  margin: 0 auto !important;
   padding: 0 !important;
 }
 

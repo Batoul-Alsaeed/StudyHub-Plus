@@ -381,137 +381,140 @@ export default function Challenges() {
                   })
                 }
               >
-                {/* Title */}
-                <h2 className="challenge-title">{c.title}</h2>
-
-            
-                {/* Creator + Level*/}
-                <div className="challenge-info-row">
-                  <p className="challenge-by">By {c.creator_name}</p>
-
-                  <div className="challenge-level">
-                    <span className="material-icons">bar_chart</span>
-                    <span>{c.level} Level</span>
-                  </div>
-                </div>
-
-                {/* Status */}
-                <div className="challenge-status-row-top">
-                  <span
-                    className={`challenge-status-badge ${
-                      isEnded ? "ended" : c._status.toLowerCase()
-                    }`}
-                  >
-                    {isEnded ? "Ended" : c._status}
-                  </span>
-                </div>
-
-                {/* Description */}
-                <p className="challenge-desc">{c.description}</p>
-
-                {/* Participants */}
-                <div className="challenge-part-row">
-                  <span className="material-icons">groups</span>
-                  <span className="participants-text"> 
-                  <strong>{c._participantsCount}</strong> / {c.max_participants} Members</span>
-                </div>
-
-                {/* Progress */}
-                <div className="progress-section">
-
-                  {/* User Progress */}
-                  <div className="progress-header-row">
-                    <span className="progress-label">Your Progress</span>
-                    <span className="progress-value">{c.user_progress || 0}%</span>
-                  </div>
-
-                  <div className="progress-bar">
-                    <div
-                      className="progress-fill"
-                      style={{ width: `${c.user_progress || 0}%` }}
-                    ></div>
-                  </div>
-
-                  {/* Group Progress */}
-                  <div className="progress-header-row">
-                    <span className="progress-label">Group Progress</span>
-                    <span className="progress-value">{c.group_progress || 0}%</span>
-                  </div>
-
-                  <div className="progress-bar">
-                    <div
-                      className="progress-fill"
-                      style={{ width: `${c.group_progress || 0}%` }}
-                    ></div>
-                  </div>
-
-                </div>
-
-                {/* Tasks Preview */}
-                <div className="tasks-preview">
-                  <label className="tasks-title">Requirements</label>
-
-                  {/* Show max 3 tasks */}
-                  {c.tasks.slice(0, 3).map((t: any) => (
-                  <div key={t.id} className="task-preview-item">
-                    <span className="task-check-icon">✔</span>
-                    <span>{t.title}</span>
-                  </div>
-                  ))}
+                <div className="challenges-page">
+                  {/* Title */}
                   
-                  {/* If more tasks exist */}
-                  {c.tasks.length > 3 && (
-                    <div className="task-preview-more">
-                      +{c.tasks.length - 3} more...
-                    </div>
-                  )}
-                </div>
+                    <h2 className="challenge-title">{c.title}</h2>
 
-                {/* ACTION BUTTONS */}
-                <div
-                  className="challenge-card-actions"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {isEnded ? (
-                    <button className="challenge-btn ended" disabled>
-                      Ended
-                    </button>
-                  ) : owner ? (
-                    <>
-                      <button
-                        className="challenge-btn edit"
-                        onClick={() => handleEdit(c)}
+                
+                    {/* Creator + Level*/}
+                    <div className="challenge-info-row">
+                      <p className="challenge-by">By {c.creator_name}</p>
+
+                      <div className="challenge-level">
+                        <span className="material-icons">bar_chart</span>
+                        <span>{c.level} Level</span>
+                      </div>
+                    </div>
+
+                    {/* Status */}
+                    <div className="challenge-status-row-top">
+                      <span
+                        className={`challenge-status-badge ${
+                          isEnded ? "ended" : c._status.toLowerCase()
+                        }`}
                       >
-                        Edit
-                      </button>
-                      <button
-                        className="challenge-btn delete"
-                        onClick={() => handleDelete(c.id)}
-                      >
-                        Delete
-                      </button>
-                    </>
-                  ) : member ? (
-                    <button
-                      className="challenge-btn leave"
-                      onClick={() => handleLeave(c.id)}
+                        {isEnded ? "Ended" : c._status}
+                      </span>
+                    </div>
+
+                    {/* Description */}
+                    <p className="challenge-desc">{c.description}</p>
+
+                    {/* Participants */}
+                    <div className="challenge-part-row">
+                      <span className="material-icons">groups</span>
+                      <span className="participants-text"> 
+                      <strong>{c._participantsCount}</strong> / {c.max_participants} Members</span>
+                    </div>
+
+                    {/* Progress */}
+                    <div className="progress-section">
+
+                      {/* User Progress */}
+                      <div className="progress-header-row">
+                        <span className="progress-label">Your Progress</span>
+                        <span className="progress-value">{c.user_progress || 0}%</span>
+                      </div>
+
+                      <div className="progress-bar">
+                        <div
+                          className="progress-fill"
+                          style={{ width: `${c.user_progress || 0}%` }}
+                        ></div>
+                      </div>
+
+                      {/* Group Progress */}
+                      <div className="progress-header-row">
+                        <span className="progress-label">Group Progress</span>
+                        <span className="progress-value">{c.group_progress || 0}%</span>
+                      </div>
+
+                      <div className="progress-bar">
+                        <div
+                          className="progress-fill"
+                          style={{ width: `${c.group_progress || 0}%` }}
+                        ></div>
+                      </div>
+
+                    </div>
+
+                    {/* Tasks Preview */}
+                    <div className="tasks-preview">
+                      <label className="tasks-title">Requirements</label>
+
+                      {/* Show max 3 tasks */}
+                      {c.tasks.slice(0, 3).map((t: any) => (
+                      <div key={t.id} className="task-preview-item">
+                        <span className="task-check-icon">✔</span>
+                        <span>{t.title}</span>
+                      </div>
+                      ))}
+                      
+                      {/* If more tasks exist */}
+                      {c.tasks.length > 3 && (
+                        <div className="task-preview-more">
+                          +{c.tasks.length - 3} more...
+                        </div>
+                      )}
+                    </div>
+
+                    {/* ACTION BUTTONS */}
+                    <div
+                      className="challenge-card-actions"
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      Leave
-                    </button>
-                  ) : full ? (
-                    <button className="challenge-btn full" disabled>
-                      Full
-                    </button>
-                  ) : (
-                    <button
-                      className="challenge-btn join"
-                      onClick={() => handleJoin(c.id)}
-                    >
-                      Join
-                    </button>
-                  )}
+                      {isEnded ? (
+                        <button className="challenge-btn ended" disabled>
+                          Ended
+                        </button>
+                      ) : owner ? (
+                        <>
+                          <button
+                            className="challenge-btn edit"
+                            onClick={() => handleEdit(c)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className="challenge-btn delete"
+                            onClick={() => handleDelete(c.id)}
+                          >
+                            Delete
+                          </button>
+                        </>
+                      ) : member ? (
+                        <button
+                          className="challenge-btn leave"
+                          onClick={() => handleLeave(c.id)}
+                        >
+                          Leave
+                        </button>
+                      ) : full ? (
+                        <button className="challenge-btn full" disabled>
+                          Full
+                        </button>
+                      ) : (
+                        <button
+                          className="challenge-btn join"
+                          onClick={() => handleJoin(c.id)}
+                        >
+                          Join
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
             );
           })}
         </div>
