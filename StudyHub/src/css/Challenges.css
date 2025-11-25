@@ -12,6 +12,8 @@
   font-family: "DM Sans", sans-serif;
 }
 
+
+
 /* =====================================================
    HEADER
 ===================================================== */
@@ -25,7 +27,7 @@
 }
 
 .challenges-header h1 {
-  color: #001b44;
+  color: #1a1a1a;
   font-weight: 700;
   font-size: 28px;
 }
@@ -65,7 +67,7 @@
 }
 
 .challenges-tab.active {
-  background-color: #8c7ae6;
+  background-color: #8a80c9;
   color: white;
 }
 
@@ -87,7 +89,7 @@
   background: #fff;
   padding: 22px;
   border-radius: 18px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  box-shadow: none;
   display: flex;
   flex-direction: column;
   min-height: 500px;
@@ -98,6 +100,20 @@
 .challenge-card-wrapper:hover {
   transform: translateY(-4px);
 }
+
+/* === Dynamic Colors for Cards === */
+.challenge-card-wrapper.level-easy {
+  background-color: #3140C417 !important;
+}
+
+.challenge-card-wrapper.level-medium {
+  background-color: #F9CF6217 !important;
+}
+
+.challenge-card-wrapper.level-hard {
+  background-color: #F36B8017 !important;
+}
+
 
 /* Title */
 .challenge-title {
@@ -122,7 +138,7 @@
 .challenge-by {
   font-size: 14px;
   font-weight: 600;
-  color: #777;
+  color: #646464;
 }
 
 .challenge-level {
@@ -204,7 +220,7 @@
 .participants-text {
   font-size: 13px;
   font-weight: 600;
-  color: #777;
+  color: #5d5c5c;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -242,8 +258,9 @@
 }
 
 .progress-label {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
+  color: #383737;
 }
 .progress-value {
   font-size: 12px;
@@ -286,10 +303,11 @@
 .task-preview-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 6px;
+  gap: 10px;
+  margin-bottom: 10px;
   font-size: 13px;
   font-weight: 600;
+  color: #353535;
 }
 
 /* Icon shape */
@@ -305,25 +323,22 @@
 
 /* COLORS by difficulty */
 .level-easy .task-check-icon {
-  background: #3140c4;
-  color: white;
+  color: #3140C4;
 }
 
 .level-medium .task-check-icon {
-  background: #f9cf62;
-  color: #000;
+  color: #f5b301;
 }
 
 .level-hard .task-check-icon {
-  background: #f36b80;
-  color: #fff;
+  color: #f36b80;
 }
 
 /* "+ more" text */
 .task-preview-more {
   font-size: 12px;
   font-weight: 600;
-  color: #666;
+  color: #595959;
   margin-top: 10px;
   margin-bottom: 12px;
   display: inline-block;
@@ -368,7 +383,7 @@
 }
 
 .challenge-btn.ended {
-  background: #666;
+  background: #7f7f7f;
   cursor: not-allowed;
 }
 

@@ -464,13 +464,15 @@ export default function ChallengeDetails() {
                           key={t.id}
                           className={`task-item ${t.done ? "done" : ""}`}
                           onClick={() => handleToggleTask(t.id!)}
-                          style={{
-                            cursor: challengeEnded ? "not-allowed" : "pointer",
-                            opacity: challengeEnded ? 0.5 : 1,
-                          }}
+
+                          //onClick={() => handleToggleTask(t.id!)}
+                          //style={{
+                            //cursor: challengeEnded ? "not-allowed" : "pointer",
+                            //opacity: challengeEnded ? 0.5 : 1,
+                          //}}
                         >
                           <span className="material-icons check-icon">
-                            {t.done ? "check_circle" : "radio_button_unchecked"}
+                            {t.done ? "task_alt" : "radio_button_unchecked"}
                           </span>
 
                           <span className="task-title">{t.title}</span>
@@ -566,7 +568,6 @@ export default function ChallengeDetails() {
                             <Avatar name={c.user_name} />
 
                             <div style={{ flex: 1 }}>*/}
-
 
                               {/* HEADER */}
                               <div className="comment-header-line">
